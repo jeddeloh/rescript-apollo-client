@@ -1,0 +1,1 @@
+module GraphQLError = Error_GraphQLError;

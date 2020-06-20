@@ -1,0 +1,42 @@
+{
+  "name": "@jeddeloh/bs-apollo--client",
+  "version": "0.0.0",
+  "description": "Bindings to @apollo/client",
+  "keywords": [
+    "apollo",
+    "graphql",
+    "reasonml",
+    "bucklescript",
+    "ocaml"
+  ],
+  "author": "Joel Jeddeloh <jeddeloh@gmail.com>",
+  "homepage": "https://github.com/jeddeloh/bs-apollographql/apollo-client#readme",
+  "license": "MIT",
+  "files": [
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jeddeloh/bs-apollographql.git"
+  },
+  "scripts": {
+    "clean": "bsb -clean-world",
+    "start": "bsb -make-world -w",
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/jeddeloh/bs-apollographql/issues"
+  },
+  "devDependencies": {
+    "bs-platform": "^7.3.2",
+    "reason-react": "^0.9.1"
+  },
+  "peerDependencies": {
+    "reason-react": "^0.9.1"
+  },
+  "dependencies": {
+    "@jeddeloh/bs-apollo--graphql": "^0.0.0",
+    "@jeddeloh/bs-apollo--graphql-tag": "^0.0.0",
+    "@jeddeloh/bs-apollo--zen-observable": "^0.0.0"
+  }
+}

@@ -1,3 +1,3 @@
-# Expermimental Bindings to @apollo/client
+# Expermimental Bindings to `@apollo/client`
 
 Don't use this yet :)

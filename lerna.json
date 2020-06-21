@@ -1,6 +1,0 @@
-{
-  "npmClient": "yarn",
-  "packages": ["packages/@apollo/*", "packages/*", "EXAMPLES"],
-  "useWorkspaces": true,
-  "version": "independent"
-}

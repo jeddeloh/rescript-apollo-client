@@ -1,10 +1,10 @@
 {
   "name": "examples",
   "graphql": {
-    "extend-query": "Apollo.Client.Extend.Query",
-    "extend-query-no-required-variables": "Apollo.Client.Extend.QueryNoRequiredVariables",
-    "extend-subscription": "Apollo.Client.Extend.Subscription",
-    "extend-subscription-no-required-variables": "Apollo.Client.Extend.SubscriptionNoRequiredVariables"
+    "extend-query": "ApolloClient.GraphQL_PPX.ExtendQuery",
+    "extend-query-no-required-variables": "ApolloClient.GraphQL_PPX.ExtendQueryNoRequiredVariables",
+    "extend-subscription": "ApolloClient.GraphQL_PPX.ExtendSubscription",
+    "extend-subscription-no-required-variables": "ApolloClient.GraphQL_PPX.ExtendSubscriptionNoRequiredVariables"
   },
   "package-specs": [
     {
@@ -25,10 +25,7 @@
   ],
   "suffix": ".bs.js",
   "bs-dependencies": [
-    "@jeddeloh/bs-apollo--client",
-    "@jeddeloh/bs-apollo--graphql",
-    "@jeddeloh/bs-apollo--link-ws",
-    "@jeddeloh/bs-apollo--subscriptions-transport-ws",
+    "@jeddeloh/reason-apollo-client",
     "@reasonml-community/graphql-ppx",
     "reason-react"
   ]

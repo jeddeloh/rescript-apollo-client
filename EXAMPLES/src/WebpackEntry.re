@@ -1,6 +1,6 @@
 ReactDOMRe.renderToElementWithId(
-  <Apollo.Client.ApolloProvider client=Client.instance>
+  <ApolloClient.ApolloProvider client=Client.instance>
     <App />
-  </Apollo.Client.ApolloProvider>,
+  </ApolloClient.ApolloProvider>,
   "root",
 );

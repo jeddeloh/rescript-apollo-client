@@ -1,0 +1,1 @@
+let getOperationDefinition = ApolloClient__Utilities_Graphql_GetFromAst.getOperationDefinition;

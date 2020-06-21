@@ -1,13 +1,14 @@
 {
   "name": "examples",
   "version": "0.0.0",
-  "description": "Examples for bs-apollographql",
+  "description": "Examples for reason-apollo-client",
   "private": true,
   "scripts": {
     "clean": "bsb -clean-world",
     "server": "webpack-dev-server",
     "start": "bsb -make-world -w",
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "update-deps": "rm -rf node_modules/reason-apollo-hooks && yarn install --check-files ",
+    "dedupe": "npm dedupe bs-platform reason-react --no-package-lock"
   },
   "devDependencies": {
     "@reasonml-community/graphql-ppx": "^1.0.0-beta.11",
@@ -18,13 +19,10 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
+    "@jeddeloh/reason-apollo-client": "../",
     "@apollo/client": "^3.0.0-rc.6",
     "@apollo/link-ws": "^2.0.0-beta.3",
-    "@jeddeloh/bs-apollo--client": "^0.0.0",
-    "@jeddeloh/bs-apollo--graphql": "^0.0.0",
-    "@jeddeloh/bs-apollo--link-ws": "^0.0.0",
-    "@jeddeloh/bs-apollo--subscriptions-transport-ws": "^0.0.0",
-    "graphql": "^14.0.0 || ^15.0.0",
+    "graphql": "^14.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "reason-react": "^0.9.1",

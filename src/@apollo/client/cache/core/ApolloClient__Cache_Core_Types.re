@@ -1,4 +1,4 @@
-module Graphql = ApolloClient_Graphql;
+module Graphql = ApolloClient__Graphql;
 
 module DataProxy = {
   module Query = {

@@ -18,6 +18,7 @@ module RefetchQueryDescription = ApolloClient__Core_WatchQueryOptions.RefetchQue
 module Resolvers = ApolloClient__Core_Types.Resolvers;
 module UriFunction = ApolloClient__Link_Http_SelectHttpOptionsAndBody.UriFunction;
 module Types = ApolloClient__Types;
+module Utils = ApolloClient__Utils;
 module WatchQueryFetchPolicy = ApolloClient__Core_WatchQueryOptions.WatchQueryFetchPolicy;
 module WatchQueryOptions = ApolloClient__Core_WatchQueryOptions.QueryOptions;
 
@@ -393,6 +394,11 @@ let make:
       }),
     );
 
+module type Config = {
+  type output('a);
+  let promiseTransform: Js.Promise.t('a) => output('a);
+};
+
 let mutate:
   type data variables jsData jsVariables.
     (
@@ -434,7 +440,7 @@ let mutate:
             context,
             errorPolicy,
             fetchPolicy,
-            mutation: GraphqlTag.gql(Operation.query),
+            mutation: Operation.query->Utils.castStringAsDocumentNode,
             optimisticResponse,
             updateQueries,
             refetchQueries,
@@ -481,7 +487,7 @@ let query:
       ~options=
         QueryOptions.toJs({
           fetchPolicy,
-          query: GraphqlTag.gql(Operation.query),
+          query: Operation.query->Utils.castStringAsDocumentNode,
           variables,
           errorPolicy,
           context,
@@ -512,7 +518,11 @@ let readQuery:
   (client, ~id=?, ~optimistic=?, ~variables=?, (module Operation)) => {
     Js_.readQuery(
       client,
-      ~options={id, query: GraphqlTag.gql(Operation.query), variables},
+      ~options={
+        id,
+        query: Operation.query->Utils.castStringAsDocumentNode,
+        variables,
+      },
       ~optimistic,
     )
     ->Js.toOption
@@ -540,7 +550,7 @@ let writeQuery:
         broadcast,
         data: data->Operation.serialize,
         id,
-        query: GraphqlTag.gql(Operation.query),
+        query: Operation.query->Utils.castStringAsDocumentNode,
         variables,
       },
     );

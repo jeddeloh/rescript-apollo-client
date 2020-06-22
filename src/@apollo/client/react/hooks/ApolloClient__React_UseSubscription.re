@@ -72,7 +72,7 @@ let useSubscription:
   ) => {
     let jsSubscriptionResult =
       Js_.useSubscription(
-        ~subscription=GraphqlTag.gql(Operation.query),
+        ~subscription=Operation.query->Utils.castStringAsDocumentNode,
         ~options=
           SubscriptionHookOptions.toJs(
             {

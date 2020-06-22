@@ -12,26 +12,6 @@ module WatchQueryFetchPolicy = ApolloClient__Core_WatchQueryOptions.WatchQueryFe
 module type Operation = Types.Operation;
 module type OperationNoRequiredVars = Types.OperationNoRequiredVars;
 
-exception InternalReasonApolloExn;
-let exceptionQueryResult = () =>
-  QueryResult.{
-    called: true,
-    client: Obj.magic(),
-    data: None,
-    error:
-      Some(
-        ApolloError.make(
-          ~errorMessage="Internal Reason Apollo Exception",
-          (),
-        ),
-      ),
-    fetchMore:
-      (~context as _=?, ~variables as _=?, ~updateQuery as _=?, ()) =>
-      Js.Promise.reject(InternalReasonApolloExn),
-    loading: false,
-    networkStatus: Ready,
-  };
-
 module Js_ = {
   // export declare function useQuery<TData = any, TVariables = OperationVariables>(query: DocumentNode, options?: QueryHookOptions<TData, TVariables>): QueryResult<TData, TVariables>;
   [@bs.module "@apollo/client"]
@@ -81,45 +61,42 @@ let useQuery:
     ~ssr=?,
     ~variables,
     (module Operation),
-  ) =>
-    try({
-      let jsQueryResult =
-        Js_.useQuery(
-          ~query=GraphqlTag.gql(Operation.query),
-          ~options=
-            QueryHookOptions.toJs(
-              {
-                client,
-                context,
-                displayName,
-                errorPolicy,
-                fetchPolicy,
-                onCompleted,
-                onError,
-                notifyOnNetworkStatusChange,
-                partialRefetch,
-                pollInterval,
-                query: None,
-                skip,
-                ssr,
-                variables,
-              },
-              ~parse=Operation.parse,
-            ),
-        );
-
-      Utils.useGuaranteedMemo1(
-        () => {
-          jsQueryResult->QueryResult.fromJs(
+  ) => {
+    let jsQueryResult =
+      Js_.useQuery(
+        ~query=Operation.query->Utils.castStringAsDocumentNode,
+        ~options=
+          QueryHookOptions.toJs(
+            {
+              client,
+              context,
+              displayName,
+              errorPolicy,
+              fetchPolicy,
+              onCompleted,
+              onError,
+              notifyOnNetworkStatusChange,
+              partialRefetch,
+              pollInterval,
+              query: None,
+              skip,
+              ssr,
+              variables,
+            },
             ~parse=Operation.parse,
-            ~serialize=Operation.serialize,
-          )
-        },
-        jsQueryResult,
+          ),
       );
-    }) {
-    | _anyExn => exceptionQueryResult()
-    };
+
+    Utils.useGuaranteedMemo1(
+      () => {
+        jsQueryResult->QueryResult.fromJs(
+          ~parse=Operation.parse,
+          ~serialize=Operation.serialize,
+        )
+      },
+      jsQueryResult,
+    );
+  };
 
 let useQuery0:
   type data jsData jsVariables.

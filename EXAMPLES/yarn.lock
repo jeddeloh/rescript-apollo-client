@@ -29,9 +29,9 @@
   version "0.0.0"
 
 "@reasonml-community/graphql-ppx@^1.0.0-beta.11":
-  version "1.0.0-e4ff159.0"
-  resolved "https://registry.yarnpkg.com/@reasonml-community/graphql-ppx/-/graphql-ppx-1.0.0-e4ff159.0.tgz#351b7691fc6c6fbb2223247eb9505269774a13c0"
-  integrity sha512-ssQtEuexmfKHafL2n4AKJkEn1VAc+NHaxpZk1x07lm0+gQz6+wksjO0a4BdZqhsn4yk8E9TkRDQfC3iwC9a9+A==
+  version "1.0.0-beta.11"
+  resolved "https://registry.yarnpkg.com/@reasonml-community/graphql-ppx/-/graphql-ppx-1.0.0-beta.11.tgz#ea6d9bf96c4129cbd40e3a806cf7ada06809b2e6"
+  integrity sha512-cLoaEh0/+1K3B29FR33gao2m6PAmn9NNwpirQlQtQtc4/To7VYX4FZnf+VztK9hpPm83Hwzwn3SfkdG+6enGHw==
   dependencies:
     bs-platform "^7.3.2"
 
@@ -1775,7 +1775,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2:
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.4.tgz#2256bde14d3632958c465ebc96dc467ca07a29fb"
   integrity sha512-WjKPNJF79dtJAVniUlGGWHYGz2jWxT6VhN/4m1NdkbZ2nOsEF+cI1Edgql5zCRhs/VsQYRvrXctxktVXZUkixw==
 
-graphql-tag@^2.10.2:
+graphql-tag@^2.10.2, graphql-tag@^2.10.3:
   version "2.10.3"
   resolved "https://registry.yarnpkg.com/graphql-tag/-/graphql-tag-2.10.3.tgz#ea1baba5eb8fc6339e4c4cf049dabe522b0edf03"
   integrity sha512-4FOv3ZKfA4WdOKJeHdz6B3F/vxBLSgmBcGeAFPf4n1F64ltJUvOOerNj0rsJxONQGdhUMynQIvd6LzB+1J5oKA==

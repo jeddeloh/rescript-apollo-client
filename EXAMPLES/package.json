@@ -7,7 +7,7 @@
     "clean": "bsb -clean-world",
     "server": "webpack-dev-server",
     "start": "bsb -make-world -w",
-    "update-deps": "rm -rf node_modules/reason-apollo-hooks && yarn install --check-files ",
+    "update-deps": "rm -rf node_modules/reason-apollo-hooks && yarn install --check-files && npm run dedupe",
     "dedupe": "npm dedupe bs-platform reason-react --no-package-lock"
   },
   "devDependencies": {
@@ -19,10 +19,11 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
-    "@jeddeloh/reason-apollo-client": "../",
     "@apollo/client": "^3.0.0-rc.6",
     "@apollo/link-ws": "^2.0.0-beta.3",
+    "@jeddeloh/reason-apollo-client": "../",
     "graphql": "^14.0.0",
+    "graphql-tag": "^2.10.3",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "reason-react": "^0.9.1",

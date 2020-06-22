@@ -3,6 +3,7 @@ module GraphqlTag = ApolloClient__GraphqlTag;
 module FetchResult = ApolloClient__Link_Core_Types.FetchResult;
 module Resolver = ApolloClient__Core_LocalState.Resolver;
 module Types = ApolloClient__Types;
+module Utils = ApolloClient__Utils;
 
 module PureQueryOptions = {
   module Js_ = {
@@ -28,7 +29,7 @@ module PureQueryOptions = {
 
   let toJs: t('variables) => Js_.t('variables) =
     t => {
-      query: GraphqlTag.gql(t.query),
+      query: t.query->Utils.castStringAsDocumentNode,
       variables: t.variables,
       context: t.context,
     };

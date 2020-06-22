@@ -12,7 +12,13 @@
       "in-source": true
     }
   ],
-  "ppx-flags": ["@reasonml-community/graphql-ppx/ppx"],
+  "ppx-flags": [
+    [
+      "@reasonml-community/graphql-ppx/ppx",
+      "-template-tag-import=gql",
+      "-template-tag-location=@apollo/client"
+    ]
+  ],
   "reason": {
     "react-jsx": 3
   },

@@ -1,4 +1,4 @@
-module Graphql = ApolloClient_Graphql;
+module Graphql = ApolloClient__Graphql;
 
 [@bs.module "@apollo/client/utilities"]
 external getOperationDefinition:

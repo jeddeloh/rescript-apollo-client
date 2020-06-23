@@ -1,19 +1,25 @@
-NOTE: this is just documenting my process for this PR in case anyone wants to help. It's not necessarily intended to be used as the CONTRIBUTING file for `reason-apollo-hooks`
+# Core Philosopies
 
-# Goals and Intent
+- Provide 1:1 bindings to Javascript _then_ use those as building blocks for more "reasonable" ergonomics
+- Follow a consistent pattern for bindings
+- Avoid partial types or bindings if possible
+- Encourage incremental contribution from the community rather than biting off more than one person can chew
 
-My hope is that we can achieve well maintained, nearly-complete bindings without a huge burden on any single person if we follow these two rules:
+## Following a Consistent Pattern
 
-1. Follow a consistent pattern for bindings
-1. Avoid partial types or bindings if possible
+At the file level, bindings to Javascript packacges should follow an identical directory structure as in the JS package. No thinking required! It also helps when you're going
 
-## Going the Full Distance
+At the code level, all JS bindings should go in a `Js_` module of some sort. At first it seems ridiculous, but it pays off at scale.
 
-Please type something as completely as possible when you come across it or leave it for someone else (if nothing else, put an abstract type so things will still flow through everywhere and people can cast it). If all of us contribute just a little piece, but do it completely, it should be very easy to get 99% complete bindings. Also, 50% of the work is in tracing through the code and loading up context. This way no one has to go back and duplicate that work. Each binding we add also makes the next one that much faster as we have more and more types we can reuse blindly.
+## Avoiding Partial Types
 
-# Guidelines (style)
+Please type something as completely as possible when you come across it or leave it for someone else (if nothing else, you can use an abstract type so things will still flow through everywhere and people can cast it when in a hurry). This way no one has to go back and duplicate that work of tracing through the same code you were just in _and_ we can trust that if a binding exists, it's complete and we can reuse easily.
 
-## Directory Structure and File Naming
+# Style Guidelines
+
+## Directory Structure and Module Naming
+
+Each directory should have a corresponding Reason module
 
 ```
 @apollo/client/react/hooks/useQuery.js
@@ -36,6 +42,7 @@ in reason.
 
 ## Types
 
+- Please use the same naming as typescript where possible
 - Every type goes in its own module with a `type t` (exception: see SubStypes)
 - Every type module should contain a `type t`, a `Js_` module with a `type t`, and a `toJs` or `fromJs` conversion function. `t => Js_.t` or `Js_.t => t`
 - Paste the type definition from the `.d.ts` file above the `type t` in the `Js_` module
@@ -58,12 +65,6 @@ module Js_ = {
 
 // #5 - add `toJs` or `fromJs`. They often require parsing: `let fromJs: Js_.t('jsData, ~parse: 'jsData => 'data) => t('data)`
 ```
-
-### Reasoning behind `Js_` modules
-
-When I'm defining a `Js_` `type t` that references other types, I know I should always be using the `Js_.t` versions of those types and it's very easy to visually confirm the correct types are being referenced. The same goes for defining a top-level `type t`, I should never see a `Js_.t` there. Now I can just follow the compiler errors.
-
-FWIW, I tried `JS` naming, but I would accidentally type `Js` all the time and not see it. Additionally, due to the importance of the above, I wanted it to stick out and the `_` helps a little there. :shrug:
 
 ### SubTypes
 
@@ -90,3 +91,125 @@ Use standard variants. You can use `jsConverter` for ints, but otherwise use man
 - Prefer T-first because that's the Reason community default
 - Hooks are T-last because that makes sense given their usage
 - ApolloClient methods are a Frankenstein T-first _and_ T-last because they want to maintain similarity with hooks api, but are also T-first due to [@bs.send] and T-first preference
+
+## Reasoning behind `Js_` modules
+
+Here's a stupid example:
+
+```
+module TypeName = {
+  module Js_ = {
+    type t;
+  }
+
+  type t = Js_.t;
+};
+```
+
+But what if we need to parse/serialize some data which happens a lot in this library?
+
+```diff
+module TypeName = {
+  module Js_ = {
++   type t('jsData) = {
++     data: 'jsData,
++   };
+  }
+
++ type t('data) = {
++   data: 'data
++ };
+
++ let toJs: t => Js_.t = (t, ~serialize) => {
++   data: serialize(t.data)
++ };
+};
+```
+
+Nice, we can never forget to parse because records are nominally typed.
+
+What if you need to construct a class or object with a bunch of optional properties?
+
+```diff
+module TypeName = {
+  module Js_ = {
+    type t('jsData) = {
+      data: 'jsData,
++     optionalProp: option(bool),
+    };
+
++   type make_options('jsData) = {
++     data: 'jsData,
++     optionalProp: option(bool),
++   }
++   [@bs.new] [@bs.module "someModule"]
++   external make = (make_options('jsData)) => t = "someClass";
+  }
+
+  type t('data) = {
+    data: 'data,
++   optionalProp: option(bool),
+  };
+
+  let toJs: t => Js_.t = (t, ~serialize) => {
+    data: serialize(t.data)
++   optionalProp: t.optionalProp
+  };
+
++ let make: (~data, ~optionalProp=?, ~serialize, ()) =>
++   Js_.make(
++     toJs({
++         data,
++         optionalProp
++       },
++       ~serialize,
++     )
++   );
+};
+```
+
+It's nice to have all this conversion stuff wrapped in one module and have a consistent naming. All of it together really begins to pay off when we're reusing many of the types.
+
+```diff
+module TypeName = {
+  module Js_ = {
+    type t('jsData) = {
+      data: 'jsData,
++     reusedType: ReusedType.Js_.t
+    };
+
+    type make_options('jsData) = {
+      data: 'jsData,
+      optionalProp: option(bool),
++     reusedType: ReusedType.Js_.t
+    }
+    [@bs.new] [@bs.module "someModule"]
+    external make = (make_options('jsData)) => t = "someClass";
+  }
+
+  type t('data) = {
+    data: 'data,
+    optionalProp: option(bool),
+    reusedType: ReusedType.t
+  };
+
+  let toJs: t => Js_.t = (t, ~serialize) => {
+    data: serialize(t.data)
+    optionalProp: t.optionalProp
+  };
+
+  let make: (~data, ~optionalProp=?, ~serialize, ()) =>
+    Js_.make(
+      toJs({
+          data,
+          optionalProp
+        },
+        ~serialize,
+      )
+    );
+};
+```
+
+When I'm defining a `Js_` `type t` that references other types, I know I should always be using the `Js_.t` versions of those types and it's very easy to visually confirm the correct types are being referenced. The same goes for defining a top-level `type t`, I should never see a `Js_.t` there. Now I can just follow the compiler errors.
+
+FWIW, I tried `JS` naming, but I would accidentally type `Js` all the time and not see it. I found adding the `_` to helpit stick out. :shrug:

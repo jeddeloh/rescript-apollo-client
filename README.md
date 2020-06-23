@@ -1,4 +1,4 @@
-# Expermimental BuckleScript/ReasonML Bindings to `@apollo/client` and related packages
+# Experimental BuckleScript/ReasonML Bindings to `@apollo/client` and related packages
 
 Don't use this yet :)
 

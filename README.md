@@ -8,5 +8,4 @@ Currently contains partial bindings for:
 - `@apollo/link-ws`
 - `subscriptions-transport-ws`
 - `graphql`
-- `graphql-tag`
 - `zen-observable`

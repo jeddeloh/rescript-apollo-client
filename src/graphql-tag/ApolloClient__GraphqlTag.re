@@ -1,2 +1,2 @@
-[@bs.module "graphql-tag"]
-external gql: string => ApolloClient__Graphql.Language.documentNode = "default";
+[@bs.module "@apollo/client"]
+external gql: string => ApolloClient__Graphql.Language.documentNode = "gql";

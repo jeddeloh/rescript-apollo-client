@@ -7,7 +7,6 @@ module FetchPolicy = ApolloClient__Core_WatchQueryOptions.FetchPolicy;
 module FetchPolicy__noCacheExtracted = ApolloClient__Core_WatchQueryOptions.FetchPolicy__noCacheExtracted;
 module FragmentMatcher = ApolloClient__Core_LocalState.FragmentMatcher;
 module Graphql = ApolloClient__Graphql;
-module GraphqlTag = ApolloClient__GraphqlTag;
 module FetchResult = ApolloClient__Link_Core_Types.FetchResult;
 module MutationOptions = ApolloClient__Core_WatchQueryOptions.MutationOptions;
 module MutationQueryReducersMap = ApolloClient__Core_WatchQueryOptions.MutationQueryReducersMap;

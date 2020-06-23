@@ -3,9 +3,9 @@
 
 
 "@apollo/client@^3.0.0-beta.23", "@apollo/client@^3.0.0-rc.6":
-  version "3.0.0-rc.6"
-  resolved "https://registry.yarnpkg.com/@apollo/client/-/client-3.0.0-rc.6.tgz#8bd8de57d7b025ac40d3141fbab383971907b617"
-  integrity sha512-nHEJ8K8SoaP8mJaPwuREdSc1FY25fIL7yAGyjb3cKTCnEV4cT6fZQg/+aJyKpX7fuqsyxZIKoAWS8Q3WdcGSJg==
+  version "3.0.0-rc.7"
+  resolved "https://registry.yarnpkg.com/@apollo/client/-/client-3.0.0-rc.7.tgz#f57b297bd92f06c9bb6a8e0ec71ddfdd3fc2fca0"
+  integrity sha512-pS68924tMZFBlC+Rbqy9rMqvqNHNKL2Jx/lw45aSCclpmk7GuIEFZCXAZihKG3PRYVZGG8p7DTQrdfC8XH51/w==
   dependencies:
     "@types/zen-observable" "^0.8.0"
     "@wry/equality" "^0.1.9"
@@ -29,9 +29,9 @@
   version "0.0.0"
 
 "@reasonml-community/graphql-ppx@^1.0.0-beta.11":
-  version "1.0.0-beta.11"
-  resolved "https://registry.yarnpkg.com/@reasonml-community/graphql-ppx/-/graphql-ppx-1.0.0-beta.11.tgz#ea6d9bf96c4129cbd40e3a806cf7ada06809b2e6"
-  integrity sha512-cLoaEh0/+1K3B29FR33gao2m6PAmn9NNwpirQlQtQtc4/To7VYX4FZnf+VztK9hpPm83Hwzwn3SfkdG+6enGHw==
+  version "1.0.0-e4ff159.0"
+  resolved "https://registry.yarnpkg.com/@reasonml-community/graphql-ppx/-/graphql-ppx-1.0.0-e4ff159.0.tgz#351b7691fc6c6fbb2223247eb9505269774a13c0"
+  integrity sha512-ssQtEuexmfKHafL2n4AKJkEn1VAc+NHaxpZk1x07lm0+gQz6+wksjO0a4BdZqhsn4yk8E9TkRDQfC3iwC9a9+A==
   dependencies:
     bs-platform "^7.3.2"
 
@@ -1775,7 +1775,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2:
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.4.tgz#2256bde14d3632958c465ebc96dc467ca07a29fb"
   integrity sha512-WjKPNJF79dtJAVniUlGGWHYGz2jWxT6VhN/4m1NdkbZ2nOsEF+cI1Edgql5zCRhs/VsQYRvrXctxktVXZUkixw==
 
-graphql-tag@^2.10.2, graphql-tag@^2.10.3:
+graphql-tag@^2.10.2:
   version "2.10.3"
   resolved "https://registry.yarnpkg.com/graphql-tag/-/graphql-tag-2.10.3.tgz#ea1baba5eb8fc6339e4c4cf049dabe522b0edf03"
   integrity sha512-4FOv3ZKfA4WdOKJeHdz6B3F/vxBLSgmBcGeAFPf4n1F64ltJUvOOerNj0rsJxONQGdhUMynQIvd6LzB+1J5oKA==

@@ -2,7 +2,6 @@ module ApolloClient = ApolloClient__ApolloClient;
 module ApolloError = ApolloClient__ApolloError;
 module ErrorPolicy = ApolloClient__Core_WatchQueryOptions.ErrorPolicy;
 module Graphql = ApolloClient__Graphql;
-module GraphqlTag = ApolloClient__GraphqlTag;
 module QueryHookOptions = ApolloClient__React_Types.QueryHookOptions;
 module QueryResult = ApolloClient__React_Types.QueryResult;
 module Types = ApolloClient__Types;

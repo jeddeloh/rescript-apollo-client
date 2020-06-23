@@ -1,7 +1,6 @@
 module ApolloCache = ApolloClient__Cache_Core_Cache.ApolloCache;
 module FetchResult = ApolloClient__Link_Core_Types.FetchResult;
 module Graphql = ApolloClient__Graphql;
-module GraphqlTag = ApolloClient__GraphqlTag;
 module MutationQueryReducersMap = ApolloClient__Core_Types.MutationQueryReducersMap;
 module Types = ApolloClient__Types;
 module PureQueryOptions = ApolloClient__Core_Types.PureQueryOptions;

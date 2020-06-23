@@ -3,7 +3,6 @@ module ApolloError = ApolloClient__ApolloError;
 module BaseSubscriptionOptions = ApolloClient__React_Types.BaseSubscriptionOptions;
 module FetchPolicy = ApolloClient__Core_WatchQueryOptions.FetchPolicy;
 module Graphql = ApolloClient__Graphql;
-module GraphqlTag = ApolloClient__GraphqlTag;
 module OnSubscriptionDataOptions = ApolloClient__React_Types.OnSubscriptionDataOptions;
 module SubscriptionHookOptions = ApolloClient__React_Types.SubscriptionHookOptions;
 module Types = ApolloClient__Types;

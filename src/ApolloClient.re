@@ -2,6 +2,7 @@ module Bindings = {
   module Client = ApolloClient__Client;
   module Graphql = ApolloClient__Graphql;
   module LinkWs = ApolloClient__LinkWs;
+  module SubscriptionTransportWs = ApolloClient__SubscriptionsTransportWs;
   module ZenObservable = ApolloClient__ZenObservable;
 };
 
@@ -15,14 +16,25 @@ module GraphQL_PPX = {
 };
 
 module Links = {
+  module ApolloLink = ApolloClient__Link_Core_ApolloLink;
+  module HttpLink = ApolloClient__Link_Http_HttpLink;
+  module LinkWs = ApolloClient__LinkWs;
   let concat = ApolloClient__Link_Core_ApolloLink.Static.concat;
   let execute = ApolloClient__Link_Core_ApolloLink.Static.execute;
   let empty = ApolloClient__Link_Core_ApolloLink.Static.empty;
   let from = ApolloClient__Link_Core_ApolloLink.Static.from;
   let split = ApolloClient__Link_Core_ApolloLink.Static.split;
-  module ApolloLink = ApolloClient__Link_Core_ApolloLink;
-  module HttpLink = ApolloClient__Link_Http_HttpLink;
-  module LinkWs = ApolloClient__LinkWs;
+};
+
+module React = {
+  module ApolloProvider = ApolloClient__React_Context_ApolloProvider;
+  let useApolloClient = ApolloClient__React_Hooks_UseApolloClient.useApolloClient;
+  let useMutation = ApolloClient__React_Hooks_UseMutation.useMutation;
+  let useMutation0 = ApolloClient__React_Hooks_UseMutation.useMutation0;
+  let useQuery = ApolloClient__React_Hooks_UseQuery.useQuery;
+  let useQuery0 = ApolloClient__React_Hooks_UseQuery.useQuery0;
+  let useSubscription = ApolloClient__React_Hooks_UseSubscription.useSubscription;
+  let useSubscription0 = ApolloClient__React_Hooks_UseSubscription.useSubscription0;
 };
 
 module Utilities = ApolloClient__Utilities;

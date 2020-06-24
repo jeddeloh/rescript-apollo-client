@@ -195,7 +195,6 @@ let useMutation0:
       ~optimisticResponse: jsVariables => data=?,
       ~refetchQueries: RefetchQueryDescription.t=?,
       ~update: MutationUpdaterFn.t(data)=?,
-      ~variables: jsVariables=?,
       (module OperationNoRequiredVars with
          type t = data and
          type Raw.t = jsData and
@@ -215,7 +214,6 @@ let useMutation0:
     ~optimisticResponse=?,
     ~refetchQueries=?,
     ~update=?,
-    ~variables=?,
     (module OperationNoRequiredVars),
   ) => {
     let jsMutationTuple =
@@ -238,12 +236,7 @@ let useMutation0:
               optimisticResponse,
               refetchQueries,
               update,
-              variables:
-                Some(
-                  variables->Belt.Option.getWithDefault(
-                    OperationNoRequiredVars.makeDefaultVariables(),
-                  ),
-                ),
+              variables: Some(OperationNoRequiredVars.makeDefaultVariables()),
             },
             ~parse=OperationNoRequiredVars.parse,
             ~serialize=OperationNoRequiredVars.serialize,
@@ -346,9 +339,42 @@ module ExtendNoRequiredVariables = (M: Types.OperationNoRequiredVars) => {
         ~optimisticResponse=?,
         ~refetchQueries=?,
         ~update=?,
-        variables,
+        (),
       ) => {
     useMutation0(
+      ~awaitRefetchQueries?,
+      ~context?,
+      ~client?,
+      ~errorPolicy?,
+      ~fetchPolicy?,
+      ~ignoreResults?,
+      ~notifyOnNetworkStatusChange?,
+      ~onError?,
+      ~onCompleted?,
+      ~optimisticResponse?,
+      ~refetchQueries?,
+      ~update?,
+      (module M),
+    );
+  };
+
+  let useWithVariables =
+      (
+        ~awaitRefetchQueries=?,
+        ~context=?,
+        ~client=?,
+        ~errorPolicy=?,
+        ~fetchPolicy=?,
+        ~ignoreResults=?,
+        ~notifyOnNetworkStatusChange=?,
+        ~onError=?,
+        ~onCompleted=?,
+        ~optimisticResponse=?,
+        ~refetchQueries=?,
+        ~update=?,
+        variables,
+      ) => {
+    useMutationWithVariables(
       ~awaitRefetchQueries?,
       ~context?,
       ~client?,

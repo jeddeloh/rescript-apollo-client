@@ -113,7 +113,6 @@ let useQuery0:
       ~pollInterval: int=?,
       ~skip: bool=?,
       ~ssr: bool=?,
-      ~variables: jsVariables=?,
       (module Types.OperationNoRequiredVars with
          type t = data and
          type Raw.t = jsData and
@@ -133,7 +132,6 @@ let useQuery0:
     ~pollInterval=?,
     ~skip=?,
     ~ssr=?,
-    ~variables=?,
     (module Operation),
   ) => {
     useQuery(
@@ -149,10 +147,7 @@ let useQuery0:
       ~pollInterval?,
       ~skip?,
       ~ssr?,
-      ~variables=
-        variables->Belt.Option.getWithDefault(
-          Operation.makeDefaultVariables(),
-        ),
+      ~variables=Operation.makeDefaultVariables(),
       (module Operation),
     );
   };
@@ -232,7 +227,7 @@ module ExtendNoRequiredVariables = (M: OperationNoRequiredVars) => {
         ~variables=?,
         (),
       ) => {
-    useQuery0(
+    useQuery(
       ~client?,
       ~context?,
       ~displayName?,
@@ -245,7 +240,8 @@ module ExtendNoRequiredVariables = (M: OperationNoRequiredVars) => {
       ~pollInterval?,
       ~skip?,
       ~ssr?,
-      ~variables?,
+      ~variables=
+        variables->Belt.Option.getWithDefault(M.makeDefaultVariables()),
       (module M),
     );
   };

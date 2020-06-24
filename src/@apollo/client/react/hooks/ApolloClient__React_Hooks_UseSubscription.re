@@ -110,7 +110,6 @@ let useSubscription0:
       ~shouldResubscribe: BaseSubscriptionOptions.t(data, jsVariables) => bool
                             =?,
       ~skip: bool=?,
-      ~variables: jsVariables=?,
       (module Types.OperationNoRequiredVars with
          type t = data and
          type Raw.t = jsData and
@@ -124,7 +123,6 @@ let useSubscription0:
     ~onSubscriptionComplete=?,
     ~shouldResubscribe=?,
     ~skip=?,
-    ~variables=?,
     (module Operation),
   ) => {
     useSubscription(
@@ -134,10 +132,7 @@ let useSubscription0:
       ~onSubscriptionComplete?,
       ~shouldResubscribe?,
       ~skip?,
-      ~variables=
-        variables->Belt.Option.getWithDefault(
-          Operation.makeDefaultVariables(),
-        ),
+      ~variables=Operation.makeDefaultVariables(),
       (module Operation),
     );
   };
@@ -176,15 +171,18 @@ module ExtendNoRequiredVariables = (M: OperationNoRequiredVars) => {
         ~onSubscriptionComplete=?,
         ~shouldResubscribe=?,
         ~skip=?,
+        ~variables=?,
         (),
       ) => {
-    useSubscription0(
+    useSubscription(
       ~client?,
       ~fetchPolicy?,
       ~onSubscriptionData?,
       ~onSubscriptionComplete?,
       ~shouldResubscribe?,
       ~skip?,
+      ~variables=
+        variables->Belt.Option.getWithDefault(M.makeDefaultVariables()),
       (module M),
     );
   };

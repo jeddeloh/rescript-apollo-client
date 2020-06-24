@@ -256,10 +256,6 @@ module ApolloClientOptions = {
     };
 };
 
-type refetchQueryDescription =
-  | PureQueryOptions(PureQueryOptions.t('variables)): refetchQueryDescription
-  | String(string): refetchQueryDescription;
-
 module Js_ = {
   // export declare class ApolloClient<TCacheShape> implements DataProxy {
   //     link: ApolloLink;

@@ -9,6 +9,8 @@ module DefaultOptions = ApolloClient__ApolloClient.DefaultOptions;
 let make = ApolloClient__ApolloClient.make;
 
 module GraphQL_PPX = {
+  module ExtendMutation = ApolloClient__React_UseMutation.Extend;
+  module ExtendMutationNoRequiredVariables = ApolloClient__React_UseMutation.ExtendNoRequiredVariables;
   module ExtendQuery = ApolloClient__React_UseQuery.Extend;
   module ExtendQueryNoRequiredVariables = ApolloClient__React_UseQuery.ExtendNoRequiredVariables;
   module ExtendSubscription = ApolloClient__React_UseSubscription.Extend;

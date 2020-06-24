@@ -331,7 +331,7 @@ module Extend = (M: Types.Operation) => {
   };
 };
 
-module ExtendNoRequiredVars = (M: Types.OperationNoRequiredVars) => {
+module ExtendNoRequiredVariables = (M: Types.OperationNoRequiredVars) => {
   let use =
       (
         ~awaitRefetchQueries=?,

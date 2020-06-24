@@ -23,14 +23,15 @@ module PureQueryOptions = {
     // };
     type t('variables) = {
       query: Graphql.documentNode,
-      variables: option('variables),
+      // We don't allow optional variables because it's not typesafe
+      variables: 'variables,
       context: option(Js.Json.t),
     };
   };
 
   type t('variables) = {
     query: string,
-    variables: option('variables),
+    variables: 'variables,
     context: option(Js.Json.t),
   };
 

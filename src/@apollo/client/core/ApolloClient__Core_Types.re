@@ -4,6 +4,14 @@ module Resolver = ApolloClient__Core_LocalState.Resolver;
 module Types = ApolloClient__Types;
 module Utils = ApolloClient__Utils;
 
+module OperationVariables = {
+  module Js_ = {
+    // export declare type OperationVariables = Record<string, any>;
+    type t = Js.Json.t;
+  };
+  type t = Js_.t;
+};
+
 module PureQueryOptions = {
   module Js_ = {
     // export declare type PureQueryOptions = {
@@ -15,14 +23,15 @@ module PureQueryOptions = {
     // };
     type t('variables) = {
       query: Graphql.documentNode,
-      variables: option('variables),
+      // We don't allow optional variables because it's not typesafe
+      variables: 'variables,
       context: option(Js.Json.t),
     };
   };
 
   type t('variables) = {
     query: string,
-    variables: option('variables),
+    variables: 'variables,
     context: option(Js.Json.t),
   };
 

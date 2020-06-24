@@ -1,6 +1,8 @@
 {
   "name": "examples",
   "graphql": {
+    "extend-mutation": "ApolloClient.GraphQL_PPX.ExtendMutation",
+    "extend-mutation-no-required-variables": "ApolloClient.GraphQL_PPX.ExtendMutationNoRequiredVariables",
     "extend-query": "ApolloClient.GraphQL_PPX.ExtendQuery",
     "extend-query-no-required-variables": "ApolloClient.GraphQL_PPX.ExtendQueryNoRequiredVariables",
     "extend-subscription": "ApolloClient.GraphQL_PPX.ExtendSubscription",

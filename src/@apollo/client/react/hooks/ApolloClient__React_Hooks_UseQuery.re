@@ -4,6 +4,7 @@ module ErrorPolicy = ApolloClient__Core_WatchQueryOptions.ErrorPolicy;
 module Graphql = ApolloClient__Graphql;
 module QueryHookOptions = ApolloClient__React_Types.QueryHookOptions;
 module QueryResult = ApolloClient__React_Types.QueryResult;
+module RefetchQueryDescription = ApolloClient__Core_WatchQueryOptions.RefetchQueryDescription;
 module Types = ApolloClient__Types;
 module Utils = ApolloClient__Utils;
 module WatchQueryFetchPolicy = ApolloClient__Core_WatchQueryOptions.WatchQueryFetchPolicy;
@@ -16,7 +17,7 @@ module Js_ = {
   [@bs.module "@apollo/client"]
   external useQuery:
     (
-      ~query: Graphql.documentNode,
+      . ~query: Graphql.documentNode,
       ~options: QueryHookOptions.Js_.t('jsData, 'variables)=?
     ) =>
     QueryResult.Js_.t('jsData, 'variables) =
@@ -62,7 +63,7 @@ let useQuery:
     (module Operation),
   ) => {
     let jsQueryResult =
-      Js_.useQuery(
+      Js_.useQuery(.
         ~query=Operation.query->Utils.castStringAsDocumentNode,
         ~options=
           QueryHookOptions.toJs(
@@ -152,6 +153,16 @@ let useQuery0:
   };
 
 module Extend = (M: Operation) => {
+  let asRefetchQuery:
+    (~context: Js.Json.t=?, M.Raw.t_variables) =>
+    RefetchQueryDescription.t_variant =
+    (~context=?, variables: M.Raw.t_variables) =>
+      RefetchQueryDescription.PureQueryOptions({
+        query: M.query,
+        variables,
+        context,
+      });
+
   let use =
       (
         ~client=?,
@@ -166,8 +177,7 @@ module Extend = (M: Operation) => {
         ~pollInterval=?,
         ~skip=?,
         ~ssr=?,
-        ~variables,
-        (),
+        variables,
       ) => {
     useQuery(
       ~client?,
@@ -189,6 +199,17 @@ module Extend = (M: Operation) => {
 };
 
 module ExtendNoRequiredVariables = (M: OperationNoRequiredVars) => {
+  let asRefetchQuery:
+    (~context: Js.Json.t=?, ~variables: M.Raw.t_variables=?, unit) =>
+    RefetchQueryDescription.t_variant =
+    (~context=?, ~variables: option(M.Raw.t_variables)=?, ()) =>
+      RefetchQueryDescription.PureQueryOptions({
+        query: M.query,
+        variables:
+          variables->Belt.Option.getWithDefault(M.makeDefaultVariables()),
+        context,
+      });
+
   let use =
       (
         ~client=?,
@@ -203,9 +224,10 @@ module ExtendNoRequiredVariables = (M: OperationNoRequiredVars) => {
         ~pollInterval=?,
         ~skip=?,
         ~ssr=?,
+        ~variables=?,
         (),
       ) => {
-    useQuery0(
+    useQuery(
       ~client?,
       ~context?,
       ~displayName?,
@@ -218,6 +240,8 @@ module ExtendNoRequiredVariables = (M: OperationNoRequiredVars) => {
       ~pollInterval?,
       ~skip?,
       ~ssr?,
+      ~variables=
+        variables->Belt.Option.getWithDefault(M.makeDefaultVariables()),
       (module M),
     );
   };

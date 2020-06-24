@@ -28,7 +28,7 @@ module Js_ = {
   [@bs.module "@apollo/client"]
   external useSubscription:
     (
-      ~subscription: Graphql.Language.documentNode,
+      . ~subscription: Graphql.Language.documentNode,
       ~options: SubscriptionHookOptions.Js_.t('jsData, 'variables)=?
     ) =>
     useSubscription_result('jsData, 'variables) =
@@ -70,7 +70,7 @@ let useSubscription:
     (module Operation),
   ) => {
     let jsSubscriptionResult =
-      Js_.useSubscription(
+      Js_.useSubscription(.
         ~subscription=Operation.query->Utils.castStringAsDocumentNode,
         ~options=
           SubscriptionHookOptions.toJs(
@@ -171,15 +171,18 @@ module ExtendNoRequiredVariables = (M: OperationNoRequiredVars) => {
         ~onSubscriptionComplete=?,
         ~shouldResubscribe=?,
         ~skip=?,
+        ~variables=?,
         (),
       ) => {
-    useSubscription0(
+    useSubscription(
       ~client?,
       ~fetchPolicy?,
       ~onSubscriptionData?,
       ~onSubscriptionComplete?,
       ~shouldResubscribe?,
       ~skip?,
+      ~variables=
+        variables->Belt.Option.getWithDefault(M.makeDefaultVariables()),
       (module M),
     );
   };

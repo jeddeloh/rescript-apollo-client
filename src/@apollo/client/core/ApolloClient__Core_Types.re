@@ -4,6 +4,14 @@ module Resolver = ApolloClient__Core_LocalState.Resolver;
 module Types = ApolloClient__Types;
 module Utils = ApolloClient__Utils;
 
+module OperationVariables = {
+  module Js_ = {
+    // export declare type OperationVariables = Record<string, any>;
+    type t = Js.Json.t;
+  };
+  type t = Js_.t;
+};
+
 module PureQueryOptions = {
   module Js_ = {
     // export declare type PureQueryOptions = {

@@ -16,7 +16,7 @@ module Js_ = {
   [@bs.module "@apollo/client"]
   external useQuery:
     (
-      ~query: Graphql.documentNode,
+      . ~query: Graphql.documentNode,
       ~options: QueryHookOptions.Js_.t('jsData, 'variables)=?
     ) =>
     QueryResult.Js_.t('jsData, 'variables) =
@@ -62,7 +62,7 @@ let useQuery:
     (module Operation),
   ) => {
     let jsQueryResult =
-      Js_.useQuery(
+      Js_.useQuery(.
         ~query=Operation.query->Utils.castStringAsDocumentNode,
         ~options=
           QueryHookOptions.toJs(
@@ -112,6 +112,7 @@ let useQuery0:
       ~pollInterval: int=?,
       ~skip: bool=?,
       ~ssr: bool=?,
+      ~variables: jsVariables=?,
       (module Types.OperationNoRequiredVars with
          type t = data and
          type Raw.t = jsData and
@@ -131,6 +132,7 @@ let useQuery0:
     ~pollInterval=?,
     ~skip=?,
     ~ssr=?,
+    ~variables=?,
     (module Operation),
   ) => {
     useQuery(
@@ -146,7 +148,10 @@ let useQuery0:
       ~pollInterval?,
       ~skip?,
       ~ssr?,
-      ~variables=Operation.makeDefaultVariables(),
+      ~variables=
+        variables->Belt.Option.getWithDefault(
+          Operation.makeDefaultVariables(),
+        ),
       (module Operation),
     );
   };
@@ -166,8 +171,7 @@ module Extend = (M: Operation) => {
         ~pollInterval=?,
         ~skip=?,
         ~ssr=?,
-        ~variables,
-        (),
+        variables,
       ) => {
     useQuery(
       ~client?,
@@ -203,6 +207,7 @@ module ExtendNoRequiredVariables = (M: OperationNoRequiredVars) => {
         ~pollInterval=?,
         ~skip=?,
         ~ssr=?,
+        ~variables=?,
         (),
       ) => {
     useQuery0(
@@ -218,6 +223,7 @@ module ExtendNoRequiredVariables = (M: OperationNoRequiredVars) => {
       ~pollInterval?,
       ~skip?,
       ~ssr?,
+      ~variables?,
       (module M),
     );
   };

@@ -213,7 +213,7 @@ module MutationOptions = {
       // ...extends MutationBaseOption,
       awaitRefetchQueries: option(bool),
       errorPolicy: option(ErrorPolicy.Js_.t),
-      optimisticResponse: option('variables => 'jsData),
+      optimisticResponse: option((. 'variables) => 'jsData),
       update: option(MutationUpdaterFn.Js_.t('jsData)),
       updateQueries: option(MutationQueryReducersMap.Js_.t('jsData)),
       refetchQueries: option(RefetchQueryDescription.Js_.t),
@@ -225,7 +225,7 @@ module MutationOptions = {
     context: option(Js.Json.t),
     fetchPolicy: option(FetchPolicy__noCacheExtracted.t),
     mutation: Graphql.documentNode,
-    // ...extends MutationBaseOption,
+    // ...extends MutationBaseOptions,
     awaitRefetchQueries: option(bool),
     errorPolicy: option(ErrorPolicy.t),
     optimisticResponse: option('variables => 'data),
@@ -251,8 +251,8 @@ module MutationOptions = {
       mutation: t.mutation,
       optimisticResponse:
         t.optimisticResponse
-        ->Belt.Option.map((optimisticResponse, variables) =>
-            optimisticResponse(variables)->serialize
+        ->Belt.Option.map(optimisticResponse =>
+            (. variables) => optimisticResponse(variables)->serialize
           ),
       refetchQueries:
         t.refetchQueries->Belt.Option.map(RefetchQueryDescription.toJs),

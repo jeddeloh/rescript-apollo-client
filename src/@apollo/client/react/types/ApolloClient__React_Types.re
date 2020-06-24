@@ -3,8 +3,13 @@ module ApolloError = ApolloClient__ApolloError;
 module ApolloQueryResult = ApolloClient__Core_Types.ApolloQueryResult;
 module ErrorPolicy = ApolloClient__Core_WatchQueryOptions.ErrorPolicy;
 module FetchPolicy = ApolloClient__Core_WatchQueryOptions.FetchPolicy;
+module FetchPolicy__noCacheExtracted = ApolloClient__Core_WatchQueryOptions.FetchPolicy__noCacheExtracted;
+module FetchResult = ApolloClient__Link_Core_Types.FetchResult;
 module Graphql = ApolloClient__Graphql;
+module MutationUpdaterFn = ApolloClient__Core_WatchQueryOptions.MutationUpdaterFn;
 module NetworkStatus = ApolloClient__Core_NetworkStatus;
+module RefetchQueryDescription = ApolloClient__Core_WatchQueryOptions.RefetchQueryDescription;
+module Types = ApolloClient__Types;
 module WatchQueryFetchPolicy = ApolloClient__Core_WatchQueryOptions.WatchQueryFetchPolicy;
 
 module QueryHookOptions = {
@@ -30,7 +35,7 @@ module QueryHookOptions = {
       // INTENTIONALLY IGNORED
       // returnPartialData: option(bool),
       ssr: option(bool),
-      // Intentionally restricted to not be non-optional. `option(unit)` does not compile cleanly to `undefined`
+      // We don't allow optional variables because it's not typesafe
       variables: 'variables,
     };
   };
@@ -40,7 +45,6 @@ module QueryHookOptions = {
     // ...extends QueryFunctionOptions
     displayName: option(string),
     skip: option(bool),
-    // consider parsing?
     onCompleted: option('data => unit),
     onError: option(ApolloError.t => unit),
     // ...extends BaseQueryOptions
@@ -192,6 +196,458 @@ module QueryResult = {
       },
       loading: js.loading,
       networkStatus: js.networkStatus,
+    };
+};
+
+module BaseMutationOptions = {
+  module Js_ = {
+    // export interface BaseMutationOptions<TData = any, TVariables = OperationVariables> {
+    //     awaitRefetchQueries?: boolean;
+    //     client?: ApolloClient<object>;
+    //     context?: Context;
+    //     errorPolicy?: ErrorPolicy;
+    //     fetchPolicy?: Extract<WatchQueryFetchPolicy, 'no-cache'>;
+    //     ignoreResults?: boolean;
+    //     onCompleted?: (data: TData) => void;
+    //     onError?: (error: ApolloError) => void;
+    //     optimisticResponse?: TData | ((vars: TVariables) => TData);
+    //     notifyOnNetworkStatusChange?: boolean;
+    //     refetchQueries?: Array<string | PureQueryOptions> | RefetchQueriesFunction;
+    //     update?: MutationUpdaterFn<TData>;
+    //     variables?: TVariables;
+    // }
+    type t('jsData, 'variables) = {
+      awaitRefetchQueries: option(bool),
+      client: option(ApolloClient.Js_.t),
+      context: option(Js.Json.t), // actual: option(Context)
+      errorPolicy: option(ErrorPolicy.Js_.t),
+      fetchPolicy: option(FetchPolicy__noCacheExtracted.Js_.t),
+      ignoreResults: option(bool),
+      notifyOnNetworkStatusChange: option(bool),
+      onError: option(ApolloError.Js_.t => unit),
+      optimisticResponse: option('variables => 'jsData),
+      refetchQueries: option(RefetchQueryDescription.Js_.t),
+      update: option(MutationUpdaterFn.Js_.t('jsData)),
+      variables: option('variables),
+    };
+  };
+
+  type t('data, 'variables) = {
+    awaitRefetchQueries: option(bool),
+    context: option(Js.Json.t),
+    client: option(ApolloClient.t),
+    errorPolicy: option(ErrorPolicy.t),
+    fetchPolicy: option(FetchPolicy__noCacheExtracted.t),
+    ignoreResults: option(bool),
+    notifyOnNetworkStatusChange: option(bool),
+    onError: option(ApolloError.t => unit),
+    onCompleted: option('data => unit),
+    optimisticResponse: option('variables => 'data),
+    refetchQueries: option(RefetchQueryDescription.t),
+    update: option(MutationUpdaterFn.t('data)),
+    variables: option('variables),
+  };
+};
+
+module MutationHookOptions = {
+  module Js_ = {
+    // export interface MutationHookOptions<TData = any, TVariables = OperationVariables> extends BaseMutationOptions<TData, TVariables> {
+    //   mutation?: DocumentNode;
+    // }
+    /**
+     * We use deriving abstract here because option('variables) is not typesafe,
+     * but still needs to be optional since a user has the option of providing
+     * the variables to the results of the hook rather than the hook itself
+     */
+    [@bs.deriving abstract]
+    type t('jsData, 'variables) = {
+      [@bs.optional]
+      mutation: Graphql.documentNode,
+      // ...extends BaseMutationOptions
+      [@bs.optional]
+      awaitRefetchQueries: bool,
+      [@bs.optional]
+      client: ApolloClient.Js_.t,
+      [@bs.optional]
+      context: Js.Json.t, // actual: option(Context)
+      [@bs.optional]
+      errorPolicy: ErrorPolicy.Js_.t,
+      [@bs.optional]
+      fetchPolicy: FetchPolicy__noCacheExtracted.Js_.t,
+      [@bs.optional]
+      ignoreResults: bool,
+      [@bs.optional]
+      notifyOnNetworkStatusChange: bool,
+      [@bs.optional]
+      onError: ApolloError.Js_.t => unit,
+      [@bs.optional]
+      optimisticResponse: 'variables => 'jsData,
+      [@bs.optional]
+      refetchQueries: RefetchQueryDescription.Js_.t,
+      [@bs.optional]
+      update: MutationUpdaterFn.Js_.t('jsData),
+      [@bs.optional]
+      variables: 'variables,
+    };
+    let make = t;
+  };
+
+  type t('data, 'variables) = {
+    mutation: option(Graphql.documentNode),
+    awaitRefetchQueries: option(bool),
+    context: option(Js.Json.t),
+    client: option(ApolloClient.t),
+    errorPolicy: option(ErrorPolicy.t),
+    fetchPolicy: option(FetchPolicy__noCacheExtracted.t),
+    ignoreResults: option(bool),
+    notifyOnNetworkStatusChange: option(bool),
+    onError: option(ApolloError.t => unit),
+    onCompleted: option('data => unit),
+    optimisticResponse: option('variables => 'data),
+    refetchQueries: option(RefetchQueryDescription.t),
+    update: option(MutationUpdaterFn.t('data)),
+    variables: option('variables),
+  };
+
+  let toJs:
+    (
+      t('data, 'variables),
+      ~parse: Types.parse('jsData, 'data),
+      ~serialize: Types.serialize('data, 'jsData)
+    ) =>
+    Js_.t('jsData, 'variables) =
+    (t, ~parse, ~serialize) => {
+      Js_.make(
+        ~awaitRefetchQueries=?t.awaitRefetchQueries,
+        ~context=?t.context,
+        ~client=?t.client,
+        ~errorPolicy=?t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
+        ~fetchPolicy=?
+          t.fetchPolicy->Belt.Option.map(FetchPolicy__noCacheExtracted.toJs),
+        ~ignoreResults=?t.ignoreResults,
+        ~mutation=?t.mutation,
+        ~notifyOnNetworkStatusChange=?t.notifyOnNetworkStatusChange,
+        ~onError=?t.onError,
+        ~optimisticResponse=?
+          t.optimisticResponse
+          ->Belt.Option.map((optimisticResponse, variables) =>
+              optimisticResponse(variables)->serialize
+            ),
+        ~refetchQueries=?
+          t.refetchQueries->Belt.Option.map(RefetchQueryDescription.toJs),
+        ~update=?t.update->Belt.Option.map(MutationUpdaterFn.toJs(~parse)),
+        ~variables=?t.variables,
+        (),
+      );
+    };
+};
+
+module MutationResult = {
+  module Js_ = {
+    // export interface MutationResult<TData = any> {
+    //     data?: TData | null;
+    //     error?: ApolloError;
+    //     loading: boolean;
+    //     called: boolean;
+    //     client?: ApolloClient<object>;
+    // }
+    type t('jsData) = {
+      data: Js.nullable('jsData),
+      error: option(ApolloError.Js_.t),
+      loading: option(bool),
+      called: option(bool),
+      client: option(ApolloClient.Js_.t),
+    };
+  };
+
+  type t('data) = {
+    data: option('data),
+    error: option(ApolloError.t),
+    loading: option(bool),
+    called: option(bool),
+    client: option(ApolloClient.t),
+  };
+
+  let fromJs: (Js_.t('jsData), ~parse: 'jsData => 'data) => t('data) =
+    (js, ~parse) => {
+      data: js.data->Js.toOption->Belt.Option.map(parse),
+      error: js.error,
+      loading: js.loading,
+      called: js.called,
+      client: js.client,
+    };
+};
+
+module MutationFunctionOptions = {
+  module Js_ = {
+    // export interface MutationFunctionOptions<TData = any, TVariables = OperationVariables> {
+    //     variables?: TVariables;
+    //     optimisticResponse?: TData | ((vars: TVariables | {}) => TData);
+    //     refetchQueries?: Array<string | PureQueryOptions> | RefetchQueriesFunction;
+    //     awaitRefetchQueries?: boolean;
+    //     update?: MutationUpdaterFn<TData>;
+    //     context?: Context;
+    //     fetchPolicy?: WatchQueryFetchPolicy;
+    // }
+    /**
+     * We use deriving abstract here because this is used in a context where passing in explicit
+     * properties could override one already passed in
+     */
+    type t('jsData, 'variables) = {
+      // We don't allow optional variables because it's not typesafe
+      variables: 'variables,
+      optimisticResponse: option((. 'variables) => 'jsData),
+      refetchQueries: option(RefetchQueryDescription.Js_.t),
+      awaitRefetchQueries: option(bool),
+      update: option(MutationUpdaterFn.Js_.t('jsData)),
+      context: option(Js.Json.t), // actual: option(Context)
+      fetchPolicy: option(WatchQueryFetchPolicy.Js_.t),
+    };
+  };
+
+  type t('data, 'variables) = {
+    variables: 'variables,
+    optimisticResponse: option('variables => 'data),
+    refetchQueries: option(RefetchQueryDescription.t),
+    awaitRefetchQueries: option(bool),
+    update: option(MutationUpdaterFn.t('data)),
+    context: option(Js.Json.t), // actual: option(Context)
+    fetchPolicy: option(WatchQueryFetchPolicy.t),
+  };
+
+  let toJs:
+    (
+      t('data, 'variables),
+      ~parse: 'jsData => 'data,
+      ~serialize: 'data => 'jsData
+    ) =>
+    Js_.t('jsData, 'variables) =
+    (t, ~parse, ~serialize) => {
+      variables: t.variables,
+      optimisticResponse:
+        t.optimisticResponse
+        ->Belt.Option.map(optimisticResponse =>
+            (. variables) => optimisticResponse(variables)->serialize
+          ),
+      refetchQueries:
+        t.refetchQueries->Belt.Option.map(RefetchQueryDescription.toJs),
+      awaitRefetchQueries: t.awaitRefetchQueries,
+      update: t.update->Belt.Option.map(MutationUpdaterFn.toJs(~parse)),
+      context: t.context,
+      fetchPolicy: t.fetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
+    };
+};
+
+module MutationTuple = {
+  module Js_ = {
+    // export declare type MutationTuple<TData, TVariables> = [(options?: MutationFunctionOptions<TData, TVariables>) => Promise<FetchResult<TData>>, MutationResult<TData>];
+    type t('jsData, 'variables) = (
+      option(MutationFunctionOptions.Js_.t('jsData, 'variables)) =>
+      Js.Promise.t(FetchResult.Js_.t('jsData)),
+      MutationResult.Js_.t('jsData),
+    );
+  };
+  type t_mutationFn('data, 'variables) =
+    (
+      ~variables: 'variables,
+      ~optimisticResponse: 'variables => 'data=?,
+      ~refetchQueries: RefetchQueryDescription.t=?,
+      ~awaitRefetchQueries: bool=?,
+      ~update: MutationUpdaterFn.t('data)=?,
+      ~context: Js.Json.t=?,
+      ~fetchPolicy: WatchQueryFetchPolicy.t=?,
+      unit
+    ) =>
+    Js.Promise.t(FetchResult.t('data));
+  type t('data, 'variables) = (
+    t_mutationFn('data, 'variables),
+    MutationResult.t('data),
+  );
+
+  let fromJs:
+    (
+      Js_.t('jsData, 'variables),
+      ~parse: 'jsData => 'data,
+      ~serialize: 'data => 'jsData
+    ) =>
+    t('data, 'variables) =
+    ((jsMutationFn, jsMutationResult), ~parse, ~serialize) => {
+      let mutationFn =
+          (
+            ~variables,
+            ~optimisticResponse=?,
+            ~refetchQueries=?,
+            ~awaitRefetchQueries=?,
+            ~update=?,
+            ~context=?,
+            ~fetchPolicy=?,
+            (),
+          ) => {
+        jsMutationFn(
+          Some(
+            MutationFunctionOptions.toJs(
+              {
+                variables,
+                optimisticResponse,
+                refetchQueries,
+                awaitRefetchQueries,
+                update,
+                context,
+                fetchPolicy,
+              },
+              ~parse,
+              ~serialize,
+            ),
+          ),
+        )
+        ->Js.Promise.then_(
+            jsResult =>
+              FetchResult.fromJs(jsResult, ~parse)->Js.Promise.resolve,
+            _,
+          );
+      };
+
+      (mutationFn, jsMutationResult->MutationResult.fromJs(~parse));
+    };
+};
+
+module MutationTuple__noVariables = {
+  module Js_ = {
+    type t('jsData, 'variables) = MutationTuple.Js_.t('jsData, 'variables);
+  };
+
+  type t_mutationFn('data, 'variables) =
+    (
+      ~optimisticResponse: 'variables => 'data=?,
+      ~refetchQueries: RefetchQueryDescription.t=?,
+      ~awaitRefetchQueries: bool=?,
+      ~update: MutationUpdaterFn.t('data)=?,
+      ~context: Js.Json.t=?,
+      ~fetchPolicy: WatchQueryFetchPolicy.t=?,
+      unit
+    ) =>
+    Js.Promise.t(FetchResult.t('data));
+
+  type t('data, 'variables) = (
+    t_mutationFn('data, 'variables),
+    MutationResult.t('data),
+  );
+
+  let fromJs:
+    (
+      Js_.t('jsData, 'variables),
+      ~parse: 'jsData => 'data,
+      ~serialize: 'data => 'jsData,
+      ~variables: 'variables
+    ) =>
+    t('data, 'variables) =
+    ((jsMutationFn, jsMutationResult), ~parse, ~serialize, ~variables) => {
+      let mutationFn =
+          (
+            ~optimisticResponse=?,
+            ~refetchQueries=?,
+            ~awaitRefetchQueries=?,
+            ~update=?,
+            ~context=?,
+            ~fetchPolicy=?,
+            (),
+          ) => {
+        jsMutationFn(
+          Some(
+            MutationFunctionOptions.toJs(
+              {
+                variables,
+                optimisticResponse,
+                refetchQueries,
+                awaitRefetchQueries,
+                update,
+                context,
+                fetchPolicy,
+              },
+              ~parse,
+              ~serialize,
+            ),
+          ),
+        )
+        ->Js.Promise.then_(
+            jsResult =>
+              FetchResult.fromJs(jsResult, ~parse)->Js.Promise.resolve,
+            _,
+          );
+      };
+
+      (mutationFn, jsMutationResult->MutationResult.fromJs(~parse));
+    };
+};
+
+module MutationTuple__optionalVariables = {
+  module Js_ = {
+    type t('jsData, 'variables) = MutationTuple.Js_.t('jsData, 'variables);
+  };
+
+  type t_mutationFn('data, 'variables) =
+    (
+      ~variables: 'variables=?,
+      ~optimisticResponse: 'variables => 'data=?,
+      ~refetchQueries: RefetchQueryDescription.t=?,
+      ~awaitRefetchQueries: bool=?,
+      ~update: MutationUpdaterFn.t('data)=?,
+      ~context: Js.Json.t=?,
+      ~fetchPolicy: WatchQueryFetchPolicy.t=?,
+      unit
+    ) =>
+    Js.Promise.t(FetchResult.t('data));
+
+  type t('data, 'variables) = (
+    t_mutationFn('data, 'variables),
+    MutationResult.t('data),
+  );
+
+  let fromJs:
+    (
+      Js_.t('jsData, 'variables),
+      ~defaultVariables: 'variables,
+      ~parse: 'jsData => 'data,
+      ~serialize: 'data => 'jsData
+    ) =>
+    t('data, 'variables) =
+    ((jsMutationFn, jsMutationResult), ~defaultVariables, ~parse, ~serialize) => {
+      let mutationFn =
+          (
+            ~variables=defaultVariables,
+            ~optimisticResponse=?,
+            ~refetchQueries=?,
+            ~awaitRefetchQueries=?,
+            ~update=?,
+            ~context=?,
+            ~fetchPolicy=?,
+            (),
+          ) => {
+        jsMutationFn(
+          Some(
+            MutationFunctionOptions.toJs(
+              {
+                variables,
+                optimisticResponse,
+                refetchQueries,
+                awaitRefetchQueries,
+                update,
+                context,
+                fetchPolicy,
+              },
+              ~parse,
+              ~serialize,
+            ),
+          ),
+        )
+        ->Js.Promise.then_(
+            jsResult =>
+              FetchResult.fromJs(jsResult, ~parse)->Js.Promise.resolve,
+            _,
+          );
+      };
+
+      (mutationFn, jsMutationResult->MutationResult.fromJs(~parse));
     };
 };
 

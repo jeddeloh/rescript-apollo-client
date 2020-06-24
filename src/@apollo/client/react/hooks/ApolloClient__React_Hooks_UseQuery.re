@@ -196,6 +196,38 @@ module Extend = (M: Operation) => {
       (module M),
     );
   };
+
+  let useLazy =
+      (
+        ~client=?,
+        ~context=?,
+        ~displayName=?,
+        ~errorPolicy=?,
+        ~fetchPolicy=?,
+        ~notifyOnNetworkStatusChange=?,
+        ~onCompleted=?,
+        ~onError=?,
+        ~partialRefetch=?,
+        ~pollInterval=?,
+        ~ssr=?,
+        variables,
+      ) => {
+    ApolloClient__React_Hooks_UseLazyQuery.useLazyQuery(
+      ~client?,
+      ~context?,
+      ~displayName?,
+      ~errorPolicy?,
+      ~fetchPolicy?,
+      ~notifyOnNetworkStatusChange?,
+      ~onCompleted?,
+      ~onError?,
+      ~partialRefetch?,
+      ~pollInterval?,
+      ~ssr?,
+      ~variables,
+      (module M),
+    );
+  };
 };
 
 module ExtendNoRequiredVariables = (M: OperationNoRequiredVars) => {
@@ -239,6 +271,40 @@ module ExtendNoRequiredVariables = (M: OperationNoRequiredVars) => {
       ~partialRefetch?,
       ~pollInterval?,
       ~skip?,
+      ~ssr?,
+      ~variables=
+        variables->Belt.Option.getWithDefault(M.makeDefaultVariables()),
+      (module M),
+    );
+  };
+
+  let useLazy =
+      (
+        ~client=?,
+        ~context=?,
+        ~displayName=?,
+        ~errorPolicy=?,
+        ~fetchPolicy=?,
+        ~notifyOnNetworkStatusChange=?,
+        ~onCompleted=?,
+        ~onError=?,
+        ~partialRefetch=?,
+        ~pollInterval=?,
+        ~ssr=?,
+        ~variables=?,
+        (),
+      ) => {
+    ApolloClient__React_Hooks_UseLazyQuery.useLazyQuery(
+      ~client?,
+      ~context?,
+      ~displayName?,
+      ~errorPolicy?,
+      ~fetchPolicy?,
+      ~notifyOnNetworkStatusChange?,
+      ~onCompleted?,
+      ~onError?,
+      ~partialRefetch?,
+      ~pollInterval?,
       ~ssr?,
       ~variables=
         variables->Belt.Option.getWithDefault(M.makeDefaultVariables()),

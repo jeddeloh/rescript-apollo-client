@@ -83,8 +83,91 @@ module QueryHookOptions = {
   };
 };
 
+module LazyQueryHookOptions = {
+  module Js_ = {
+    // export interface LazyQueryHookOptions<TData = any, TVariables = OperationVariables> extends Omit<QueryFunctionOptions<TData, TVariables>, 'skip'> {
+    //     query?: DocumentNode;
+    // }
+    type t('jsData, 'variables) = {
+      query: option(Graphql.documentNode),
+      // ...extends QueryFunctionOptions
+      displayName: option(string),
+      onCompleted: option('jsData => unit),
+      onError: option(ApolloError.t => unit),
+      // ..extends BaseQueryOptions
+      client: option(ApolloClient.t),
+      context: option(Js.Json.t), // ACTUAL: Record<string, any>
+      errorPolicy: option(string),
+      fetchPolicy: option(string),
+      notifyOnNetworkStatusChange: option(bool),
+      partialRefetch: option(bool),
+      pollInterval: option(int),
+      // INTENTIONALLY IGNORED
+      // returnPartialData: option(bool),
+      ssr: option(bool),
+      // We don't allow optional variables because it's not typesafe
+      variables: 'variables,
+    };
+  };
+
+  type t('data, 'variables) = {
+    query: option(Graphql.documentNode),
+    // ...extends QueryFunctionOptions
+    displayName: option(string),
+    onCompleted: option('data => unit),
+    onError: option(ApolloError.t => unit),
+    // ...extends BaseQueryOptions
+    client: option(ApolloClient.t),
+    context: option(Js.Json.t),
+    errorPolicy: option(ErrorPolicy.t),
+    fetchPolicy: option(WatchQueryFetchPolicy.t),
+    notifyOnNetworkStatusChange: option(bool),
+    partialRefetch: option(bool),
+    pollInterval: option(int),
+    // INTENTIONALLY IGNORED
+    // returnPartialData: option(bool),
+    ssr: option(bool),
+    variables: 'variables,
+  };
+
+  let toJs =
+      (t: t('data, 'variables), ~parse: 'jsData => 'data)
+      : Js_.t('jsData, 'variables) => {
+    client: t.client,
+    context: t.context,
+    displayName: t.displayName,
+    errorPolicy: t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
+    onCompleted:
+      t.onCompleted
+      ->Belt.Option.map((onCompleted, jsData) => onCompleted(jsData->parse)),
+    onError: t.onError,
+    fetchPolicy: t.fetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
+    notifyOnNetworkStatusChange: t.notifyOnNetworkStatusChange,
+    query: t.query,
+    pollInterval: t.pollInterval,
+    partialRefetch: t.partialRefetch,
+    ssr: t.ssr,
+    variables: t.variables,
+  };
+};
+module QueryLazyOptions = {
+  module Js_ = {
+    // export interface QueryLazyOptions<TVariables> {
+    //     variables?: TVariables;
+    //     context?: Context;
+    // }
+    type t('variables) = {
+      variables: 'variables,
+      context: option(Js.Json.t),
+    };
+  };
+
+  type t('variables) = Js_.t('variables);
+};
+
 module QueryResult = {
   module Js_ = {
+    // TODO: 'parsedData ??? check this
     type t_fetchMoreOptions_updateQueryOptions('parsedData, 'variables) = {
       fetchMoreResult: option('parsedData),
       variables: option('variables),
@@ -197,6 +280,112 @@ module QueryResult = {
       loading: js.loading,
       networkStatus: js.networkStatus,
     };
+};
+
+module UnexecutedLazyResult = {
+  module Js_ = {
+    // declare type UnexecutedLazyFields = {
+    //     loading: false;
+    //     networkStatus: NetworkStatus.ready;
+    //     called: false;
+    //     data: undefined;
+    // };
+    // declare type UnexecutedLazyResult = UnexecutedLazyFields & AbsentLazyResultFields;
+    type t = {
+      loading: bool,
+      networkStatus: NetworkStatus.Js_.t,
+      called: bool,
+    };
+  };
+  type t = {
+    loading: bool,
+    networkStatus: NetworkStatus.t,
+    called: bool,
+  };
+
+  let fromJs: Js_.t => t =
+    js => {
+      loading: js.loading,
+      networkStatus: js.networkStatus->NetworkStatus.fromJs,
+      called: js.called,
+    };
+};
+
+module LazyQueryResult = {
+  module Js_ = {
+    module Union: {
+      type t;
+      let unexecutedLazyResult: UnexecutedLazyResult.Js_.t => t;
+      let queryResult: QueryResult.Js_.t('jsData, 'variables) => t;
+      type case('jsData, 'variables) =
+        | UnexecutedLazyResult(UnexecutedLazyResult.Js_.t)
+        | QueryResult(QueryResult.Js_.t('jsData, 'variables));
+      let classify: t => case('jsData, 'variables);
+    } = {
+      [@unboxed]
+      type t =
+        | Any('a): t;
+      let unexecutedLazyResult = (v: UnexecutedLazyResult.Js_.t) => Any(v);
+      let queryResult = (v: QueryResult.Js_.t('jsData, 'variables)) =>
+        Any(v);
+      type case('jsData, 'variables) =
+        | UnexecutedLazyResult(UnexecutedLazyResult.Js_.t)
+        | QueryResult(QueryResult.Js_.t('jsData, 'variables));
+      let classify = (Any(v): t): case('jsData, 'variables) =>
+        if ([%raw {|function (value) { return  !value.client}|}](v)) {
+          UnexecutedLazyResult(Obj.magic(v): UnexecutedLazyResult.Js_.t);
+        } else {
+          QueryResult(Obj.magic(v): QueryResult.Js_.t('jsData, 'variables));
+        };
+    };
+    // export declare type LazyQueryResult<TData, TVariables> = UnexecutedLazyResult | QueryResult<TData, TVariables>;
+    type t('jsData, 'variables) = Union.t;
+  };
+
+  type t('data, 'variables) =
+    | Executed(QueryResult.t('data, 'variables))
+    | Unexecuted(UnexecutedLazyResult.t);
+
+  let fromJs:
+    (
+      Js_.t('jsData, 'variables),
+      ~parse: 'jsData => 'data,
+      ~serialize: 'data => 'jsData
+    ) =>
+    t('data, 'variables) =
+    (js, ~parse, ~serialize) => {
+      switch (js->Js_.Union.classify) {
+      | UnexecutedLazyResult(v) => Unexecuted(v->UnexecutedLazyResult.fromJs)
+      | QueryResult(v) => Executed(v->QueryResult.fromJs(~parse, ~serialize))
+      };
+    };
+};
+
+module QueryTuple = {
+  module Js_ = {
+    // export declare type QueryTuple<TData, TVariables> = [(options?: QueryLazyOptions<TVariables>) => void, LazyQueryResult<TData, TVariables>];
+    type t('jsData, 'variables) = (
+      QueryLazyOptions.Js_.t('variables) => unit,
+      LazyQueryResult.Js_.t('jsData, 'variables),
+    );
+  };
+
+  type t('data, 'variables) = (
+    (~context: Js.Json.t=?, 'variables) => unit,
+    LazyQueryResult.t('data, 'variables),
+  );
+
+  let fromJs:
+    (
+      Js_.t('jsData, 'variables),
+      ~parse: 'jsData => 'data,
+      ~serialize: 'data => 'jsData
+    ) =>
+    t('data, 'variables) =
+    ((jsExecuteQuery, jsLazyQueryResult), ~parse, ~serialize) => (
+      (~context=?, variables) => jsExecuteQuery({context, variables}),
+      jsLazyQueryResult->LazyQueryResult.fromJs(~parse, ~serialize),
+    );
 };
 
 module BaseMutationOptions = {

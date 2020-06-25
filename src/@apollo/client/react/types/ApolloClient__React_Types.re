@@ -332,10 +332,10 @@ module LazyQueryResult = {
         | UnexecutedLazyResult(UnexecutedLazyResult.Js_.t)
         | QueryResult(QueryResult.Js_.t('jsData, 'variables));
       let classify = (Any(v): t): case('jsData, 'variables) =>
-        if ([%raw {|function (value) { return  !value.client}|}](v)) {
-          UnexecutedLazyResult(Obj.magic(v): UnexecutedLazyResult.Js_.t);
-        } else {
+        if ([%raw {|function (value) { return "client" in value}|}](v)) {
           QueryResult(Obj.magic(v): QueryResult.Js_.t('jsData, 'variables));
+        } else {
+          UnexecutedLazyResult(Obj.magic(v): UnexecutedLazyResult.Js_.t);
         };
     };
     // export declare type LazyQueryResult<TData, TVariables> = UnexecutedLazyResult | QueryResult<TData, TVariables>;

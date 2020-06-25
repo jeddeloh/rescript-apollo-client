@@ -9,6 +9,7 @@
   "devDependencies": {
     "@apollo/client": "^3.0.0-rc.6",
     "@apollo/link-context": "^2.0.0-beta.3",
+    "@apollo/link-error": "^2.0.0-beta.3",
     "@apollo/link-ws": "^2.0.0-beta.3",
     "@reasonml-community/graphql-ppx": "^1.0.0-beta.11",
     "bs-platform": "^7.3.2",

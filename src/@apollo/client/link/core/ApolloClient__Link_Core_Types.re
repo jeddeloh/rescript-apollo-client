@@ -90,6 +90,7 @@ module NextLink = {
     // export declare type NextLink = (operation: Operation) => Observable<FetchResult>;
     type t = Operation.Js_.t => Observable.t(FetchResult.Js_.t(Js.Json.t));
   };
+  type t = Js_.t;
 };
 
 module RequestHandler = {

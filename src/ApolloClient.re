@@ -32,6 +32,8 @@ module Utilities = ApolloClient__Utilities;
 
 module ApolloLink = {
   module HttpLink = ApolloClient__Link_Http_HttpLink;
+  module LinkContext = ApolloClient__LinkContext;
+  module LinkError = ApolloClient__LinkError;
   module LinkWs = ApolloClient__LinkWs;
   type t = ApolloClient__Link_Core_ApolloLink.t;
   let concat = ApolloClient__Link_Core_ApolloLink.Static.concat;

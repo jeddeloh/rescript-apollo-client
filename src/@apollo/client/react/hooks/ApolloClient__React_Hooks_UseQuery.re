@@ -153,7 +153,7 @@ let useQuery0:
   };
 
 module Extend = (M: Operation) => {
-  let asRefetchQuery:
+  let refetchQueryDescription:
     (~context: Js.Json.t=?, M.Raw.t_variables) =>
     RefetchQueryDescription.t_variant =
     (~context=?, variables: M.Raw.t_variables) =>
@@ -231,7 +231,7 @@ module Extend = (M: Operation) => {
 };
 
 module ExtendNoRequiredVariables = (M: OperationNoRequiredVars) => {
-  let asRefetchQuery:
+  let refetchQueryDescription:
     (~context: Js.Json.t=?, ~variables: M.Raw.t_variables=?, unit) =>
     RefetchQueryDescription.t_variant =
     (~context=?, ~variables: option(M.Raw.t_variables)=?, ()) =>

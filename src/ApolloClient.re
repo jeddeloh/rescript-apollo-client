@@ -1,6 +1,8 @@
 module Bindings = {
   module Client = ApolloClient__Client;
   module Graphql = ApolloClient__Graphql;
+  module LinkError = ApolloClient__LinkError;
+  module LinkContext = ApolloClient__LinkContext;
   module LinkWs = ApolloClient__LinkWs;
   module SubscriptionTransportWs = ApolloClient__SubscriptionsTransportWs;
   module ZenObservable = ApolloClient__ZenObservable;

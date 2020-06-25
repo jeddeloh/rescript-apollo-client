@@ -30,7 +30,7 @@ module React = {
 
 module Utilities = ApolloClient__Utilities;
 
-module ApolloLink = {
+module Link = {
   module HttpLink = ApolloClient__Link_Http_HttpLink;
   module LinkContext = ApolloClient__LinkContext;
   module LinkError = ApolloClient__LinkError;
@@ -44,7 +44,7 @@ module ApolloLink = {
   let split = ApolloClient__Link_Core_ApolloLink.Static.split;
 };
 
-module ApolloCache = {
+module Cache = {
   module InMemoryCache = ApolloClient__Cache_InMemory_InMemoryCache;
   type t('serialized) =
     ApolloClient__Cache_Core_Cache.ApolloCache.t('serialized);

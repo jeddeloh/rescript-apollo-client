@@ -16,10 +16,7 @@ module Js_ = {
   // export declare function useQuery<TData = any, TVariables = OperationVariables>(query: DocumentNode, options?: QueryHookOptions<TData, TVariables>): QueryResult<TData, TVariables>;
   [@bs.module "@apollo/client"]
   external useQuery:
-    (
-      . ~query: Graphql.documentNode,
-      ~options: QueryHookOptions.Js_.t('jsData, 'variables)=?
-    ) =>
+    (. Graphql.documentNode, QueryHookOptions.Js_.t('jsData, 'variables)) =>
     QueryResult.Js_.t('jsData, 'variables) =
     "useQuery";
 };
@@ -64,27 +61,26 @@ let useQuery:
   ) => {
     let jsQueryResult =
       Js_.useQuery(.
-        ~query=Operation.query->Utils.castStringAsDocumentNode,
-        ~options=
-          QueryHookOptions.toJs(
-            {
-              client,
-              context,
-              displayName,
-              errorPolicy,
-              fetchPolicy,
-              onCompleted,
-              onError,
-              notifyOnNetworkStatusChange,
-              partialRefetch,
-              pollInterval,
-              query: None,
-              skip,
-              ssr,
-              variables,
-            },
-            ~parse=Operation.parse,
-          ),
+        Operation.query->Utils.castStringAsDocumentNode,
+        QueryHookOptions.toJs(
+          {
+            client,
+            context,
+            displayName,
+            errorPolicy,
+            fetchPolicy,
+            onCompleted,
+            onError,
+            notifyOnNetworkStatusChange,
+            partialRefetch,
+            pollInterval,
+            query: None,
+            skip,
+            ssr,
+            variables,
+          },
+          ~parse=Operation.parse,
+        ),
       );
 
     Utils.useGuaranteedMemo1(

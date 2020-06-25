@@ -16,8 +16,8 @@ module Js_ = {
   [@bs.module "@apollo/client"]
   external useLazyQuery:
     (
-      . ~query: Graphql.documentNode,
-      ~options: LazyQueryHookOptions.Js_.t('jsData, 'variables)
+      . Graphql.documentNode,
+      LazyQueryHookOptions.Js_.t('jsData, 'variables)
     ) =>
     QueryTuple.Js_.t('jsData, 'variables) =
     "useLazyQuery";
@@ -60,27 +60,26 @@ let useLazyQuery:
     (module Operation),
   ) => {
     let jsQueryTuple =
-      Js_.useLazyQuery(.
-        ~query=Operation.query->Utils.castStringAsDocumentNode,
-        ~options=
-          LazyQueryHookOptions.toJs(
-            {
-              client,
-              context,
-              displayName,
-              errorPolicy,
-              fetchPolicy,
-              onCompleted,
-              onError,
-              notifyOnNetworkStatusChange,
-              partialRefetch,
-              pollInterval,
-              query: None,
-              ssr,
-              variables,
-            },
-            ~parse=Operation.parse,
-          ),
+      Js_.useLazyQuery(
+        Operation.query->Utils.castStringAsDocumentNode,
+        LazyQueryHookOptions.toJs(
+          {
+            client,
+            context,
+            displayName,
+            errorPolicy,
+            fetchPolicy,
+            onCompleted,
+            onError,
+            notifyOnNetworkStatusChange,
+            partialRefetch,
+            pollInterval,
+            query: None,
+            ssr,
+            variables,
+          },
+          ~parse=Operation.parse,
+        ),
       );
 
     Utils.useGuaranteedMemo1(

@@ -28,8 +28,8 @@ module Js_ = {
   [@bs.module "@apollo/client"]
   external useSubscription:
     (
-      . ~subscription: Graphql.Language.documentNode,
-      ~options: SubscriptionHookOptions.Js_.t('jsData, 'variables)=?
+      . Graphql.Language.documentNode,
+      SubscriptionHookOptions.Js_.t('jsData, 'variables)
     ) =>
     useSubscription_result('jsData, 'variables) =
     "useSubscription";

@@ -21,8 +21,8 @@ module Js_ = {
   [@bs.module "@apollo/client"]
   external useMutation:
     (
-      . ~mutation: Graphql.documentNode,
-      ~options: MutationHookOptions.Js_.t('jsData, 'variables)=?
+      . Graphql.documentNode,
+      MutationHookOptions.Js_.t('jsData, 'variables)
     ) =>
     MutationTuple.Js_.t('jsData, 'variables) =
     "useMutation";
@@ -66,28 +66,27 @@ let useMutation:
   ) => {
     let jsMutationTuple =
       Js_.useMutation(.
-        ~mutation=Operation.query->Utils.castStringAsDocumentNode,
-        ~options=
-          MutationHookOptions.toJs(
-            {
-              mutation: None,
-              awaitRefetchQueries,
-              context,
-              client,
-              errorPolicy,
-              fetchPolicy,
-              ignoreResults,
-              notifyOnNetworkStatusChange,
-              onError,
-              onCompleted,
-              optimisticResponse,
-              refetchQueries,
-              update,
-              variables: None,
-            },
-            ~parse=Operation.parse,
-            ~serialize=Operation.serialize,
-          ),
+        Operation.query->Utils.castStringAsDocumentNode,
+        MutationHookOptions.toJs(
+          {
+            mutation: None,
+            awaitRefetchQueries,
+            context,
+            client,
+            errorPolicy,
+            fetchPolicy,
+            ignoreResults,
+            notifyOnNetworkStatusChange,
+            onError,
+            onCompleted,
+            optimisticResponse,
+            refetchQueries,
+            update,
+            variables: None,
+          },
+          ~parse=Operation.parse,
+          ~serialize=Operation.serialize,
+        ),
       );
 
     Utils.useGuaranteedMemo1(

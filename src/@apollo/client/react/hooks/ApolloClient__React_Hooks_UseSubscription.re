@@ -71,21 +71,20 @@ let useSubscription:
   ) => {
     let jsSubscriptionResult =
       Js_.useSubscription(.
-        ~subscription=Operation.query->Utils.castStringAsDocumentNode,
-        ~options=
-          SubscriptionHookOptions.toJs(
-            {
-              client,
-              fetchPolicy,
-              onSubscriptionData,
-              onSubscriptionComplete,
-              subscription: None,
-              shouldResubscribe,
-              skip,
-              variables,
-            },
-            ~parse=Operation.parse,
-          ),
+        Operation.query->Utils.castStringAsDocumentNode,
+        SubscriptionHookOptions.toJs(
+          {
+            client,
+            fetchPolicy,
+            onSubscriptionData,
+            onSubscriptionComplete,
+            subscription: None,
+            shouldResubscribe,
+            skip,
+            variables,
+          },
+          ~parse=Operation.parse,
+        ),
       );
 
     Utils.useGuaranteedMemo1(

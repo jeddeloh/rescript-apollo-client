@@ -140,28 +140,27 @@ let useMutationWithVariables:
   ) => {
     let jsMutationTuple =
       Js_.useMutation(.
-        ~mutation=Operation.query->Utils.castStringAsDocumentNode,
-        ~options=
-          MutationHookOptions.toJs(
-            {
-              mutation: None,
-              awaitRefetchQueries,
-              context,
-              client,
-              errorPolicy,
-              fetchPolicy,
-              ignoreResults,
-              notifyOnNetworkStatusChange,
-              onError,
-              onCompleted,
-              optimisticResponse,
-              refetchQueries,
-              update,
-              variables: Some(variables),
-            },
-            ~parse=Operation.parse,
-            ~serialize=Operation.serialize,
-          ),
+        Operation.query->Utils.castStringAsDocumentNode,
+        MutationHookOptions.toJs(
+          {
+            mutation: None,
+            awaitRefetchQueries,
+            context,
+            client,
+            errorPolicy,
+            fetchPolicy,
+            ignoreResults,
+            notifyOnNetworkStatusChange,
+            onError,
+            onCompleted,
+            optimisticResponse,
+            refetchQueries,
+            update,
+            variables: Some(variables),
+          },
+          ~parse=Operation.parse,
+          ~serialize=Operation.serialize,
+        ),
       );
 
     Utils.useGuaranteedMemo1(
@@ -217,29 +216,27 @@ let useMutation0:
   ) => {
     let jsMutationTuple =
       Js_.useMutation(.
-        ~mutation=
-          OperationNoRequiredVars.query->Utils.castStringAsDocumentNode,
-        ~options=
-          MutationHookOptions.toJs(
-            {
-              mutation: None,
-              awaitRefetchQueries,
-              context,
-              client,
-              errorPolicy,
-              fetchPolicy,
-              ignoreResults,
-              notifyOnNetworkStatusChange,
-              onError,
-              onCompleted,
-              optimisticResponse,
-              refetchQueries,
-              update,
-              variables: Some(OperationNoRequiredVars.makeDefaultVariables()),
-            },
-            ~parse=OperationNoRequiredVars.parse,
-            ~serialize=OperationNoRequiredVars.serialize,
-          ),
+        OperationNoRequiredVars.query->Utils.castStringAsDocumentNode,
+        MutationHookOptions.toJs(
+          {
+            mutation: None,
+            awaitRefetchQueries,
+            context,
+            client,
+            errorPolicy,
+            fetchPolicy,
+            ignoreResults,
+            notifyOnNetworkStatusChange,
+            onError,
+            onCompleted,
+            optimisticResponse,
+            refetchQueries,
+            update,
+            variables: Some(OperationNoRequiredVars.makeDefaultVariables()),
+          },
+          ~parse=OperationNoRequiredVars.parse,
+          ~serialize=OperationNoRequiredVars.serialize,
+        ),
       );
 
     Utils.useGuaranteedMemo1(

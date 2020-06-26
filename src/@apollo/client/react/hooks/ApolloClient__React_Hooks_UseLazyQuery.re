@@ -60,7 +60,7 @@ let useLazyQuery:
     (module Operation),
   ) => {
     let jsQueryTuple =
-      Js_.useLazyQuery(
+      Js_.useLazyQuery(.
         Operation.query->Utils.castStringAsDocumentNode,
         LazyQueryHookOptions.toJs(
           {

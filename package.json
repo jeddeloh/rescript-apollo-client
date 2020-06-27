@@ -20,7 +20,7 @@
   "peerDependencies": {
     "@apollo/client": "^3.0.0-rc.6",
     "@reasonml-community/graphql-ppx": "^1.0.0-beta.11",
-    "bs-platform": "^7.3.0",
+    "bs-platform": "^7.3.0 || ^8.0.0",
     "reason-react": "^0.9.0"
   }
 }

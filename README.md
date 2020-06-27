@@ -4,13 +4,13 @@
 
 ## Installation
 
-### 1 - Install `graphql-ppx`
+### 1. Install `graphql-ppx`
 
 We rely on Graphql-ppx for typesafe GraphQL operations and fragments in ReasonML. [Go to the official documentation](https://beta.graphql-ppx.com) for installation instructions.
 
 You should now have a `graphql_schema.json` in your project somewhere. Make sure it's always up-to-date!
 
-### 2 - Install Apollo Client and Optional Dependencies
+### 2. Install Apollo Client and Optional Dependencies
 
 ```sh
 yarn add @apollo/client @jeddeloh/reason-apollo-client@dev
@@ -26,7 +26,7 @@ npm install @apollo/client @jeddeloh/reason-apollo-client@dev
 npm install @apollo/link-context @apollo/link-error @apollo/link-ws subscriptions-transport-ws
 ```
 
-### 3 - Apollo-Specific `graphql-ppx` Configuration
+### 3. Apollo-Specific `graphql-ppx` Configuration
 
 Add the following to `bs-dependencies`, `graphql`, and `ppx-flags` in your `bsconfig.json`
 
@@ -56,7 +56,9 @@ Add the following to `bs-dependencies`, `graphql`, and `ppx-flags` in your `bsco
 }
 ```
 
-`"apollo-mode"` automaticaly sprinkles `__typename` throughout our operation definitions, `"-template-tag-*"` is how we tell `graphql-ppx` to wrap every operation with `gql`, and finally the `"extend-*"` allows `reason-apollo-client` to automatically decorate the generated modules with Apollo-specific things like the correct hook for that operation!
+- `"apollo-mode"` automaticaly sprinkles `__typename` throughout our operation definitions
+- `"-template-tag-*"` is how we tell `graphql-ppx` to wrap every operation with `gql`
+- `"extend-*"` allows `reason-apollo-client` to automatically decorate the generated modules with Apollo-specific things like the correct hook for that operation!
 
 ## Bindings to Javascript Packages
 

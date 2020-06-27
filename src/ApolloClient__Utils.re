@@ -3,7 +3,8 @@ module Graphql = ApolloClient__Graphql;
 // external castStringAsDocumentNode: string => Graphql.documentNode =
 //   "%identity";
 // Temporarily rolling back using graphql ppx template tags
-let castStringAsDocumentNode = ApolloClient__Client.gql;
+[@bs.module "@apollo/client"]
+external castStringAsDocumentNode: string => Graphql.documentNode = "gql";
 
 let useGuaranteedMemo1 = (f, dependency) => {
   let value = React.useRef(f());

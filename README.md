@@ -13,7 +13,7 @@ You should now have a `graphql_schema.json` in your project somewhere. Make sure
 ### 2 - Install Apollo Client and Optional Dependencies
 
 ```sh
-yarn add @apollo/client <tbd>
+yarn add @apollo/client @jeddeloh/reason-apollo-client@dev
 # optional
 yarn add @apollo/link-context @apollo/link-error @apollo/link-ws subscriptions-transport-ws
 ```
@@ -21,7 +21,7 @@ yarn add @apollo/link-context @apollo/link-error @apollo/link-ws subscriptions-t
 or
 
 ```sh
-npm install @apollo/client <tbd>
+npm install @apollo/client @jeddeloh/reason-apollo-client@dev
 # optional
 npm install @apollo/link-context @apollo/link-error @apollo/link-ws subscriptions-transport-ws
 ```
@@ -44,8 +44,9 @@ Add the following to `bs-dependencies`, `graphql`, and `ppx-flags` in your `bsco
   "ppx-flags": [
     [
       "@reasonml-community/graphql-ppx/ppx",
-+     "-template-tag-import=gql",
-+     "-template-tag-location=@apollo/client"
+-     // don't enter this yet, but you'll need it soon
+-     "-template-tag-import=gql",
+-     "-template-tag-location=@apollo/client"
     ]
   ],
   "bs-dependencies: [

@@ -8,6 +8,8 @@
 
 We rely on Graphql-ppx for typesafe GraphQL operations and fragments in ReasonML. [Go to the official documentation](https://beta.graphql-ppx.com) for installation instructions.
 
+You should now have a `graphql_schema.json` in your project somewhere. Make sure it's always up-to-date!
+
 ### 2 - Install Apollo Client and Optional Dependencies
 
 ```sh
@@ -26,7 +28,7 @@ npm install @apollo/link-context @apollo/link-error @apollo/link-ws subscription
 
 ### 3 - Apollo-Specific `graphql-ppx` Configuration
 
-Add the following to `ppx-flags` and `bs-dependencies` and `graphql` in your `bsconfig.json`
+Add the following to `bs-dependencies`, `graphql`, and `ppx-flags` in your `bsconfig.json`
 
 ```diff
 {
@@ -48,12 +50,12 @@ Add the following to `ppx-flags` and `bs-dependencies` and `graphql` in your `bs
   ],
   "bs-dependencies: [
     "@reasonml-community/graphql-ppx"
-+   "<tbd>"
++   "@jeddeloh/reason-apollo-client"
   ]
 }
 ```
 
-`"apollo-mode"` automaticaly adds `__typename` where appropriate, `"-template-tag-*"` is how we tell `graphql-ppx` to wrap all our query strings with `gql`, and finally the `"extend-*"` allow us to automatically decorate the modules that are generated with Apollo-specific things like the correct hook for the operation!
+`"apollo-mode"` automaticaly sprinkles `__typename` throughout our operation definitions, `"-template-tag-*"` is how we tell `graphql-ppx` to wrap every operation with `gql`, and finally the `"extend-*"` allows `reason-apollo-client` to automatically decorate the generated modules with Apollo-specific things like the correct hook for that operation!
 
 ## Bindings to Javascript Packages
 
@@ -67,11 +69,11 @@ Contains partial bindings to the following:
 - `subscriptions-transport-ws`
 - `zen-observable`
 
-While we strive to provide ergonomics that are "reasonable", we do expose the 1:1 bindings if you find it easier to use the Apollo Docs as reference
+While we strive to provide ergonomics that are intuitive and "reasonable", we do expose the 1:1 bindings if that is your preference. Say you're looking in the Apollo docs and see `import { getOperationDefinition } from '@apollo/client/utilities'` and you'd prefer to be able to access with the same filepath, you could do it like so:
 
 ```js
 module Apollo = {
-  include Apollo.Bindings;
+  include ApolloClient.Bindings;
 };
 
 // import { getOperationDefinition } from '@apollo/client/utilities'

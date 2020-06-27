@@ -3,7 +3,7 @@ let graphqlEndpoint = "api.graph.cool/simple/v1/cjdgba1jw4ggk0185ig4bhpsn";
 let headers = {"high": "five"};
 
 let httpLink =
-  ApolloClient.HttpLink.make(
+  ApolloClient.Link.HttpLink.make(
     ~uri=_ => "https://" ++ graphqlEndpoint,
     ~credentials="include",
     ~headers=Obj.magic(headers),
@@ -11,7 +11,7 @@ let httpLink =
   );
 
 let wsLink =
-  ApolloClient.LinkWs.(
+  ApolloClient.Link.LinkWs.(
     WebSocketLink.make(
       ~uri="wss://" ++ graphqlEndpoint,
       ~options=
@@ -26,7 +26,7 @@ let wsLink =
   );
 
 let terminatingLink =
-  ApolloClient.split(
+  ApolloClient.Link.split(
     ~test=
       ({query}) => {
         let definition = ApolloClient.Utilities.getOperationDefinition(query);
@@ -43,7 +43,7 @@ let terminatingLink =
 let instance =
   ApolloClient.(
     make(
-      ~cache=InMemoryCache.make(),
+      ~cache=Cache.InMemoryCache.make(),
       ~connectToDevTools=true,
       ~defaultOptions=
         DefaultOptions.make(

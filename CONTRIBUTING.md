@@ -5,15 +5,21 @@
 - Avoid partial types or bindings if possible
 - Encourage incremental contribution from the community rather than biting off more than one person can chew
 
+## Provide 1:1 bindings as the priority
+
+## The power of numbers and OSS
+
+There's nothing fancy about this library. It tends to view the problem of bindings as more of a people problem (how can we leverage the power of numbers) than a programming problem (automatic conversion from typescript—would be amazing!). As such, a lot of detail is paid to consistency and clarity with the hope of maximizing human ability to both add and verify that bindings are correct. The long-term success or failure of this library is intended to be dependent on active community contribution rather than the efforts of a few individuals. Will it work? That's up to you, dear reader <3
+
 ## Following a Consistent Pattern
 
-At the file level, bindings to Javascript packacges should follow an identical directory structure as in the JS package. No thinking required! It also helps when you're going
+At the file level, bindings to Javascript packages should follow an identical directory structure as in the JS package. No thinking required! This has the side benefit of being able to navigate to any import you see in the javascript docs via filepath pattern.
 
-At the code level, all JS bindings should go in a `Js_` module of some sort. At first it seems ridiculous, but it pays off at scale.
+At the code level, all JS bindings should go in a `Js_` module of some sort. At first it seems ridiculous, but it pays off at scale. (See **Reasoning Behind `Js_` modules**)
 
 ## Avoiding Partial Types
 
-Please type something as completely as possible when you come across it or leave it for someone else (if nothing else, you can use an abstract type so things will still flow through everywhere and people can cast it when in a hurry). This way no one has to go back and duplicate that work of tracing through the same code you were just in _and_ we can trust that if a binding exists, it's complete and we can reuse easily.
+Please type something as completely as possible when you come across it or leave it for someone else (if nothing else, you can use an abstract type so things will still flow through everywhere and people can cast it when in a hurry). This way no one has to go back and duplicate that work of tracing through the same code you were just in _and_ we can trust that if a binding exists, it's probably complete and we can just reuse.
 
 # Style Guidelines
 
@@ -68,7 +74,7 @@ module Js_ = {
 
 ### SubTypes
 
-Sometimes multiple types were required to represent a single type in TypeScript. In order to help make it clear what is a binding to an actual type and what is just needed by Reason. In this case we take a similar naming approach to the modules (prefixing with the parent). For instance, `Apollo_Client__React_Types.QueryResult.Raw` has a `type t` that uses `t_fetchMoreOptions` which in turn uses `t_fetchMoreOptions_updateQueryOptions`.
+Sometimes multiple types were required to represent a single type in TypeScript. In order to help make it clear what is a binding to an actual type and what is just needed by Reason, we take a similar naming approach to the modules (prefixing with the parent). For instance, `Apollo_Client__React_Types.QueryResult.Raw` has a `type t` that uses `t_fetchMoreOptions` which in turn uses `t_fetchMoreOptions_updateQueryOptions`.
 
 ## Binding to Js Module Exports
 
@@ -84,7 +90,7 @@ Use records
 
 ## Binding to Enums
 
-Use standard variants. You can use `jsConverter` for ints, but otherwise use manual `toJs` and `fromJs` functions.
+Prefer standard variants. `jsConverter` works great for ints, but otherwise use manual `toJs` and `fromJs` functions. The reasoning is that Apollo may very well be an entry point into ReasonML and we don't want to _immediately_ expose users to polymorphic variants.
 
 ## General
 
@@ -94,7 +100,7 @@ Use standard variants. You can use `jsConverter` for ints, but otherwise use man
 
 ## Reasoning behind `Js_` modules
 
-Here's a stupid example:
+Here's a typical example:
 
 ```
 module TypeName = {
@@ -106,16 +112,18 @@ module TypeName = {
 };
 ```
 
-But what if we need to parse/serialize some data which happens a lot in this library?
+Stupid, right? But bear with me it pays off in the big picture. What if we need to parse/serialize some data which happens a lot in this library?
 
 ```diff
 module TypeName = {
   module Js_ = {
+-   type t;
 +   type t('jsData) = {
 +     data: 'jsData,
 +   };
   }
 
+- type t = Js_.t;
 + type t('data) = {
 +   data: 'data
 + };
@@ -126,7 +134,7 @@ module TypeName = {
 };
 ```
 
-Nice, we can never forget to parse because records are nominally typed.
+Nice, now when wherever we say we want a `Typename.t`, we can never forget to parse because records are nominally typed.
 
 What if you need to construct a class or object with a bunch of optional properties?
 
@@ -142,6 +150,7 @@ module TypeName = {
 +     data: 'jsData,
 +     optionalProp: option(bool),
 +   }
+
 +   [@bs.new] [@bs.module "someModule"]
 +   external make = (make_options('jsData)) => t = "someClass";
   }
@@ -151,12 +160,12 @@ module TypeName = {
 +   optionalProp: option(bool),
   };
 
-  let toJs: t => Js_.t = (t, ~serialize) => {
+  let toJs: t => Js_.t = (t) => {
     data: serialize(t.data)
 +   optionalProp: t.optionalProp
   };
 
-+ let make: (~data, ~optionalProp=?, ~serialize, ()) =>
++ let make: (~data, ~optionalProp=?, ()) =>
 +   Js_.make(
 +     toJs({
 +         data,
@@ -168,7 +177,7 @@ module TypeName = {
 };
 ```
 
-It's nice to have all this conversion stuff wrapped in one module and have a consistent naming. All of it together really begins to pay off when we're reusing many of the types.
+It's nice to have all this conversion stuff wrapped in one module and have consistent naming. All of it together really begins to pay off when we have types that reference many other types.
 
 ```diff
 module TypeName = {
@@ -190,19 +199,23 @@ module TypeName = {
   type t('data) = {
     data: 'data,
     optionalProp: option(bool),
-    reusedType: ReusedType.t
++   reusedType: ReusedType.t
   };
 
-  let toJs: t => Js_.t = (t, ~serialize) => {
+- let toJs: t => Js_.t = (t) => {
++ let toJs: t => Js_.t = (t, ~serialize) => {
     data: serialize(t.data)
     optionalProp: t.optionalProp
++   reusedType: t.reusedType->ReusedType.toJs(~serialize)
   };
 
-  let make: (~data, ~optionalProp=?, ~serialize, ()) =>
+- let make: (~data, ~optionalProp=?, ()) =>
++ let make: (~data, ~optionalProp=?, ~reusedType, ~serialize, ()) =>
     Js_.make(
       toJs({
           data,
           optionalProp
++         reusedType
         },
         ~serialize,
       )
@@ -210,6 +223,51 @@ module TypeName = {
 };
 ```
 
-When I'm defining a `Js_` `type t` that references other types, I know I should always be using the `Js_.t` versions of those types and it's very easy to visually confirm the correct types are being referenced. The same goes for defining a top-level `type t`, I should never see a `Js_.t` there. Now I can just follow the compiler errors.
+Does `reusedType` need some conversion or parsing or serializing? If we've done things right, all we need to confirm is that any `Js_` modules reference the `Js_.t` versions of types, the compiler will do the rest! In this case, it turns out it needs also needs parse!
 
-FWIW, I tried `JS` naming, but I would accidentally type `Js` all the time and not see it. I found adding the `_` to helpit stick out. :shrug:
+```diff
+module TypeName = {
+  module Js_ = {
+    type t('jsData) = {
+      data: 'jsData,
+      reusedType: ReusedType.Js_.t
+    };
+
+    type make_options('jsData) = {
+      data: 'jsData,
+      optionalProp: option(bool),
+      reusedType: ReusedType.Js_.t
+    }
+    [@bs.new] [@bs.module "someModule"]
+    external make = (make_options('jsData)) => t = "someClass";
+  }
+
+  type t('data) = {
+    data: 'data,
+    optionalProp: option(bool),
+    reusedType: ReusedType.t
+  };
+
+- let toJs: t => Js_.t = (t, ~serialize) => {
++ let toJs: t => Js_.t = (t, ~parse, ~serialize) => {
+    data: serialize(t.data)
+    optionalProp: t.optionalProp
+-   reusedType: t.reusedType->ReusedType.toJs(~serialize)
++   reusedType: t.reusedType->ReusedType.toJs(~parse, ~serialize)
+  };
+
+- let make: (~data, ~optionalProp=?, ~reusedType, ~serialize, ()) =>
++ let make: (~data, ~optionalProp=?, ~parse, ~reusedType, ~serialize, ()) =>
+    Js_.make(
+      toJs({
+          data,
+          optionalProp
+          reusedType
+        },
+        ~serialize,
+      )
+    );
+};
+```
+
+Regarding the actual module naming, I tried `JS`, but I would accidentally type `Js` all the time and not see it. I found adding the `_` helped it stick out. :shrug:

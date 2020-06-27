@@ -206,9 +206,40 @@ module Extend = (M: Operation) => {
         ~partialRefetch=?,
         ~pollInterval=?,
         ~ssr=?,
-        variables,
+        (),
       ) => {
     ApolloClient__React_Hooks_UseLazyQuery.useLazyQuery(
+      ~client?,
+      ~context?,
+      ~displayName?,
+      ~errorPolicy?,
+      ~fetchPolicy?,
+      ~notifyOnNetworkStatusChange?,
+      ~onCompleted?,
+      ~onError?,
+      ~partialRefetch?,
+      ~pollInterval?,
+      ~ssr?,
+      (module M),
+    );
+  };
+
+  let useLazyWithVariables =
+      (
+        ~client=?,
+        ~context=?,
+        ~displayName=?,
+        ~errorPolicy=?,
+        ~fetchPolicy=?,
+        ~notifyOnNetworkStatusChange=?,
+        ~onCompleted=?,
+        ~onError=?,
+        ~partialRefetch=?,
+        ~pollInterval=?,
+        ~ssr=?,
+        variables,
+      ) => {
+    ApolloClient__React_Hooks_UseLazyQuery.useLazyQueryWithVariables(
       ~client?,
       ~context?,
       ~displayName?,
@@ -287,10 +318,41 @@ module ExtendNoRequiredVariables = (M: OperationNoRequiredVars) => {
         ~partialRefetch=?,
         ~pollInterval=?,
         ~ssr=?,
+        (),
+      ) => {
+    ApolloClient__React_Hooks_UseLazyQuery.useLazyQuery0(
+      ~client?,
+      ~context?,
+      ~displayName?,
+      ~errorPolicy?,
+      ~fetchPolicy?,
+      ~notifyOnNetworkStatusChange?,
+      ~onCompleted?,
+      ~onError?,
+      ~partialRefetch?,
+      ~pollInterval?,
+      ~ssr?,
+      (module M),
+    );
+  };
+
+  let useLazyWithVariables =
+      (
+        ~client=?,
+        ~context=?,
+        ~displayName=?,
+        ~errorPolicy=?,
+        ~fetchPolicy=?,
+        ~notifyOnNetworkStatusChange=?,
+        ~onCompleted=?,
+        ~onError=?,
+        ~partialRefetch=?,
+        ~pollInterval=?,
+        ~ssr=?,
         ~variables=?,
         (),
       ) => {
-    ApolloClient__React_Hooks_UseLazyQuery.useLazyQuery(
+    ApolloClient__React_Hooks_UseLazyQuery.useLazyQueryWithVariables(
       ~client?,
       ~context?,
       ~displayName?,

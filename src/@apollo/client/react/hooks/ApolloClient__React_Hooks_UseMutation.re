@@ -169,7 +169,7 @@ let useMutationWithVariables:
           jsMutationTuple->MutationTuple__noVariables.fromJs(
             ~parse=Operation.parse,
             ~serialize=Operation.serialize,
-            // We're passing in the same variables from above. This helps to reuse the same types
+            // Passing in the same variables from above allows us to reuse some types
             ~variables,
           );
         (mutate, mutationResult);

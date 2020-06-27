@@ -88,26 +88,40 @@ module LazyQueryHookOptions = {
     // export interface LazyQueryHookOptions<TData = any, TVariables = OperationVariables> extends Omit<QueryFunctionOptions<TData, TVariables>, 'skip'> {
     //     query?: DocumentNode;
     // }
+    [@bs.deriving abstract]
     type t('jsData, 'variables) = {
-      query: option(Graphql.documentNode),
+      [@bs.optional]
+      query: Graphql.documentNode,
       // ...extends QueryFunctionOptions
-      displayName: option(string),
-      onCompleted: option('jsData => unit),
-      onError: option(ApolloError.t => unit),
+      [@bs.optional]
+      displayName: string,
+      [@bs.optional]
+      onCompleted: 'jsData => unit,
+      [@bs.optional]
+      onError: ApolloError.t => unit,
       // ..extends BaseQueryOptions
-      client: option(ApolloClient.t),
-      context: option(Js.Json.t), // ACTUAL: Record<string, any>
-      errorPolicy: option(string),
-      fetchPolicy: option(string),
-      notifyOnNetworkStatusChange: option(bool),
-      partialRefetch: option(bool),
-      pollInterval: option(int),
+      [@bs.optional]
+      client: ApolloClient.t,
+      [@bs.optional]
+      context: Js.Json.t, // ACTUAL: Record<string, any>
+      [@bs.optional]
+      errorPolicy: string,
+      [@bs.optional]
+      fetchPolicy: string,
+      [@bs.optional]
+      notifyOnNetworkStatusChange: bool,
+      [@bs.optional]
+      partialRefetch: bool,
+      [@bs.optional]
+      pollInterval: int,
       // INTENTIONALLY IGNORED
       // returnPartialData: option(bool),
-      ssr: option(bool),
-      // We don't allow optional variables because it's not typesafe
+      [@bs.optional]
+      ssr: bool,
+      [@bs.optional]
       variables: 'variables,
     };
+    let make = t;
   };
 
   type t('data, 'variables) = {
@@ -127,28 +141,33 @@ module LazyQueryHookOptions = {
     // INTENTIONALLY IGNORED
     // returnPartialData: option(bool),
     ssr: option(bool),
-    variables: 'variables,
+    variables: option('variables),
   };
 
   let toJs =
       (t: t('data, 'variables), ~parse: 'jsData => 'data)
-      : Js_.t('jsData, 'variables) => {
-    client: t.client,
-    context: t.context,
-    displayName: t.displayName,
-    errorPolicy: t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
-    onCompleted:
-      t.onCompleted
-      ->Belt.Option.map((onCompleted, jsData) => onCompleted(jsData->parse)),
-    onError: t.onError,
-    fetchPolicy: t.fetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
-    notifyOnNetworkStatusChange: t.notifyOnNetworkStatusChange,
-    query: t.query,
-    pollInterval: t.pollInterval,
-    partialRefetch: t.partialRefetch,
-    ssr: t.ssr,
-    variables: t.variables,
-  };
+      : Js_.t('jsData, 'variables) =>
+    Js_.make(
+      ~client=?t.client,
+      ~context=?t.context,
+      ~displayName=?t.displayName,
+      ~errorPolicy=?t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
+      ~onCompleted=?
+        t.onCompleted
+        ->Belt.Option.map((onCompleted, jsData) =>
+            onCompleted(jsData->parse)
+          ),
+      ~onError=?t.onError,
+      ~fetchPolicy=?
+        t.fetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
+      ~notifyOnNetworkStatusChange=?t.notifyOnNetworkStatusChange,
+      ~query=?t.query,
+      ~pollInterval=?t.pollInterval,
+      ~partialRefetch=?t.partialRefetch,
+      ~ssr=?t.ssr,
+      ~variables=?t.variables,
+      (),
+    );
 };
 module QueryLazyOptions = {
   module Js_ = {
@@ -388,6 +407,63 @@ module QueryTuple = {
     );
 };
 
+module QueryTuple__optionalVariables = {
+  module Js_ = {
+    type t('jsData, 'variables) = QueryTuple.Js_.t('jsData, 'variables);
+  };
+
+  type t('data, 'variables) = (
+    (~context: Js.Json.t=?, ~variables: 'variables=?, unit) => unit,
+    LazyQueryResult.t('data, 'variables),
+  );
+
+  let fromJs:
+    (
+      Js_.t('jsData, 'variables),
+      ~defaultVariables: 'variables,
+      ~parse: 'jsData => 'data,
+      ~serialize: 'data => 'jsData
+    ) =>
+    t('data, 'variables) =
+    (
+      (jsExecuteQuery, jsLazyQueryResult),
+      ~defaultVariables,
+      ~parse,
+      ~serialize,
+    ) => (
+      (~context=?, ~variables=?, ()) =>
+        jsExecuteQuery({
+          context,
+          variables: variables->Belt.Option.getWithDefault(defaultVariables),
+        }),
+      jsLazyQueryResult->LazyQueryResult.fromJs(~parse, ~serialize),
+    );
+};
+
+module QueryTuple__noVariables = {
+  module Js_ = {
+    type t('jsData, 'variables) = QueryTuple.Js_.t('jsData, 'variables);
+  };
+
+  type t('data, 'variables) = (
+    (~context: Js.Json.t=?, unit) => unit,
+    LazyQueryResult.t('data, 'variables),
+  );
+
+  let fromJs:
+    (
+      Js_.t('jsData, 'variables),
+      ~parse: 'jsData => 'data,
+      ~serialize: 'data => 'jsData,
+      ~variables: 'variables
+    ) =>
+    t('data, 'variables) =
+    ((jsExecuteQuery, jsLazyQueryResult), ~parse, ~serialize, ~variables) => (
+      (~context=?, ()) => jsExecuteQuery({context, variables}),
+      jsLazyQueryResult->LazyQueryResult.fromJs(~parse, ~serialize),
+    );
+};
+
 module BaseMutationOptions = {
   module Js_ = {
     // export interface BaseMutationOptions<TData = any, TVariables = OperationVariables> {
@@ -543,8 +619,8 @@ module MutationResult = {
     type t('jsData) = {
       data: Js.nullable('jsData),
       error: option(ApolloError.Js_.t),
-      loading: option(bool),
-      called: option(bool),
+      loading: bool,
+      called: bool,
       client: option(ApolloClient.Js_.t),
     };
   };
@@ -552,8 +628,8 @@ module MutationResult = {
   type t('data) = {
     data: option('data),
     error: option(ApolloError.t),
-    loading: option(bool),
-    called: option(bool),
+    loading: bool,
+    called: bool,
     client: option(ApolloClient.t),
   };
 
@@ -638,14 +714,13 @@ module MutationTuple = {
   };
   type t_mutationFn('data, 'variables) =
     (
-      ~variables: 'variables,
       ~optimisticResponse: 'variables => 'data=?,
       ~refetchQueries: RefetchQueryDescription.t=?,
       ~awaitRefetchQueries: bool=?,
       ~update: MutationUpdaterFn.t('data)=?,
       ~context: Js.Json.t=?,
       ~fetchPolicy: WatchQueryFetchPolicy.t=?,
-      unit
+      'variables
     ) =>
     Js.Promise.t(FetchResult.t('data));
   type t('data, 'variables) = (
@@ -663,14 +738,13 @@ module MutationTuple = {
     ((jsMutationFn, jsMutationResult), ~parse, ~serialize) => {
       let mutationFn =
           (
-            ~variables,
             ~optimisticResponse=?,
             ~refetchQueries=?,
             ~awaitRefetchQueries=?,
             ~update=?,
             ~context=?,
             ~fetchPolicy=?,
-            (),
+            variables,
           ) => {
         jsMutationFn(
           Some(

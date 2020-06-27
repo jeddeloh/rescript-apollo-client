@@ -4,6 +4,8 @@ module ErrorPolicy = ApolloClient__Core_WatchQueryOptions.ErrorPolicy;
 module Graphql = ApolloClient__Graphql;
 module LazyQueryHookOptions = ApolloClient__React_Types.LazyQueryHookOptions;
 module QueryTuple = ApolloClient__React_Types.QueryTuple;
+module QueryTuple__noVariables = ApolloClient__React_Types.QueryTuple__noVariables;
+module QueryTuple__optionalVariables = ApolloClient__React_Types.QueryTuple__optionalVariables;
 module Types = ApolloClient__Types;
 module Utils = ApolloClient__Utils;
 module WatchQueryFetchPolicy = ApolloClient__Core_WatchQueryOptions.WatchQueryFetchPolicy;
@@ -37,13 +39,81 @@ let useLazyQuery:
       ~partialRefetch: bool=?,
       ~pollInterval: int=?,
       ~ssr: bool=?,
-      ~variables: jsVariables,
       (module Operation with
          type t = data and
          type Raw.t = jsData and
          type Raw.t_variables = jsVariables)
     ) =>
     QueryTuple.t(data, jsVariables) =
+  (
+    ~client=?,
+    ~context=?,
+    ~displayName=?,
+    ~errorPolicy=?,
+    ~fetchPolicy=?,
+    ~notifyOnNetworkStatusChange=?,
+    ~onCompleted=?,
+    ~onError=?,
+    ~partialRefetch=?,
+    ~pollInterval=?,
+    ~ssr=?,
+    (module Operation),
+  ) => {
+    let jsQueryTuple =
+      Js_.useLazyQuery(.
+        Operation.query->Utils.castStringAsDocumentNode,
+        LazyQueryHookOptions.toJs(
+          {
+            client,
+            context,
+            displayName,
+            errorPolicy,
+            fetchPolicy,
+            onCompleted,
+            onError,
+            notifyOnNetworkStatusChange,
+            partialRefetch,
+            pollInterval,
+            query: None,
+            ssr,
+            variables: None,
+          },
+          ~parse=Operation.parse,
+        ),
+      );
+
+    Utils.useGuaranteedMemo1(
+      () => {
+        jsQueryTuple->QueryTuple.fromJs(
+          ~parse=Operation.parse,
+          ~serialize=Operation.serialize,
+        )
+      },
+      jsQueryTuple,
+    );
+  };
+
+let useLazyQueryWithVariables:
+  type data jsData jsVariables.
+    (
+      ~client: ApolloClient.t=?,
+      ~context: Js.Json.t=?,
+      ~displayName: string=?,
+      ~errorPolicy: ErrorPolicy.t=?,
+      ~fetchPolicy: WatchQueryFetchPolicy.t=?,
+      ~notifyOnNetworkStatusChange: bool=?,
+      ~onCompleted: data => unit=?,
+      ~onError: ApolloError.t => unit=?,
+      ~partialRefetch: bool=?,
+      ~pollInterval: int=?,
+      ~ssr: bool=?,
+      ~variables: jsVariables,
+      (module Operation with
+         type t = data and
+         type Raw.t = jsData and
+         type Raw.t_variables = jsVariables)
+    ) =>
+    QueryTuple__noVariables.t(data, jsVariables) =
   (
     ~client=?,
     ~context=?,
@@ -76,7 +146,7 @@ let useLazyQuery:
             pollInterval,
             query: None,
             ssr,
-            variables,
+            variables: Some(variables),
           },
           ~parse=Operation.parse,
         ),
@@ -84,9 +154,11 @@ let useLazyQuery:
 
     Utils.useGuaranteedMemo1(
       () => {
-        jsQueryTuple->QueryTuple.fromJs(
+        jsQueryTuple->QueryTuple__noVariables.fromJs(
           ~parse=Operation.parse,
           ~serialize=Operation.serialize,
+          // Passing in the same variables from above allows us to reuse some types
+          ~variables,
         )
       },
       jsQueryTuple,
@@ -112,7 +184,7 @@ let useLazyQuery0:
          type Raw.t = jsData and
          type Raw.t_variables = jsVariables)
     ) =>
-    QueryTuple.t(data, jsVariables) =
+    QueryTuple__optionalVariables.t(data, jsVariables) =
   (
     ~client=?,
     ~context=?,
@@ -127,19 +199,37 @@ let useLazyQuery0:
     ~ssr=?,
     (module Operation),
   ) => {
-    useLazyQuery(
-      ~client?,
-      ~context?,
-      ~displayName?,
-      ~errorPolicy?,
-      ~fetchPolicy?,
-      ~notifyOnNetworkStatusChange?,
-      ~onCompleted?,
-      ~onError?,
-      ~partialRefetch?,
-      ~pollInterval?,
-      ~ssr?,
-      ~variables=Operation.makeDefaultVariables(),
-      (module Operation),
+    let jsQueryTuple =
+      Js_.useLazyQuery(.
+        Operation.query->Utils.castStringAsDocumentNode,
+        LazyQueryHookOptions.toJs(
+          {
+            client,
+            context,
+            displayName,
+            errorPolicy,
+            fetchPolicy,
+            onCompleted,
+            onError,
+            notifyOnNetworkStatusChange,
+            partialRefetch,
+            pollInterval,
+            query: None,
+            ssr,
+            variables: None,
+          },
+          ~parse=Operation.parse,
+        ),
+      );
+
+    Utils.useGuaranteedMemo1(
+      () => {
+        jsQueryTuple->QueryTuple__optionalVariables.fromJs(
+          ~defaultVariables=Operation.makeDefaultVariables(),
+          ~parse=Operation.parse,
+          ~serialize=Operation.serialize,
+        )
+      },
+      jsQueryTuple,
     );
   };

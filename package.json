@@ -1,7 +1,7 @@
 {
   "name": "@jeddeloh/reason-apollo-client",
   "license": "MIT",
-  "version": "0.0.0",
+  "version": "0.0.1-718c160.0",
   "scripts": {
     "clean": "bsb -clean-world",
     "start": "bsb -make-world -w"
@@ -22,8 +22,6 @@
     "@apollo/link-ws": "^2.0.0-beta.3",
     "@reasonml-community/graphql-ppx": "^1.0.0-beta.11",
     "bs-platform": "^7.3.0",
-    "graphql": "^14.0.0",
-    "reason-react": "^0.9.0",
-    "subscriptions-transport-ws": "^0.9.0"
+    "reason-react": "^0.9.0"
   }
 }

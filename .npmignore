@@ -1,9 +1,10 @@
+.CONTRIBUTING
 .bsb.lock
 .merlin
 yarn-error.log
 *.bs.js
-.graphql_ppx_cache/
 .vscode/
+.graphql_ppx_cache/
 EXAMPLES/
 lib/
 node_modules/

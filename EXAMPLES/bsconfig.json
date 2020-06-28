@@ -16,9 +16,9 @@
   ],
   "ppx-flags": [
     [
-      "@reasonml-community/graphql-ppx/ppx",
-      "-template-tag-import=gql",
-      "-template-tag-location=@apollo/client"
+      "@reasonml-community/graphql-ppx/ppx"
+      // "-template-tag-import=gql",
+      // "-template-tag-location=@apollo/client"
     ]
   ],
   "reason": {

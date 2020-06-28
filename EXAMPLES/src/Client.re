@@ -11,8 +11,8 @@ let httpLink =
   );
 
 let wsLink =
-  ApolloClient.Link.LinkWs.(
-    WebSocketLink.make(
+  ApolloClient.Link.WebSocketLink.(
+    make(
       ~uri="wss://" ++ graphqlEndpoint,
       ~options=
         ClientOptions.make(
@@ -32,7 +32,8 @@ let terminatingLink =
         let definition = ApolloClient.Utilities.getOperationDefinition(query);
         switch (definition) {
         | Some({kind, operation}) =>
-          kind === "OperationDefinition" && operation === "subscription"
+          [%debugger];
+          kind === "OperationDefinition" && operation === "subscription";
         | None => false
         };
       },

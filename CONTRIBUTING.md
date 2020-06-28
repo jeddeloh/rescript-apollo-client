@@ -5,8 +5,6 @@
 - Avoid partial types or bindings if possible
 - Encourage incremental contribution from the community rather than biting off more than one person can chew
 
-## Provide 1:1 bindings as the priority
-
 ## The power of numbers and OSS
 
 There's nothing fancy about this library. It tends to view the problem of bindings as more of a people problem (how can we leverage the power of numbers) than a programming problem (automatic conversion from typescript—would be amazing!). As such, a lot of detail is paid to consistency and clarity with the hope of maximizing human ability to both add and verify that bindings are correct. The long-term success or failure of this library is intended to be dependent on active community contribution rather than the efforts of a few individuals. Will it work? That's up to you, dear reader <3

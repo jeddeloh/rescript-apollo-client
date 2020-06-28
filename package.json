@@ -2,6 +2,7 @@
   "name": "@jeddeloh/reason-apollo-client",
   "license": "MIT",
   "version": "0.0.0",
+  "repository": "github:jeddeloh/reason-apollo-client",
   "scripts": {
     "build": "bsb -make-world",
     "clean": "bsb -clean-world",

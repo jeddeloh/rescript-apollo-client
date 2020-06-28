@@ -1,6 +1,6 @@
 > WARNING: This library is currently highly unstable and untested. It is mostly "complete", however, and is a superset of `reason-apollo` and `reason-apollo-hooks` functionality
 
-# ReasonML / BuckleScript bindings for the Apollo Client ecosystem
+# Reason Apollo Client
 
 ## Installation
 
@@ -60,6 +60,30 @@ Add the following to `bs-dependencies`, `graphql`, and `ppx-flags` in your `bsco
 - `"-template-tag-*"` is how we tell `graphql-ppx` to wrap every operation with `gql`
 - `"extend-*"` allows `reason-apollo-client` to automatically decorate the generated modules with Apollo-specific things like the correct hook for that operation!
 
+## Usage
+
+See the [Examples/](https://github.com/jeddeloh/reason-apollo-client/tree/master/EXAMPLES) directory for now, but in general the appropriate hook is exposed as a `use` function on the graphql module. If variables are required, they are the last argument:
+
+```js
+
+module Query = [%graphql {|
+  query Example {
+    users {
+      id
+      name
+    }
+  }
+|}];
+
+[@react.component]
+let make = () => {
+  switch (Query.use()) {
+    | {data: Some({users})} =>
+    ...
+  }
+}
+```
+
 ## Bindings to Javascript Packages
 
 Contains partial bindings to the following:
@@ -72,13 +96,13 @@ Contains partial bindings to the following:
 - `subscriptions-transport-ws`
 - `zen-observable`
 
-While we strive to provide ergonomics that are intuitive and "reasonable", we do expose the 1:1 bindings if that is your preference. Say you're looking in the Apollo docs and see `import { getOperationDefinition } from '@apollo/client/utilities'` and you'd prefer to be able to access with the same filepath, you could do it like so:
+While we strive to provide ergonomics that are intuitive and "reasonable", we do expose the 1:1 mapping to the javascript module structures if that is your preference. For instance, if you're looking in the Apollo docs and see `import { setContext } from '@apollo/link-context'` and you'd prefer to be able to access with the same filepath, you could do it like so:
 
 ```js
 module Apollo = {
   include ApolloClient.Bindings;
 };
 
-// import { getOperationDefinition } from '@apollo/client/utilities'
-let getOperationDefinition = Apollo.Client.Utilities.getOperationDefinition;
+// `import { setContext } from '@apollo/link-context'`
+let setContext = Apollo.LinkContext.setContext;
 ```

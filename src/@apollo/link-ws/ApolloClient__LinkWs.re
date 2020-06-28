@@ -1,9 +1,9 @@
 module ApolloLink = ApolloClient__Link_Core_ApolloLink;
-module ClientOptions = ApolloClient__SubscriptionsTransportWs.ClientOptions;
 module Graphql = ApolloClient__Graphql;
 module SubscriptionClient = ApolloClient__SubscriptionsTransportWs.SubscriptionClient;
 
 module WebSocketLink = {
+  module ClientOptions = ApolloClient__SubscriptionsTransportWs.ClientOptions;
   module Configuration = {
     module Js_ = {
       // export declare namespace WebSocketLink {
@@ -63,7 +63,7 @@ module WebSocketLink = {
       );
     };
 
-  let make_withSubscriptionClient: SubscriptionClient.t => ApolloLink.t =
+  let makeWithSubscriptionClient: SubscriptionClient.t => ApolloLink.t =
     subscriptionClient => {
       Js_.make(`SubscriptionClient(subscriptionClient));
     };

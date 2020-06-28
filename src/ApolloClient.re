@@ -33,10 +33,10 @@ module React = {
 module Utilities = ApolloClient__Utilities;
 
 module Link = {
+  module ContextLink = ApolloClient__LinkContext.ContextLink;
+  module ErrorLink = ApolloClient__LinkError.ErrorLink;
   module HttpLink = ApolloClient__Link_Http_HttpLink;
-  module LinkContext = ApolloClient__LinkContext;
-  module LinkError = ApolloClient__LinkError;
-  module LinkWs = ApolloClient__LinkWs;
+  module WebSocketLink = ApolloClient__LinkWs.WebSocketLink;
   type t = ApolloClient__Link_Core_ApolloLink.t;
   let concat = ApolloClient__Link_Core_ApolloLink.Static.concat;
   let execute = ApolloClient__Link_Core_ApolloLink.Static.execute;

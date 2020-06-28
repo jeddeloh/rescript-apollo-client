@@ -17,3 +17,9 @@ external setContextAsync:
   ) =>
   ApolloLink.t =
   "setContext";
+
+// reason-specific
+module ContextLink = {
+  let make = setContext;
+  let makeAsync = setContextAsync;
+};

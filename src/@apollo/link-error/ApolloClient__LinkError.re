@@ -100,3 +100,8 @@ let onError: (ErrorResponse.t => option(NextLink.t)) => ApolloLink.t =
     Js_.onError(jsErrorResponse =>
       errorCb(jsErrorResponse->ErrorResponse.fromJs)
     );
+
+// Reason-specific
+module ErrorLink = {
+  let make = onError;
+};

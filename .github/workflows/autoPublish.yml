@@ -25,7 +25,7 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Publish
-        if: success() && github.event_name === 'release'
+        if: success() && github.event_name == 'release'
         run: npm publish --tag=latest
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

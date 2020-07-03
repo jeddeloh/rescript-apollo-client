@@ -35,6 +35,8 @@
   "bs-dependencies": [
     "@jeddeloh/reason-apollo-client",
     "@reasonml-community/graphql-ppx",
+    "@yawaramin/prometo",
+    "reason-promise",
     "reason-react"
   ]
 }

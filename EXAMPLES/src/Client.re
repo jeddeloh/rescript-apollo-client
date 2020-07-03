@@ -32,8 +32,7 @@ let terminatingLink =
         let definition = ApolloClient.Utilities.getOperationDefinition(query);
         switch (definition) {
         | Some({kind, operation}) =>
-          [%debugger];
-          kind === "OperationDefinition" && operation === "subscription";
+          kind === "OperationDefinition" && operation === "subscription"
         | None => false
         };
       },

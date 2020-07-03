@@ -26,7 +26,7 @@
     tslib "^1.9.3"
 
 "@jeddeloh/reason-apollo-client@../":
-  version "0.0.0"
+  version "0.0.0-alpha.0"
 
 "@reasonml-community/graphql-ppx@^1.0.0-beta.11":
   version "1.0.0-e4ff159.0"
@@ -274,6 +274,11 @@
   version "4.2.2"
   resolved "https://registry.yarnpkg.com/@xtuc/long/-/long-4.2.2.tgz#d291c6a4e97989b5c61d9acf396ae4fe133a718d"
   integrity sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==
+
+"@yawaramin/prometo@0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@yawaramin/prometo/-/prometo-0.11.0.tgz#eb79931a3d1bd8ad8c328040ee3b6934da1d2370"
+  integrity sha512-S7O8zsjRCDTF3PsugPIxgHqxi3WrSpnZ1QmdHNpgqKmETHT2iL/4fVpn1DdxgAhSGMgPCPjWgnrJNI4n1XsCGw==
 
 accepts@~1.3.4, accepts@~1.3.5, accepts@~1.3.7:
   version "1.3.7"
@@ -3230,6 +3235,11 @@ readdirp@~3.4.0:
   integrity sha512-0xe001vZBnJEK+uKcj8qOhyAKPzIT+gStxWr3LCB0DwcXR5NZJ3IaC+yGnHCYzB/S7ov3m3EEbZI2zeNvX+hGQ==
   dependencies:
     picomatch "^2.2.1"
+
+reason-promise@1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/reason-promise/-/reason-promise-1.1.1.tgz#966133fed21e748a50ffb8839a1da04912bcf380"
+  integrity sha512-xMXDiyzTjn7t9pq9aQrkgu8CLB5DILU70oWQ+LI20YecshypUwsw37TKOvCxgoFR3vo30ucF0/iWe2BZ181/jw==
 
 reason-react@^0.9.1:
   version "0.9.1"

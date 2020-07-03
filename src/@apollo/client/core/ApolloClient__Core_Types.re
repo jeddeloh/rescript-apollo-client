@@ -59,14 +59,20 @@ module ApolloQueryResult = {
     };
   };
 
-  type t('parsedData) = Js_.t('parsedData);
+  type t('data) = {
+    data: option('data),
+    errors: option(array(Graphql.Error.GraphQLError.t)),
+    loading: bool,
+    networkStatus: int,
+  };
 
-  let fromJs: (t('jsData), ~parse: 'jsData => 'parsedData) => t('parsedData) =
-    ({data, errors, loading, networkStatus}, ~parse) => {
-      data: data->Belt.Option.map(parse),
-      errors,
-      loading,
-      networkStatus,
+  let fromJs:
+    (Js_.t('jsData), ~parse: 'jsData => 'parsedData) => t('parsedData) =
+    (js, ~parse) => {
+      data: js.data->Belt.Option.map(parse),
+      errors: js.errors,
+      loading: js.loading,
+      networkStatus: js.networkStatus,
     };
 };
 

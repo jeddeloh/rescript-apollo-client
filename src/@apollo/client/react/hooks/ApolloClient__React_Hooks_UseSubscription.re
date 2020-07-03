@@ -43,7 +43,7 @@ type useSubscription_result('data, 'variables) = {
 };
 
 let useSubscription:
-  type data jsData jsVariables.
+  type data jsVariables.
     (
       ~client: ApolloClient.t=?,
       ~fetchPolicy: FetchPolicy.t=?,
@@ -54,9 +54,7 @@ let useSubscription:
       ~skip: bool=?,
       ~variables: jsVariables,
       (module Operation with
-         type t = data and
-         type Raw.t = jsData and
-         type Raw.t_variables = jsVariables)
+         type t = data and type Raw.t_variables = jsVariables)
     ) =>
     useSubscription_result(data, jsVariables) =
   (
@@ -100,7 +98,7 @@ let useSubscription:
   };
 
 let useSubscription0:
-  type data jsData jsVariables.
+  type data jsVariables.
     (
       ~client: ApolloClient.t=?,
       ~fetchPolicy: FetchPolicy.t=?,
@@ -110,9 +108,7 @@ let useSubscription0:
                             =?,
       ~skip: bool=?,
       (module Types.OperationNoRequiredVars with
-         type t = data and
-         type Raw.t = jsData and
-         type Raw.t_variables = jsVariables)
+         type t = data and type Raw.t_variables = jsVariables)
     ) =>
     useSubscription_result(data, jsVariables) =
   (

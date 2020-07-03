@@ -29,7 +29,7 @@ module Js_ = {
 };
 
 let useMutation:
-  type data jsData jsVariables.
+  type data jsVariables.
     (
       ~awaitRefetchQueries: bool=?,
       ~context: Js.Json.t=?,
@@ -44,9 +44,7 @@ let useMutation:
       ~refetchQueries: RefetchQueryDescription.t=?,
       ~update: MutationUpdaterFn.t(data)=?,
       (module Operation with
-         type t = data and
-         type Raw.t = jsData and
-         type Raw.t_variables = jsVariables)
+         type t = data and type Raw.t_variables = jsVariables)
     ) =>
     MutationTuple.t(data, jsVariables) =
   (
@@ -101,7 +99,7 @@ let useMutation:
   };
 
 let useMutationWithVariables:
-  type data jsData jsVariables.
+  type data jsVariables.
     (
       ~awaitRefetchQueries: bool=?,
       ~context: Js.Json.t=?,
@@ -117,9 +115,7 @@ let useMutationWithVariables:
       ~update: MutationUpdaterFn.t(data)=?,
       ~variables: jsVariables,
       (module Operation with
-         type t = data and
-         type Raw.t = jsData and
-         type Raw.t_variables = jsVariables)
+         type t = data and type Raw.t_variables = jsVariables)
     ) =>
     MutationTuple__noVariables.t(data, jsVariables) =
   (
@@ -179,7 +175,7 @@ let useMutationWithVariables:
   };
 
 let useMutation0:
-  type data jsData jsVariables.
+  type data jsVariables.
     (
       ~awaitRefetchQueries: bool=?,
       ~context: Js.Json.t=?,
@@ -194,9 +190,7 @@ let useMutation0:
       ~refetchQueries: RefetchQueryDescription.t=?,
       ~update: MutationUpdaterFn.t(data)=?,
       (module OperationNoRequiredVars with
-         type t = data and
-         type Raw.t = jsData and
-         type Raw.t_variables = jsVariables)
+         type t = data and type Raw.t_variables = jsVariables)
     ) =>
     MutationTuple__optionalVariables.t(data, jsVariables) =
   (

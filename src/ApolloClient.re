@@ -15,6 +15,7 @@ module GraphQL_PPX = {
   module ExtendQueryNoRequiredVariables = ApolloClient__React_Hooks_UseQuery.ExtendNoRequiredVariables;
   module ExtendSubscription = ApolloClient__React_Hooks_UseSubscription.Extend;
   module ExtendSubscriptionNoRequiredVariables = ApolloClient__React_Hooks_UseSubscription.ExtendNoRequiredVariables;
+  type templateTagReturnType = ApolloClient__Graphql.documentNode;
 };
 
 module React = {
@@ -60,6 +61,10 @@ module DefaultOptions = ApolloClient__ApolloClient.DefaultOptions;
 type t = ApolloClient__ApolloClient.t;
 let make = ApolloClient__ApolloClient.make;
 let mutate = ApolloClient__ApolloClient.mutate;
+let mutate0 = ApolloClient__ApolloClient.mutate0;
 let query = ApolloClient__ApolloClient.query;
+let query0 = ApolloClient__ApolloClient.query0;
 let readQuery = ApolloClient__ApolloClient.readQuery;
+let readQuery0 = ApolloClient__ApolloClient.readQuery0;
 let writeQuery = ApolloClient__ApolloClient.writeQuery;
+let writeQuery0 = ApolloClient__ApolloClient.writeQuery0;

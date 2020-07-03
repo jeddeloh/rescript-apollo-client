@@ -94,7 +94,8 @@ module QueryOptions = {
       fetchPolicy: option(FetchPolicy.Js_.t),
       // ...extends QueryBaseOptions
       query: Graphql.documentNode,
-      variables: option('variables),
+      // We don't allow optional variables because it's not typesafe
+      variables: 'variables,
       errorPolicy: option(ErrorPolicy.Js_.t),
       context: option(Js.Json.t),
     };
@@ -103,7 +104,7 @@ module QueryOptions = {
   type t('variables) = {
     fetchPolicy: option(FetchPolicy.t),
     query: Graphql.documentNode,
-    variables: option('variables),
+    variables: 'variables,
     errorPolicy: option(ErrorPolicy.t),
     context: option(Js.Json.t),
   };
@@ -217,7 +218,8 @@ module MutationOptions = {
       update: option(MutationUpdaterFn.Js_.t('jsData)),
       updateQueries: option(MutationQueryReducersMap.Js_.t('jsData)),
       refetchQueries: option(RefetchQueryDescription.Js_.t),
-      variables: option('variables),
+      // We don't allow optional variables because it's not typesafe
+      variables: 'variables,
     };
   };
 
@@ -232,7 +234,7 @@ module MutationOptions = {
     refetchQueries: option(RefetchQueryDescription.t),
     update: option(MutationUpdaterFn.t('data)),
     updateQueries: option(MutationQueryReducersMap.t('data)),
-    variables: option('variables),
+    variables: 'variables,
   };
 
   let toJs:

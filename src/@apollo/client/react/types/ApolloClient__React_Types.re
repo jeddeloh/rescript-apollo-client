@@ -226,7 +226,7 @@ module QueryResult = {
       // ...extends ObservableQueryFields
       fetchMore:
         t_fetchMoreOptions('jsData, 'variables) =>
-        Js.Promise.t(ApolloQueryResult.t('jsData)),
+        Js.Promise.t(ApolloQueryResult.Js_.t('jsData)),
     };
   };
 

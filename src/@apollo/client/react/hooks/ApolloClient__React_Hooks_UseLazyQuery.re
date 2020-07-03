@@ -26,7 +26,7 @@ module Js_ = {
 };
 
 let useLazyQuery:
-  type data jsData jsVariables.
+  type data jsVariables.
     (
       ~client: ApolloClient.t=?,
       ~context: Js.Json.t=?,
@@ -40,9 +40,7 @@ let useLazyQuery:
       ~pollInterval: int=?,
       ~ssr: bool=?,
       (module Operation with
-         type t = data and
-         type Raw.t = jsData and
-         type Raw.t_variables = jsVariables)
+         type t = data and type Raw.t_variables = jsVariables)
     ) =>
     QueryTuple.t(data, jsVariables) =
   (
@@ -94,7 +92,7 @@ let useLazyQuery:
   };
 
 let useLazyQueryWithVariables:
-  type data jsData jsVariables.
+  type data jsVariables.
     (
       ~client: ApolloClient.t=?,
       ~context: Js.Json.t=?,
@@ -109,9 +107,7 @@ let useLazyQueryWithVariables:
       ~ssr: bool=?,
       ~variables: jsVariables,
       (module Operation with
-         type t = data and
-         type Raw.t = jsData and
-         type Raw.t_variables = jsVariables)
+         type t = data and type Raw.t_variables = jsVariables)
     ) =>
     QueryTuple__noVariables.t(data, jsVariables) =
   (
@@ -166,7 +162,7 @@ let useLazyQueryWithVariables:
   };
 
 let useLazyQuery0:
-  type data jsData jsVariables.
+  type data jsVariables.
     (
       ~client: ApolloClient.t=?,
       ~context: Js.Json.t=?,
@@ -180,9 +176,7 @@ let useLazyQuery0:
       ~pollInterval: int=?,
       ~ssr: bool=?,
       (module Types.OperationNoRequiredVars with
-         type t = data and
-         type Raw.t = jsData and
-         type Raw.t_variables = jsVariables)
+         type t = data and type Raw.t_variables = jsVariables)
     ) =>
     QueryTuple__optionalVariables.t(data, jsVariables) =
   (

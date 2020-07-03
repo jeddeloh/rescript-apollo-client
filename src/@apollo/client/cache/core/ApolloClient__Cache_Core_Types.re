@@ -10,7 +10,8 @@ module DataProxy = {
       // }
       type t('variables) = {
         query: Graphql.documentNode,
-        variables: option('variables),
+        // We don't allow optional variables because it's not typesafe
+        variables: 'variables,
         id: option(string),
       };
     };
@@ -29,7 +30,8 @@ module DataProxy = {
       type t('variables) = {
         id: string,
         fragment: Graphql.documentNode,
-        fragmentName: option(string),
+        // We don't allow optional variables because it's not typesafe
+        fragmentName: string,
         variables: option('variables),
       };
     };
@@ -48,7 +50,8 @@ module DataProxy = {
         broadcast: option(bool),
         // ...extends Query
         query: Graphql.documentNode,
-        variables: option('variables),
+        // We don't allow optional variables because it's not typesafe
+        variables: 'variables,
         id: option(string),
       };
     };
@@ -57,7 +60,7 @@ module DataProxy = {
       data: 'data,
       broadcast: option(bool),
       query: Graphql.documentNode,
-      variables: option('variables),
+      variables: 'variables,
       id: option(string),
     };
 

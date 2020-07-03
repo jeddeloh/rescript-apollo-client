@@ -22,9 +22,11 @@
     "@apollo/client": "^3.0.0-rc.6",
     "@apollo/link-ws": "^2.0.0-beta.3",
     "@jeddeloh/reason-apollo-client": "../",
+    "@yawaramin/prometo": "0.11.0",
     "graphql": "^14.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "reason-promise": "1.1.1",
     "reason-react": "^0.9.1",
     "subscriptions-transport-ws": "^0.9.16"
   }

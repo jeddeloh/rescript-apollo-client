@@ -22,7 +22,7 @@ module Js_ = {
 };
 
 let useQuery:
-  type data jsData jsVariables.
+  type data jsVariables.
     (
       ~client: ApolloClient.t=?,
       ~context: Js.Json.t=?,
@@ -38,9 +38,7 @@ let useQuery:
       ~ssr: bool=?,
       ~variables: jsVariables,
       (module Operation with
-         type t = data and
-         type Raw.t = jsData and
-         type Raw.t_variables = jsVariables)
+         type t = data and type Raw.t_variables = jsVariables)
     ) =>
     QueryResult.t(data, jsVariables) =
   (
@@ -95,7 +93,7 @@ let useQuery:
   };
 
 let useQuery0:
-  type data jsData jsVariables.
+  type data jsVariables.
     (
       ~client: ApolloClient.t=?,
       ~context: Js.Json.t=?,
@@ -110,9 +108,7 @@ let useQuery0:
       ~skip: bool=?,
       ~ssr: bool=?,
       (module Types.OperationNoRequiredVars with
-         type t = data and
-         type Raw.t = jsData and
-         type Raw.t_variables = jsVariables)
+         type t = data and type Raw.t_variables = jsVariables)
     ) =>
     QueryResult.t(data, jsVariables) =
   (

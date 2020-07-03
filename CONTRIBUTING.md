@@ -1,17 +1,17 @@
 # Core Philosopies
 
-- Provide 1:1 bindings to Javascript _then_ use those as building blocks for more "reasonable" ergonomics
+- Provide 1:1 mapping to Javascript _then_ use those as building blocks for more "reasonable" ergonomics
 - Follow a consistent pattern for bindings
 - Avoid partial types or bindings if possible
 - Encourage incremental contribution from the community rather than biting off more than one person can chew
 
 ## The power of numbers and OSS
 
-There's nothing fancy about this library. It tends to view the problem of bindings as more of a people problem (how can we leverage the power of numbers) than a programming problem (automatic conversion from typescript—would be amazing!). As such, a lot of detail is paid to consistency and clarity with the hope of maximizing human ability to both add and verify that bindings are correct. The long-term success or failure of this library is intended to be dependent on active community contribution rather than the efforts of a few individuals. Will it work? That's up to you, dear reader <3
+There's nothing fancy about this library. It tends to view the problem of bindings as a people problem (how can we leverage the power of numbers) rather than a programming problem (automatic conversion from typescript—would be amazing!). As such, a lot of detail is paid to consistency and clarity with the hope of maximizing human ability to both add and verify that bindings are correct. As such, the long-term success or failure of this library is intended to be dependent on active community contribution rather than the efforts of a few individuals. Will it work? That's up to you, dear reader ❤️
 
 ## Following a Consistent Pattern
 
-At the file level, bindings to Javascript packages should follow an identical directory structure as in the JS package. No thinking required! This has the side benefit of being able to navigate to any import you see in the javascript docs via filepath pattern.
+At the file level, bindings to Javascript packages should mirror the directory structure in the JS package. No thinking required! This has the side benefit of being able to navigate to any import you see in the javascript docs via filepath pattern, but it's primary purpose is consistency. It should be easy for anyone else to see exactly what you're binding to and encourages consistent naming rules.
 
 At the code level, all JS bindings should go in a `Js_` module of some sort. At first it seems ridiculous, but it pays off at scale. (See **Reasoning Behind `Js_` modules**)
 

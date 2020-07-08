@@ -35,7 +35,7 @@ module PersonsOlderThanQuery = [%graphql
 
 let logPeople_good_reasonPromise = _ =>
   Client.instance
-  ->ApolloClient.query0((module PeopleQuery))
+  ->ApolloClient.query(~operation=(module PeopleQuery), ())
   ->Promise.Js.fromBsPromise
   ->Promise.Js.toResult
   ->Promise.get(
@@ -47,7 +47,7 @@ let logPeople_good_reasonPromise = _ =>
 
 let logPeople_good_prometo = _ =>
   Client.instance
-  ->ApolloClient.query0((module PeopleQuery))
+  ->ApolloClient.query(~operation=(module PeopleQuery), ())
   ->Prometo.fromPromise
   ->Prometo.handle(~f=result => {
       switch (result) {
@@ -66,7 +66,7 @@ let logPeople_good_prometo = _ =>
  */
 let logPeople_bad_jsPromise = _ =>
   Client.instance
-  ->ApolloClient.query0((module PeopleQuery))
+  ->ApolloClient.query(~operation=(module PeopleQuery), ())
   ->Js.Promise.then_(
       (result: ApolloClient__ApolloClient.ApolloQueryResult.t(_)) =>
         switch (result) {
@@ -90,8 +90,8 @@ let addPerson = _ =>
   (
     Client.instance
     ->ApolloClient.mutate(
-        ~variables=AddPersonMutation.makeVariables(~age=40, ~name="Ted", ()),
-        (module AddPersonMutation),
+        ~operation=(module AddPersonMutation),
+        {age: 40, name: "Ted"},
       )
     ->Promise.Js.fromBsPromise
     ->Promise.Js.toResult

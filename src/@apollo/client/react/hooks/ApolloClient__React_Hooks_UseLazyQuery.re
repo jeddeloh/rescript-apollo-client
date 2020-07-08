@@ -59,7 +59,7 @@ let useLazyQuery:
   ) => {
     let jsQueryTuple =
       Js_.useLazyQuery(.
-        Operation.query->Utils.castStringAsDocumentNode,
+        Operation.query,
         LazyQueryHookOptions.toJs(
           {
             client,
@@ -127,7 +127,7 @@ let useLazyQueryWithVariables:
   ) => {
     let jsQueryTuple =
       Js_.useLazyQuery(.
-        Operation.query->Utils.castStringAsDocumentNode,
+        Operation.query,
         LazyQueryHookOptions.toJs(
           {
             client,
@@ -195,7 +195,7 @@ let useLazyQuery0:
   ) => {
     let jsQueryTuple =
       Js_.useLazyQuery(.
-        Operation.query->Utils.castStringAsDocumentNode,
+        Operation.query,
         LazyQueryHookOptions.toJs(
           {
             client,

@@ -59,7 +59,7 @@ let useQuery:
   ) => {
     let jsQueryResult =
       Js_.useQuery(.
-        Operation.query->Utils.castStringAsDocumentNode,
+        Operation.query,
         QueryHookOptions.toJs(
           {
             client,

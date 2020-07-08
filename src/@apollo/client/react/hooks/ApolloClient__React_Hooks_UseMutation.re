@@ -64,7 +64,7 @@ let useMutation:
   ) => {
     let jsMutationTuple =
       Js_.useMutation(.
-        Operation.query->Utils.castStringAsDocumentNode,
+        Operation.query,
         MutationHookOptions.toJs(
           {
             mutation: None,
@@ -136,7 +136,7 @@ let useMutationWithVariables:
   ) => {
     let jsMutationTuple =
       Js_.useMutation(.
-        Operation.query->Utils.castStringAsDocumentNode,
+        Operation.query,
         MutationHookOptions.toJs(
           {
             mutation: None,
@@ -210,7 +210,7 @@ let useMutation0:
   ) => {
     let jsMutationTuple =
       Js_.useMutation(.
-        OperationNoRequiredVars.query->Utils.castStringAsDocumentNode,
+        OperationNoRequiredVars.query,
         MutationHookOptions.toJs(
           {
             mutation: None,

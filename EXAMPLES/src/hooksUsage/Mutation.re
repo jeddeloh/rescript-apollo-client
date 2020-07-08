@@ -33,7 +33,7 @@ module PersonsOlderThanQuery = [%graphql
 
 [@react.component]
 let make = () => {
-  let (mutate, result) = AddPersonMutation.(use());
+  let (mutate, result) = AddPersonMutation.use();
 
   switch (result) {
   | {called: false} =>

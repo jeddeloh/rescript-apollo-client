@@ -1,3 +1,5 @@
+module Graphql = ApolloClient__Graphql;
+
 type parse('raw_t, 't) = 'raw_t => 't;
 type serialize('t, 'raw_t) = 't => 'raw_t;
 type query = string;
@@ -9,7 +11,8 @@ type graphqlDefinition('t, 'raw_t) = (
 );
 
 module type Operation = {
-  let query: string;
+  // This type is determined by the `-template-tag-return-type` ppx flag
+  let query: Graphql.documentNode;
 
   module Raw: {
     type t;

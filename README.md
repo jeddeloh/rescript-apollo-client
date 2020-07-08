@@ -62,10 +62,9 @@ Add the following to `bs-dependencies`, `graphql`, and `ppx-flags` in your `bsco
   "ppx-flags": [
     [
       "@reasonml-community/graphql-ppx/ppx",
--     // Don't add this yet, but you'll need it soon!
--     "-template-tag-return-type=ApolloClient.GraphQL_PPX.templateTagReturnType",
--     "-template-tag-import=gql",
--     "-template-tag-location=@apollo/client"
++     "-template-tag-return-type=ApolloClient.GraphQL_PPX.templateTagReturnType",
++     "-template-tag-import=gql",
++     "-template-tag-location=@apollo/client"
     ]
   ],
   "bs-dependencies: [
@@ -81,7 +80,7 @@ Add the following to `bs-dependencies`, `graphql`, and `ppx-flags` in your `bsco
 
 ## Usage
 
-The [Examples/](https://github.com/jeddeloh/reason-apollo-client/tree/master/EXAMPLES) directory is the best documentation at the moment, but in short, the appropriate hook is exposed as a `use` function on the graphql module. If variables are required, they are the last argument:
+The [EXAMPLES/](https://github.com/jeddeloh/reason-apollo-client/tree/master/EXAMPLES) directory is the best documentation at the moment, but in short, the appropriate hook is exposed as a `use` function on the graphql module. If variables are required, they are the last argument:
 
 ```js
 
@@ -103,35 +102,6 @@ let make = () => {
 }
 ```
 
-> ⚠️ **WARNING:** While not strictly necessary, this library is heavily skewed toward leveraging the graphql-ppx extension points, but extension points do not yet work with inline modules!
-
-```js
-// Include the module like this for file-level modules that you want to contain a single operation:
-module Query = [%graphql {|
-  query Example {
-    users {
-      id
-      name
-    }
-  }
-|}];
-
-include Query;
-
-// Don't do this (for now)
-[%graphql
-  {|
-    query Example {
-      users {
-        id
-        name
-      }
-    }
-  |};
-  {inline: true}
-];
-```
-
 ## Bindings to JavaScript Packages
 
 Contains partial bindings to the following:
@@ -144,7 +114,7 @@ Contains partial bindings to the following:
 - `subscriptions-transport-ws`
 - `zen-observable`
 
-While we strive to provide ergonomics that are intuitive and "reasonable", we do expose a 1:1 mapping to the javascript package structures if that is your preference. For instance, if you're looking in the Apollo docs and see `import { setContext } from '@apollo/link-context'` and you'd prefer that to interact with this libaray in the same way, you can always access with the same filepath and name like so:
+While we strive to provide ergonomics that are intuitive and "reasonable", we do expose a 1:1 mapping to the javascript package structures if that is your preference. For instance, if you're looking in the Apollo docs and see `import { setContext } from '@apollo/link-context'` and you'd prefer to interact with this libaray in the same way, you can always access with the same filepath and name like so:
 
 ```js
 module Apollo = {

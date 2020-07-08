@@ -436,7 +436,7 @@ let mutate:
             context,
             errorPolicy,
             fetchPolicy,
-            mutation: Operation.query->Utils.castStringAsDocumentNode,
+            mutation: Operation.query,
             optimisticResponse,
             updateQueries,
             refetchQueries,
@@ -524,7 +524,7 @@ let query:
       ~options=
         QueryOptions.toJs({
           fetchPolicy,
-          query: Operation.query->Utils.castStringAsDocumentNode,
+          query: Operation.query,
           variables,
           errorPolicy,
           context,
@@ -581,11 +581,7 @@ let readQuery:
   (client, ~id=?, ~optimistic=?, ~variables, (module Operation)) => {
     Js_.readQuery(
       client,
-      ~options={
-        id,
-        query: Operation.query->Utils.castStringAsDocumentNode,
-        variables,
-      },
+      ~options={id, query: Operation.query, variables},
       ~optimistic,
     )
     ->Js.toOption
@@ -631,7 +627,7 @@ let writeQuery:
         broadcast,
         data: data->Operation.serialize,
         id,
-        query: Operation.query->Utils.castStringAsDocumentNode,
+        query: Operation.query,
         variables,
       },
     );

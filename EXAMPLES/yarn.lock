@@ -26,14 +26,12 @@
     tslib "^1.9.3"
 
 "@jeddeloh/reason-apollo-client@../":
-  version "0.0.0-alpha.0"
+  version "0.0.1-alpha.1"
 
-"@reasonml-community/graphql-ppx@^1.0.0-beta.11":
-  version "1.0.0-e4ff159.0"
-  resolved "https://registry.yarnpkg.com/@reasonml-community/graphql-ppx/-/graphql-ppx-1.0.0-e4ff159.0.tgz#351b7691fc6c6fbb2223247eb9505269774a13c0"
-  integrity sha512-ssQtEuexmfKHafL2n4AKJkEn1VAc+NHaxpZk1x07lm0+gQz6+wksjO0a4BdZqhsn4yk8E9TkRDQfC3iwC9a9+A==
-  dependencies:
-    bs-platform "^7.3.2"
+"@reasonml-community/graphql-ppx@^1.0.0-beta.16":
+  version "1.0.0-beta.16"
+  resolved "https://registry.yarnpkg.com/@reasonml-community/graphql-ppx/-/graphql-ppx-1.0.0-beta.16.tgz#c91b02fdaa9951528a85f53fea9f20cd62fba984"
+  integrity sha512-Vx8HCtm7vEUM5aeQE8xZeUMtRZ46DRs88OLlIGMarBqEmLpahWDd+16FpXuYPWWH06mLC6tqJZsJd6TyXM+ZcA==
 
 "@types/anymatch@*":
   version "1.3.1"

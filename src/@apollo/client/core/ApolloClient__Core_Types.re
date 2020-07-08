@@ -30,17 +30,13 @@ module PureQueryOptions = {
   };
 
   type t('variables) = {
-    query: string,
+    query: Graphql.documentNode,
     variables: 'variables,
     context: option(Js.Json.t),
   };
 
   let toJs: t('variables) => Js_.t('variables) =
-    t => {
-      query: t.query->Utils.castStringAsDocumentNode,
-      variables: t.variables,
-      context: t.context,
-    };
+    t => {query: t.query, variables: t.variables, context: t.context};
 };
 
 module ApolloQueryResult = {

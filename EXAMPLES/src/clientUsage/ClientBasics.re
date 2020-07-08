@@ -101,7 +101,6 @@ let addPerson = _ =>
         | Error(error) => Js.log2("Error: ", error),
       )
   );
-arositen;
 
 [@react.component]
 let make = () => {

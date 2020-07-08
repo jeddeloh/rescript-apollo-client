@@ -69,7 +69,7 @@ let useSubscription:
   ) => {
     let jsSubscriptionResult =
       Js_.useSubscription(.
-        Operation.query->Utils.castStringAsDocumentNode,
+        Operation.query,
         SubscriptionHookOptions.toJs(
           {
             client,

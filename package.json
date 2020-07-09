@@ -16,15 +16,17 @@
     "@apollo/link-context": "^2.0.0-beta.3",
     "@apollo/link-error": "^2.0.0-beta.3",
     "@apollo/link-ws": "^2.0.0-beta.3",
-    "@reasonml-community/graphql-ppx": "^1.0.0-beta.17",
+    "@reasonml-community/graphql-ppx": "^1.0.0-beta.18",
     "bs-platform": "^7.3.2",
     "graphql": "^14.0.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
     "reason-react": "^0.9.1",
     "subscriptions-transport-ws": "^0.9.16"
   },
   "peerDependencies": {
     "@apollo/client": "^3.0.0-rc.6",
-    "@reasonml-community/graphql-ppx": "^1.0.0-beta.16",
+    "@reasonml-community/graphql-ppx": "^1.0.0-beta.18",
     "bs-platform": "^7.3.0 || ^8.0.0",
     "reason-react": "^0.9.0"
   }

@@ -401,6 +401,8 @@ let mutate:
   type data jsVariables.
     (
       t,
+      ~mutation: (module Operation with
+                    type t = data and type Raw.t_variables = jsVariables),
       ~awaitRefetchQueries: bool=?,
       ~context: Js.Json.t=?,
       ~errorPolicy: ErrorPolicy.t=?,
@@ -409,13 +411,12 @@ let mutate:
       ~refetchQueries: RefetchQueryDescription.t=?,
       ~updateQueries: MutationQueryReducersMap.t(data)=?,
       ~update: MutationUpdaterFn.t(data)=?,
-      ~variables: jsVariables,
-      (module Types.Operation with
-         type t = data and type Raw.t_variables = jsVariables)
+      jsVariables
     ) =>
     Js.Promise.t(FetchResult.t(data)) =
   (
     client,
+    ~mutation as (module Operation),
     ~awaitRefetchQueries=?,
     ~context=?,
     ~errorPolicy=?,
@@ -424,8 +425,7 @@ let mutate:
     ~refetchQueries=?,
     ~updateQueries=?,
     ~update=?,
-    ~variables,
-    (module Operation),
+    variables,
   ) => {
     Js_.mutate(
       client,
@@ -456,68 +456,25 @@ let mutate:
       );
   };
 
-let mutate0:
-  type data jsVariables.
-    (
-      t,
-      ~awaitRefetchQueries: bool=?,
-      ~context: Js.Json.t=?,
-      ~errorPolicy: ErrorPolicy.t=?,
-      ~fetchPolicy: FetchPolicy__noCacheExtracted.t=?,
-      ~optimisticResponse: jsVariables => data=?,
-      ~refetchQueries: RefetchQueryDescription.t=?,
-      ~updateQueries: MutationQueryReducersMap.t(data)=?,
-      ~update: MutationUpdaterFn.t(data)=?,
-      (module OperationNoRequiredVars with
-         type t = data and type Raw.t_variables = jsVariables)
-    ) =>
-    Js.Promise.t(FetchResult.t(data)) =
-  (
-    client,
-    ~awaitRefetchQueries=?,
-    ~context=?,
-    ~errorPolicy=?,
-    ~fetchPolicy=?,
-    ~optimisticResponse=?,
-    ~refetchQueries=?,
-    ~updateQueries=?,
-    ~update=?,
-    (module OperationNoRequiredVars),
-  ) => {
-    mutate(
-      client,
-      ~awaitRefetchQueries?,
-      ~context?,
-      ~errorPolicy?,
-      ~fetchPolicy?,
-      ~optimisticResponse?,
-      ~refetchQueries?,
-      ~updateQueries?,
-      ~update?,
-      ~variables=OperationNoRequiredVars.makeDefaultVariables(),
-      (module OperationNoRequiredVars),
-    );
-  };
-
 let query:
   type data jsVariables.
     (
       t,
+      ~query: (module Operation with
+                 type t = data and type Raw.t_variables = jsVariables),
       ~context: Js.Json.t=?,
       ~errorPolicy: ErrorPolicy.t=?,
       ~fetchPolicy: FetchPolicy.t=?,
-      ~variables: jsVariables,
-      (module Operation with
-         type t = data and type Raw.t_variables = jsVariables)
+      jsVariables
     ) =>
     Js.Promise.t(ApolloQueryResult.t(data)) =
   (
     client,
+    ~query as (module Operation),
     ~context=?,
     ~errorPolicy=?,
     ~fetchPolicy=?,
-    ~variables,
-    (module Operation),
+    variables,
   ) => {
     Js_.query(
       client,
@@ -539,46 +496,18 @@ let query:
       );
   };
 
-let query0:
-  type data jsVariables.
-    (
-      t,
-      ~context: Js.Json.t=?,
-      ~errorPolicy: ErrorPolicy.t=?,
-      ~fetchPolicy: FetchPolicy.t=?,
-      (module OperationNoRequiredVars with
-         type t = data and type Raw.t_variables = jsVariables)
-    ) =>
-    Js.Promise.t(ApolloQueryResult.t(data)) =
-  (
-    client,
-    ~context=?,
-    ~errorPolicy=?,
-    ~fetchPolicy=?,
-    (module OperationNoRequiredVars),
-  ) => {
-    query(
-      client,
-      ~context?,
-      ~errorPolicy?,
-      ~fetchPolicy?,
-      ~variables=OperationNoRequiredVars.makeDefaultVariables(),
-      (module OperationNoRequiredVars),
-    );
-  };
-
 let readQuery:
   type data jsVariables.
     (
       t,
+      ~query: (module Operation with
+                 type t = data and type Raw.t_variables = jsVariables),
       ~id: string=?,
       ~optimistic: bool=?,
-      ~variables: jsVariables,
-      (module Operation with
-         type t = data and type Raw.t_variables = jsVariables)
+      jsVariables
     ) =>
     option(data) =
-  (client, ~id=?, ~optimistic=?, ~variables, (module Operation)) => {
+  (client, ~query as (module Operation), ~id=?, ~optimistic=?, variables) => {
     Js_.readQuery(
       client,
       ~options={id, query: Operation.query, variables},
@@ -588,39 +517,26 @@ let readQuery:
     ->Belt.Option.map(Operation.parse);
   };
 
-let readQuery0:
-  type data jsVariables.
-    (
-      t,
-      ~id: string=?,
-      ~optimistic: bool=?,
-      (module OperationNoRequiredVars with
-         type t = data and type Raw.t_variables = jsVariables)
-    ) =>
-    option(data) =
-  (client, ~id=?, ~optimistic=?, (module OperationNoRequiredVars)) => {
-    readQuery(
-      client,
-      ~id?,
-      ~optimistic?,
-      ~variables=OperationNoRequiredVars.makeDefaultVariables(),
-      (module OperationNoRequiredVars),
-    );
-  };
-
 let writeQuery:
   type data jsVariables.
     (
       t,
+      ~query: (module Operation with
+                 type t = data and type Raw.t_variables = jsVariables),
       ~broadcast: bool=?,
       ~data: data,
       ~id: string=?,
-      ~variables: jsVariables,
-      (module Operation with
-         type t = data and type Raw.t_variables = jsVariables)
+      jsVariables
     ) =>
     unit =
-  (client, ~broadcast=?, ~data, ~id=?, ~variables, (module Operation)) => {
+  (
+    client,
+    ~query as (module Operation),
+    ~broadcast=?,
+    ~data,
+    ~id=?,
+    variables,
+  ) => {
     Js_.writeQuery(
       client,
       ~options={
@@ -630,27 +546,5 @@ let writeQuery:
         query: Operation.query,
         variables,
       },
-    );
-  };
-
-let writeQuery0:
-  type data jsVariables.
-    (
-      t,
-      ~broadcast: bool=?,
-      ~data: data,
-      ~id: string=?,
-      (module OperationNoRequiredVars with
-         type t = data and type Raw.t_variables = jsVariables)
-    ) =>
-    unit =
-  (client, ~broadcast=?, ~data, ~id=?, (module OperationNoRequiredVars)) => {
-    writeQuery(
-      client,
-      ~broadcast?,
-      ~data,
-      ~id?,
-      ~variables=OperationNoRequiredVars.makeDefaultVariables(),
-      (module OperationNoRequiredVars),
     );
   };

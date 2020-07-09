@@ -1,6 +1,8 @@
 .CONTRIBUTING
 .bsb.lock
 .merlin
+package-lock.json
+yarn.lock
 yarn-error.log
 *.bs.js
 .vscode/

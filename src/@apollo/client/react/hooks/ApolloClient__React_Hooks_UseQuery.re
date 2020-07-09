@@ -24,6 +24,8 @@ module Js_ = {
 let useQuery:
   type data jsVariables.
     (
+      ~query: (module Operation with
+                 type t = data and type Raw.t_variables = jsVariables),
       ~client: ApolloClient.t=?,
       ~context: Js.Json.t=?,
       ~displayName: string=?,
@@ -36,12 +38,11 @@ let useQuery:
       ~pollInterval: int=?,
       ~skip: bool=?,
       ~ssr: bool=?,
-      ~variables: jsVariables,
-      (module Operation with
-         type t = data and type Raw.t_variables = jsVariables)
+      jsVariables
     ) =>
     QueryResult.t(data, jsVariables) =
   (
+    ~query as (module Operation),
     ~client=?,
     ~context=?,
     ~displayName=?,
@@ -54,8 +55,7 @@ let useQuery:
     ~pollInterval=?,
     ~skip=?,
     ~ssr=?,
-    ~variables,
-    (module Operation),
+    variables,
   ) => {
     let jsQueryResult =
       Js_.useQuery(.
@@ -92,58 +92,6 @@ let useQuery:
     );
   };
 
-let useQuery0:
-  type data jsVariables.
-    (
-      ~client: ApolloClient.t=?,
-      ~context: Js.Json.t=?,
-      ~displayName: string=?,
-      ~errorPolicy: ErrorPolicy.t=?,
-      ~fetchPolicy: WatchQueryFetchPolicy.t=?,
-      ~notifyOnNetworkStatusChange: bool=?,
-      ~onCompleted: data => unit=?,
-      ~onError: ApolloError.t => unit=?,
-      ~partialRefetch: bool=?,
-      ~pollInterval: int=?,
-      ~skip: bool=?,
-      ~ssr: bool=?,
-      (module Types.OperationNoRequiredVars with
-         type t = data and type Raw.t_variables = jsVariables)
-    ) =>
-    QueryResult.t(data, jsVariables) =
-  (
-    ~client=?,
-    ~context=?,
-    ~displayName=?,
-    ~errorPolicy=?,
-    ~fetchPolicy=?,
-    ~notifyOnNetworkStatusChange=?,
-    ~onCompleted=?,
-    ~onError=?,
-    ~partialRefetch=?,
-    ~pollInterval=?,
-    ~skip=?,
-    ~ssr=?,
-    (module Operation),
-  ) => {
-    useQuery(
-      ~client?,
-      ~context?,
-      ~displayName?,
-      ~errorPolicy?,
-      ~fetchPolicy?,
-      ~notifyOnNetworkStatusChange?,
-      ~onCompleted?,
-      ~onError?,
-      ~partialRefetch?,
-      ~pollInterval?,
-      ~skip?,
-      ~ssr?,
-      ~variables=Operation.makeDefaultVariables(),
-      (module Operation),
-    );
-  };
-
 module Extend = (M: Operation) => {
   let refetchQueryDescription:
     (~context: Js.Json.t=?, M.Raw.t_variables) =>
@@ -172,6 +120,7 @@ module Extend = (M: Operation) => {
         variables,
       ) => {
     useQuery(
+      ~query=(module M),
       ~client?,
       ~context?,
       ~displayName?,
@@ -184,8 +133,7 @@ module Extend = (M: Operation) => {
       ~pollInterval?,
       ~skip?,
       ~ssr?,
-      ~variables,
-      (module M),
+      variables,
     );
   };
 
@@ -205,6 +153,7 @@ module Extend = (M: Operation) => {
         (),
       ) => {
     ApolloClient__React_Hooks_UseLazyQuery.useLazyQuery(
+      ~query=(module M),
       ~client?,
       ~context?,
       ~displayName?,
@@ -216,7 +165,7 @@ module Extend = (M: Operation) => {
       ~partialRefetch?,
       ~pollInterval?,
       ~ssr?,
-      (module M),
+      (),
     );
   };
 
@@ -236,6 +185,7 @@ module Extend = (M: Operation) => {
         variables,
       ) => {
     ApolloClient__React_Hooks_UseLazyQuery.useLazyQueryWithVariables(
+      ~query=(module M),
       ~client?,
       ~context?,
       ~displayName?,
@@ -247,122 +197,7 @@ module Extend = (M: Operation) => {
       ~partialRefetch?,
       ~pollInterval?,
       ~ssr?,
-      ~variables,
-      (module M),
-    );
-  };
-};
-
-module ExtendNoRequiredVariables = (M: OperationNoRequiredVars) => {
-  let refetchQueryDescription:
-    (~context: Js.Json.t=?, ~variables: M.Raw.t_variables=?, unit) =>
-    RefetchQueryDescription.t_variant =
-    (~context=?, ~variables: option(M.Raw.t_variables)=?, ()) =>
-      RefetchQueryDescription.PureQueryOptions({
-        query: M.query,
-        variables:
-          variables->Belt.Option.getWithDefault(M.makeDefaultVariables()),
-        context,
-      });
-
-  let use =
-      (
-        ~client=?,
-        ~context=?,
-        ~displayName=?,
-        ~errorPolicy=?,
-        ~fetchPolicy=?,
-        ~notifyOnNetworkStatusChange=?,
-        ~onCompleted=?,
-        ~onError=?,
-        ~partialRefetch=?,
-        ~pollInterval=?,
-        ~skip=?,
-        ~ssr=?,
-        ~variables=?,
-        (),
-      ) => {
-    useQuery(
-      ~client?,
-      ~context?,
-      ~displayName?,
-      ~errorPolicy?,
-      ~fetchPolicy?,
-      ~notifyOnNetworkStatusChange?,
-      ~onCompleted?,
-      ~onError?,
-      ~partialRefetch?,
-      ~pollInterval?,
-      ~skip?,
-      ~ssr?,
-      ~variables=
-        variables->Belt.Option.getWithDefault(M.makeDefaultVariables()),
-      (module M),
-    );
-  };
-
-  let useLazy =
-      (
-        ~client=?,
-        ~context=?,
-        ~displayName=?,
-        ~errorPolicy=?,
-        ~fetchPolicy=?,
-        ~notifyOnNetworkStatusChange=?,
-        ~onCompleted=?,
-        ~onError=?,
-        ~partialRefetch=?,
-        ~pollInterval=?,
-        ~ssr=?,
-        (),
-      ) => {
-    ApolloClient__React_Hooks_UseLazyQuery.useLazyQuery0(
-      ~client?,
-      ~context?,
-      ~displayName?,
-      ~errorPolicy?,
-      ~fetchPolicy?,
-      ~notifyOnNetworkStatusChange?,
-      ~onCompleted?,
-      ~onError?,
-      ~partialRefetch?,
-      ~pollInterval?,
-      ~ssr?,
-      (module M),
-    );
-  };
-
-  let useLazyWithVariables =
-      (
-        ~client=?,
-        ~context=?,
-        ~displayName=?,
-        ~errorPolicy=?,
-        ~fetchPolicy=?,
-        ~notifyOnNetworkStatusChange=?,
-        ~onCompleted=?,
-        ~onError=?,
-        ~partialRefetch=?,
-        ~pollInterval=?,
-        ~ssr=?,
-        ~variables=?,
-        (),
-      ) => {
-    ApolloClient__React_Hooks_UseLazyQuery.useLazyQueryWithVariables(
-      ~client?,
-      ~context?,
-      ~displayName?,
-      ~errorPolicy?,
-      ~fetchPolicy?,
-      ~notifyOnNetworkStatusChange?,
-      ~onCompleted?,
-      ~onError?,
-      ~partialRefetch?,
-      ~pollInterval?,
-      ~ssr?,
-      ~variables=
-        variables->Belt.Option.getWithDefault(M.makeDefaultVariables()),
-      (module M),
+      variables,
     );
   };
 };

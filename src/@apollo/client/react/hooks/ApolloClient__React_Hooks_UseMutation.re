@@ -6,7 +6,6 @@ module Graphql = ApolloClient__Graphql;
 module MutationHookOptions = ApolloClient__React_Types.MutationHookOptions;
 module MutationTuple = ApolloClient__React_Types.MutationTuple;
 module MutationTuple__noVariables = ApolloClient__React_Types.MutationTuple__noVariables;
-module MutationTuple__optionalVariables = ApolloClient__React_Types.MutationTuple__optionalVariables;
 module MutationUpdaterFn = ApolloClient__Core_WatchQueryOptions.MutationUpdaterFn;
 module OperationVariables = ApolloClient__Core_Types.OperationVariables;
 module RefetchQueryDescription = ApolloClient__Core_WatchQueryOptions.RefetchQueryDescription;
@@ -31,6 +30,8 @@ module Js_ = {
 let useMutation:
   type data jsVariables.
     (
+      ~mutation: (module Operation with
+                    type t = data and type Raw.t_variables = jsVariables),
       ~awaitRefetchQueries: bool=?,
       ~context: Js.Json.t=?,
       ~client: ApolloClient.t=?,
@@ -43,11 +44,11 @@ let useMutation:
       ~optimisticResponse: jsVariables => data=?,
       ~refetchQueries: RefetchQueryDescription.t=?,
       ~update: MutationUpdaterFn.t(data)=?,
-      (module Operation with
-         type t = data and type Raw.t_variables = jsVariables)
+      unit
     ) =>
     MutationTuple.t(data, jsVariables) =
   (
+    ~mutation as (module Operation),
     ~awaitRefetchQueries=?,
     ~context=?,
     ~client=?,
@@ -60,7 +61,7 @@ let useMutation:
     ~optimisticResponse=?,
     ~refetchQueries=?,
     ~update=?,
-    (module Operation),
+    (),
   ) => {
     let jsMutationTuple =
       Js_.useMutation(.
@@ -101,6 +102,8 @@ let useMutation:
 let useMutationWithVariables:
   type data jsVariables.
     (
+      ~mutation: (module Operation with
+                    type t = data and type Raw.t_variables = jsVariables),
       ~awaitRefetchQueries: bool=?,
       ~context: Js.Json.t=?,
       ~client: ApolloClient.t=?,
@@ -113,12 +116,11 @@ let useMutationWithVariables:
       ~optimisticResponse: jsVariables => data=?,
       ~refetchQueries: RefetchQueryDescription.t=?,
       ~update: MutationUpdaterFn.t(data)=?,
-      ~variables: jsVariables,
-      (module Operation with
-         type t = data and type Raw.t_variables = jsVariables)
+      jsVariables
     ) =>
     MutationTuple__noVariables.t(data, jsVariables) =
   (
+    ~mutation as (module Operation),
     ~awaitRefetchQueries=?,
     ~context=?,
     ~client=?,
@@ -131,8 +133,7 @@ let useMutationWithVariables:
     ~optimisticResponse=?,
     ~refetchQueries=?,
     ~update=?,
-    ~variables,
-    (module Operation),
+    variables,
   ) => {
     let jsMutationTuple =
       Js_.useMutation(.
@@ -174,77 +175,6 @@ let useMutationWithVariables:
     );
   };
 
-let useMutation0:
-  type data jsVariables.
-    (
-      ~awaitRefetchQueries: bool=?,
-      ~context: Js.Json.t=?,
-      ~client: ApolloClient.t=?,
-      ~errorPolicy: ErrorPolicy.t=?,
-      ~fetchPolicy: FetchPolicy__noCacheExtracted.t=?,
-      ~ignoreResults: bool=?,
-      ~notifyOnNetworkStatusChange: bool=?,
-      ~onError: ApolloError.t => unit=?,
-      ~onCompleted: data => unit=?,
-      ~optimisticResponse: jsVariables => data=?,
-      ~refetchQueries: RefetchQueryDescription.t=?,
-      ~update: MutationUpdaterFn.t(data)=?,
-      (module OperationNoRequiredVars with
-         type t = data and type Raw.t_variables = jsVariables)
-    ) =>
-    MutationTuple__optionalVariables.t(data, jsVariables) =
-  (
-    ~awaitRefetchQueries=?,
-    ~context=?,
-    ~client=?,
-    ~errorPolicy=?,
-    ~fetchPolicy=?,
-    ~ignoreResults=?,
-    ~notifyOnNetworkStatusChange=?,
-    ~onError=?,
-    ~onCompleted=?,
-    ~optimisticResponse=?,
-    ~refetchQueries=?,
-    ~update=?,
-    (module OperationNoRequiredVars),
-  ) => {
-    let jsMutationTuple =
-      Js_.useMutation(.
-        OperationNoRequiredVars.query,
-        MutationHookOptions.toJs(
-          {
-            mutation: None,
-            awaitRefetchQueries,
-            context,
-            client,
-            errorPolicy,
-            fetchPolicy,
-            ignoreResults,
-            notifyOnNetworkStatusChange,
-            onError,
-            onCompleted,
-            optimisticResponse,
-            refetchQueries,
-            update,
-            variables: Some(OperationNoRequiredVars.makeDefaultVariables()),
-          },
-          ~parse=OperationNoRequiredVars.parse,
-          ~serialize=OperationNoRequiredVars.serialize,
-        ),
-      );
-
-    Utils.useGuaranteedMemo1(
-      () => {
-        jsMutationTuple->MutationTuple__optionalVariables.fromJs(
-          ~defaultVariables=OperationNoRequiredVars.makeDefaultVariables(),
-          ~parse=OperationNoRequiredVars.parse,
-          ~serialize=OperationNoRequiredVars.serialize,
-        )
-      },
-      jsMutationTuple,
-    );
-  };
-
 module Extend = (M: Types.Operation) => {
   let use =
       (
@@ -263,6 +193,7 @@ module Extend = (M: Types.Operation) => {
         (),
       ) => {
     useMutation(
+      ~mutation=(module M),
       ~awaitRefetchQueries?,
       ~context?,
       ~client?,
@@ -275,7 +206,7 @@ module Extend = (M: Types.Operation) => {
       ~optimisticResponse?,
       ~refetchQueries?,
       ~update?,
-      (module M),
+      (),
     );
   };
 
@@ -296,6 +227,7 @@ module Extend = (M: Types.Operation) => {
         variables,
       ) => {
     useMutationWithVariables(
+      ~mutation=(module M),
       ~awaitRefetchQueries?,
       ~context?,
       ~client?,
@@ -308,77 +240,7 @@ module Extend = (M: Types.Operation) => {
       ~optimisticResponse?,
       ~refetchQueries?,
       ~update?,
-      ~variables,
-      (module M),
-    );
-  };
-};
-
-module ExtendNoRequiredVariables = (M: Types.OperationNoRequiredVars) => {
-  let use =
-      (
-        ~awaitRefetchQueries=?,
-        ~context=?,
-        ~client=?,
-        ~errorPolicy=?,
-        ~fetchPolicy=?,
-        ~ignoreResults=?,
-        ~notifyOnNetworkStatusChange=?,
-        ~onError=?,
-        ~onCompleted=?,
-        ~optimisticResponse=?,
-        ~refetchQueries=?,
-        ~update=?,
-        (),
-      ) => {
-    useMutation0(
-      ~awaitRefetchQueries?,
-      ~context?,
-      ~client?,
-      ~errorPolicy?,
-      ~fetchPolicy?,
-      ~ignoreResults?,
-      ~notifyOnNetworkStatusChange?,
-      ~onError?,
-      ~onCompleted?,
-      ~optimisticResponse?,
-      ~refetchQueries?,
-      ~update?,
-      (module M),
-    );
-  };
-
-  let useWithVariables =
-      (
-        ~awaitRefetchQueries=?,
-        ~context=?,
-        ~client=?,
-        ~errorPolicy=?,
-        ~fetchPolicy=?,
-        ~ignoreResults=?,
-        ~notifyOnNetworkStatusChange=?,
-        ~onError=?,
-        ~onCompleted=?,
-        ~optimisticResponse=?,
-        ~refetchQueries=?,
-        ~update=?,
-        variables,
-      ) => {
-    useMutationWithVariables(
-      ~awaitRefetchQueries?,
-      ~context?,
-      ~client?,
-      ~errorPolicy?,
-      ~fetchPolicy?,
-      ~ignoreResults?,
-      ~notifyOnNetworkStatusChange?,
-      ~onError?,
-      ~onCompleted?,
-      ~optimisticResponse?,
-      ~refetchQueries?,
-      ~update?,
-      ~variables,
-      (module M),
+      variables,
     );
   };
 };

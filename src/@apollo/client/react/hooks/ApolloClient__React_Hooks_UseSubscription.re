@@ -45,6 +45,8 @@ type useSubscription_result('data, 'variables) = {
 let useSubscription:
   type data jsVariables.
     (
+      ~subscription: (module Operation with
+                        type t = data and type Raw.t_variables = jsVariables),
       ~client: ApolloClient.t=?,
       ~fetchPolicy: FetchPolicy.t=?,
       ~onSubscriptionData: OnSubscriptionDataOptions.t(data) => unit=?,
@@ -52,20 +54,18 @@ let useSubscription:
       ~shouldResubscribe: BaseSubscriptionOptions.t(data, jsVariables) => bool
                             =?,
       ~skip: bool=?,
-      ~variables: jsVariables,
-      (module Operation with
-         type t = data and type Raw.t_variables = jsVariables)
+      jsVariables
     ) =>
     useSubscription_result(data, jsVariables) =
   (
+    ~subscription as (module Operation),
     ~client=?,
     ~fetchPolicy=?,
     ~onSubscriptionData=?,
     ~onSubscriptionComplete=?,
     ~shouldResubscribe=?,
     ~skip=?,
-    ~variables,
-    (module Operation),
+    variables,
   ) => {
     let jsSubscriptionResult =
       Js_.useSubscription(.
@@ -97,41 +97,6 @@ let useSubscription:
     );
   };
 
-let useSubscription0:
-  type data jsVariables.
-    (
-      ~client: ApolloClient.t=?,
-      ~fetchPolicy: FetchPolicy.t=?,
-      ~onSubscriptionData: OnSubscriptionDataOptions.t(data) => unit=?,
-      ~onSubscriptionComplete: unit => unit=?,
-      ~shouldResubscribe: BaseSubscriptionOptions.t(data, jsVariables) => bool
-                            =?,
-      ~skip: bool=?,
-      (module Types.OperationNoRequiredVars with
-         type t = data and type Raw.t_variables = jsVariables)
-    ) =>
-    useSubscription_result(data, jsVariables) =
-  (
-    ~client=?,
-    ~fetchPolicy=?,
-    ~onSubscriptionData=?,
-    ~onSubscriptionComplete=?,
-    ~shouldResubscribe=?,
-    ~skip=?,
-    (module Operation),
-  ) => {
-    useSubscription(
-      ~client?,
-      ~fetchPolicy?,
-      ~onSubscriptionData?,
-      ~onSubscriptionComplete?,
-      ~shouldResubscribe?,
-      ~skip?,
-      ~variables=Operation.makeDefaultVariables(),
-      (module Operation),
-    );
-  };
-
 module Extend = (M: Operation) => {
   let use =
       (
@@ -141,44 +106,17 @@ module Extend = (M: Operation) => {
         ~onSubscriptionComplete=?,
         ~shouldResubscribe=?,
         ~skip=?,
-        ~variables,
-        (),
+        variables,
       ) => {
     useSubscription(
+      ~subscription=(module M),
       ~client?,
       ~fetchPolicy?,
       ~onSubscriptionData?,
       ~onSubscriptionComplete?,
       ~shouldResubscribe?,
       ~skip?,
-      ~variables,
-      (module M),
-    );
-  };
-};
-
-module ExtendNoRequiredVariables = (M: OperationNoRequiredVars) => {
-  let use =
-      (
-        ~client=?,
-        ~fetchPolicy=?,
-        ~onSubscriptionData=?,
-        ~onSubscriptionComplete=?,
-        ~shouldResubscribe=?,
-        ~skip=?,
-        ~variables=?,
-        (),
-      ) => {
-    useSubscription(
-      ~client?,
-      ~fetchPolicy?,
-      ~onSubscriptionData?,
-      ~onSubscriptionComplete?,
-      ~shouldResubscribe?,
-      ~skip?,
-      ~variables=
-        variables->Belt.Option.getWithDefault(M.makeDefaultVariables()),
-      (module M),
+      variables,
     );
   };
 };

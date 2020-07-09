@@ -62,7 +62,6 @@ Add the following to `bs-dependencies`, `graphql`, and `ppx-flags` in your `bsco
   "ppx-flags": [
     [
       "@reasonml-community/graphql-ppx/ppx",
-+     "-fragment-in-query=include",
 +     "-template-tag-return-type=ApolloClient.GraphQL_PPX.templateTagReturnType",
 +     "-template-tag-import=gql",
 +     "-template-tag-location=@apollo/client"

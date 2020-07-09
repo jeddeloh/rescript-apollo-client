@@ -19,6 +19,8 @@
     "@reasonml-community/graphql-ppx": "^1.0.0-beta.17",
     "bs-platform": "^7.3.2",
     "graphql": "^14.0.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
     "reason-react": "^0.9.1",
     "subscriptions-transport-ws": "^0.9.16"
   },

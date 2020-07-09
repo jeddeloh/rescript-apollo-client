@@ -401,6 +401,8 @@ let mutate:
   type data jsVariables.
     (
       t,
+      ~mutation: (module Operation with
+                    type t = data and type Raw.t_variables = jsVariables),
       ~awaitRefetchQueries: bool=?,
       ~context: Js.Json.t=?,
       ~errorPolicy: ErrorPolicy.t=?,
@@ -409,13 +411,12 @@ let mutate:
       ~refetchQueries: RefetchQueryDescription.t=?,
       ~updateQueries: MutationQueryReducersMap.t(data)=?,
       ~update: MutationUpdaterFn.t(data)=?,
-      ~operation: (module Operation with
-                     type t = data and type Raw.t_variables = jsVariables),
       jsVariables
     ) =>
     Js.Promise.t(FetchResult.t(data)) =
   (
     client,
+    ~mutation as (module Operation),
     ~awaitRefetchQueries=?,
     ~context=?,
     ~errorPolicy=?,
@@ -424,7 +425,6 @@ let mutate:
     ~refetchQueries=?,
     ~updateQueries=?,
     ~update=?,
-    ~operation as (module Operation),
     variables,
   ) => {
     Js_.mutate(
@@ -460,20 +460,20 @@ let query:
   type data jsVariables.
     (
       t,
+      ~query: (module Operation with
+                 type t = data and type Raw.t_variables = jsVariables),
       ~context: Js.Json.t=?,
       ~errorPolicy: ErrorPolicy.t=?,
       ~fetchPolicy: FetchPolicy.t=?,
-      ~operation: (module Operation with
-                     type t = data and type Raw.t_variables = jsVariables),
       jsVariables
     ) =>
     Js.Promise.t(ApolloQueryResult.t(data)) =
   (
     client,
+    ~query as (module Operation),
     ~context=?,
     ~errorPolicy=?,
     ~fetchPolicy=?,
-    ~operation as (module Operation),
     variables,
   ) => {
     Js_.query(
@@ -500,14 +500,14 @@ let readQuery:
   type data jsVariables.
     (
       t,
+      ~query: (module Operation with
+                 type t = data and type Raw.t_variables = jsVariables),
       ~id: string=?,
       ~optimistic: bool=?,
-      ~operation: (module Operation with
-                     type t = data and type Raw.t_variables = jsVariables),
       jsVariables
     ) =>
     option(data) =
-  (client, ~id=?, ~optimistic=?, ~operation as (module Operation), variables) => {
+  (client, ~query as (module Operation), ~id=?, ~optimistic=?, variables) => {
     Js_.readQuery(
       client,
       ~options={id, query: Operation.query, variables},
@@ -521,20 +521,20 @@ let writeQuery:
   type data jsVariables.
     (
       t,
+      ~query: (module Operation with
+                 type t = data and type Raw.t_variables = jsVariables),
       ~broadcast: bool=?,
       ~data: data,
       ~id: string=?,
-      ~operation: (module Operation with
-                     type t = data and type Raw.t_variables = jsVariables),
       jsVariables
     ) =>
     unit =
   (
     client,
+    ~query as (module Operation),
     ~broadcast=?,
     ~data,
     ~id=?,
-    ~operation as (module Operation),
     variables,
   ) => {
     Js_.writeQuery(

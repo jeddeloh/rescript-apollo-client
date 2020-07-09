@@ -35,7 +35,7 @@ module PersonsOlderThanQuery = [%graphql
 
 let logPeople_good_reasonPromise = _ =>
   Client.instance
-  ->ApolloClient.query(~operation=(module PeopleQuery), ())
+  ->ApolloClient.query(~query=(module PeopleQuery), ())
   ->Promise.Js.fromBsPromise
   ->Promise.Js.toResult
   ->Promise.get(
@@ -47,7 +47,7 @@ let logPeople_good_reasonPromise = _ =>
 
 let logPeople_good_prometo = _ =>
   Client.instance
-  ->ApolloClient.query(~operation=(module PeopleQuery), ())
+  ->ApolloClient.query(~query=(module PeopleQuery), ())
   ->Prometo.fromPromise
   ->Prometo.handle(~f=result => {
       switch (result) {
@@ -60,13 +60,13 @@ let logPeople_good_prometo = _ =>
   ->ignore;
 
 /**
- * The ergonomice of the Js Module Promise methods are such that the compiler cannot
- * infer the type of result which means the record fields are not in scope forcing you
- * to annotate it :( I would highly recommend using one of the promise libraries above
+ * The ergonomics of the Js module promise methods are such that the compiler cannot
+ * infer the type of result which means the record fields are not in scope, forcing you
+ * to annotate it. I would highly recommend using one of the promise libraries above!
  */
 let logPeople_bad_jsPromise = _ =>
   Client.instance
-  ->ApolloClient.query(~operation=(module PeopleQuery), ())
+  ->ApolloClient.query(~query=(module PeopleQuery), ())
   ->Js.Promise.then_(
       (result: ApolloClient__ApolloClient.ApolloQueryResult.t(_)) =>
         switch (result) {
@@ -90,7 +90,7 @@ let addPerson = _ =>
   (
     Client.instance
     ->ApolloClient.mutate(
-        ~operation=(module AddPersonMutation),
+        ~mutation=(module AddPersonMutation),
         {age: 40, name: "Ted"},
       )
     ->Promise.Js.fromBsPromise

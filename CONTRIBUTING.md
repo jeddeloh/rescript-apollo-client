@@ -11,7 +11,7 @@ There's nothing fancy about this library. It tends to view the problem of bindin
 
 ## Following a Consistent Pattern
 
-At the file level, bindings to Javascript packages should mirror the directory structure in the JS package. No thinking required! This has the side benefit of being able to navigate to any import you see in the javascript docs via filepath pattern, but it's primary purpose is consistency. It should be easy for anyone else to see exactly what you're binding to and encourages consistent naming rules.
+At the file level, bindings to Javascript packages should mirror the directory structure in the JS package. No thinking required! This has the side benefit of being able to navigate to any import you see in the javascript docs via filepath pattern, but it's primary purpose is consistency. It should be easy for anyone else to see exactly what you're binding to and encourages naming rules.
 
 At the code level, all JS bindings should go in a `Js_` module of some sort. At first it seems ridiculous, but it pays off at scale. (See **Reasoning Behind `Js_` modules**)
 

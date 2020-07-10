@@ -53,16 +53,12 @@ Add the following to `bs-dependencies`, `graphql`, and `ppx-flags` in your `bsco
   "graphql": {
 +   "apollo-mode": true,
 +   "extend-mutation": "ApolloClient.GraphQL_PPX.ExtendMutation",
-+   "extend-mutation-no-required-variables": "ApolloClient.GraphQL_PPX.ExtendMutationNoRequiredVariables",
 +   "extend-query": "ApolloClient.GraphQL_PPX.ExtendQuery",
-+   "extend-query-no-required-variables": "ApolloClient.GraphQL_PPX.ExtendQueryNoRequiredVariables",
 +   "extend-subscription": "ApolloClient.GraphQL_PPX.ExtendSubscription",
-+   "extend-subscription-no-required-variables": "ApolloClient.GraphQL_PPX.ExtendSubscriptionNoRequiredVariables"
   },
   "ppx-flags": [
     [
       "@reasonml-community/graphql-ppx/ppx",
-+     "-fragment-in-query=include",
 +     "-template-tag-return-type=ApolloClient.GraphQL_PPX.templateTagReturnType",
 +     "-template-tag-import=gql",
 +     "-template-tag-location=@apollo/client"

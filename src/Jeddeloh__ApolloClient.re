@@ -10,11 +10,8 @@ module Bindings = {
 
 module GraphQL_PPX = {
   module ExtendMutation = ApolloClient__React_Hooks_UseMutation.Extend;
-  module ExtendMutationNoRequiredVariables = ApolloClient__React_Hooks_UseMutation.Extend;
   module ExtendQuery = ApolloClient__React_Hooks_UseQuery.Extend;
-  module ExtendQueryNoRequiredVariables = ApolloClient__React_Hooks_UseQuery.Extend;
   module ExtendSubscription = ApolloClient__React_Hooks_UseSubscription.Extend;
-  module ExtendSubscriptionNoRequiredVariables = ApolloClient__React_Hooks_UseSubscription.Extend;
   type templateTagReturnType = ApolloClient__Graphql.documentNode;
 };
 

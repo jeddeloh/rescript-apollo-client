@@ -14,7 +14,7 @@
   "ppx-flags": [
     [
       "@reasonml-community/graphql-ppx/ppx",
-      "-template-tag-return-type=ApolloClient.GraphQL_PPX.templateTagReturnType",
+      "-template-tag=ApolloClient.GraphQL_PPX.templateTagReturnType",
       "-template-tag-import=gql",
       "-template-tag-location=@apollo/client"
     ]

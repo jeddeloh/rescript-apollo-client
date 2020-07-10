@@ -407,39 +407,6 @@ module QueryTuple = {
     );
 };
 
-module QueryTuple__optionalVariables = {
-  module Js_ = {
-    type t('jsData, 'variables) = QueryTuple.Js_.t('jsData, 'variables);
-  };
-
-  type t('data, 'variables) = (
-    (~context: Js.Json.t=?, ~variables: 'variables=?, unit) => unit,
-    LazyQueryResult.t('data, 'variables),
-  );
-
-  let fromJs:
-    (
-      Js_.t('jsData, 'variables),
-      ~defaultVariables: 'variables,
-      ~parse: 'jsData => 'data,
-      ~serialize: 'data => 'jsData
-    ) =>
-    t('data, 'variables) =
-    (
-      (jsExecuteQuery, jsLazyQueryResult),
-      ~defaultVariables,
-      ~parse,
-      ~serialize,
-    ) => (
-      (~context=?, ~variables=?, ()) =>
-        jsExecuteQuery({
-          context,
-          variables: variables->Belt.Option.getWithDefault(defaultVariables),
-        }),
-      jsLazyQueryResult->LazyQueryResult.fromJs(~parse, ~serialize),
-    );
-};
-
 module QueryTuple__noVariables = {
   module Js_ = {
     type t('jsData, 'variables) = QueryTuple.Js_.t('jsData, 'variables);
@@ -807,77 +774,6 @@ module MutationTuple__noVariables = {
     ((jsMutationFn, jsMutationResult), ~parse, ~serialize, ~variables) => {
       let mutationFn =
           (
-            ~optimisticResponse=?,
-            ~refetchQueries=?,
-            ~awaitRefetchQueries=?,
-            ~update=?,
-            ~context=?,
-            ~fetchPolicy=?,
-            (),
-          ) => {
-        jsMutationFn(
-          Some(
-            MutationFunctionOptions.toJs(
-              {
-                variables,
-                optimisticResponse,
-                refetchQueries,
-                awaitRefetchQueries,
-                update,
-                context,
-                fetchPolicy,
-              },
-              ~parse,
-              ~serialize,
-            ),
-          ),
-        )
-        ->Js.Promise.then_(
-            jsResult =>
-              FetchResult.fromJs(jsResult, ~parse)->Js.Promise.resolve,
-            _,
-          );
-      };
-
-      (mutationFn, jsMutationResult->MutationResult.fromJs(~parse));
-    };
-};
-
-module MutationTuple__optionalVariables = {
-  module Js_ = {
-    type t('jsData, 'variables) = MutationTuple.Js_.t('jsData, 'variables);
-  };
-
-  type t_mutationFn('data, 'variables) =
-    (
-      ~variables: 'variables=?,
-      ~optimisticResponse: 'variables => 'data=?,
-      ~refetchQueries: RefetchQueryDescription.t=?,
-      ~awaitRefetchQueries: bool=?,
-      ~update: MutationUpdaterFn.t('data)=?,
-      ~context: Js.Json.t=?,
-      ~fetchPolicy: WatchQueryFetchPolicy.t=?,
-      unit
-    ) =>
-    Js.Promise.t(FetchResult.t('data));
-
-  type t('data, 'variables) = (
-    t_mutationFn('data, 'variables),
-    MutationResult.t('data),
-  );
-
-  let fromJs:
-    (
-      Js_.t('jsData, 'variables),
-      ~defaultVariables: 'variables,
-      ~parse: 'jsData => 'data,
-      ~serialize: 'data => 'jsData
-    ) =>
-    t('data, 'variables) =
-    ((jsMutationFn, jsMutationResult), ~defaultVariables, ~parse, ~serialize) => {
-      let mutationFn =
-          (
-            ~variables=defaultVariables,
             ~optimisticResponse=?,
             ~refetchQueries=?,
             ~awaitRefetchQueries=?,

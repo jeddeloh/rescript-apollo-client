@@ -5,7 +5,6 @@ module Graphql = ApolloClient__Graphql;
 module LazyQueryHookOptions = ApolloClient__React_Types.LazyQueryHookOptions;
 module QueryTuple = ApolloClient__React_Types.QueryTuple;
 module QueryTuple__noVariables = ApolloClient__React_Types.QueryTuple__noVariables;
-module QueryTuple__optionalVariables = ApolloClient__React_Types.QueryTuple__optionalVariables;
 module Types = ApolloClient__Types;
 module Utils = ApolloClient__Utils;
 module WatchQueryFetchPolicy = ApolloClient__Core_WatchQueryOptions.WatchQueryFetchPolicy;
@@ -28,6 +27,8 @@ module Js_ = {
 let useLazyQuery:
   type data jsVariables.
     (
+      ~query: (module Operation with
+                 type t = data and type Raw.t_variables = jsVariables),
       ~client: ApolloClient.t=?,
       ~context: Js.Json.t=?,
       ~displayName: string=?,
@@ -39,11 +40,11 @@ let useLazyQuery:
       ~partialRefetch: bool=?,
       ~pollInterval: int=?,
       ~ssr: bool=?,
-      (module Operation with
-         type t = data and type Raw.t_variables = jsVariables)
+      unit
     ) =>
     QueryTuple.t(data, jsVariables) =
   (
+    ~query as (module Operation),
     ~client=?,
     ~context=?,
     ~displayName=?,
@@ -55,7 +56,7 @@ let useLazyQuery:
     ~partialRefetch=?,
     ~pollInterval=?,
     ~ssr=?,
-    (module Operation),
+    (),
   ) => {
     let jsQueryTuple =
       Js_.useLazyQuery(.
@@ -94,6 +95,8 @@ let useLazyQuery:
 let useLazyQueryWithVariables:
   type data jsVariables.
     (
+      ~query: (module Operation with
+                 type t = data and type Raw.t_variables = jsVariables),
       ~client: ApolloClient.t=?,
       ~context: Js.Json.t=?,
       ~displayName: string=?,
@@ -105,12 +108,11 @@ let useLazyQueryWithVariables:
       ~partialRefetch: bool=?,
       ~pollInterval: int=?,
       ~ssr: bool=?,
-      ~variables: jsVariables,
-      (module Operation with
-         type t = data and type Raw.t_variables = jsVariables)
+      jsVariables
     ) =>
     QueryTuple__noVariables.t(data, jsVariables) =
   (
+    ~query as (module Operation),
     ~client=?,
     ~context=?,
     ~displayName=?,
@@ -122,8 +124,7 @@ let useLazyQueryWithVariables:
     ~partialRefetch=?,
     ~pollInterval=?,
     ~ssr=?,
-    ~variables,
-    (module Operation),
+    variables,
   ) => {
     let jsQueryTuple =
       Js_.useLazyQuery(.
@@ -155,73 +156,6 @@ let useLazyQueryWithVariables:
           ~serialize=Operation.serialize,
           // Passing in the same variables from above allows us to reuse some types
           ~variables,
-        )
-      },
-      jsQueryTuple,
-    );
-  };
-
-let useLazyQuery0:
-  type data jsVariables.
-    (
-      ~client: ApolloClient.t=?,
-      ~context: Js.Json.t=?,
-      ~displayName: string=?,
-      ~errorPolicy: ErrorPolicy.t=?,
-      ~fetchPolicy: WatchQueryFetchPolicy.t=?,
-      ~notifyOnNetworkStatusChange: bool=?,
-      ~onCompleted: data => unit=?,
-      ~onError: ApolloError.t => unit=?,
-      ~partialRefetch: bool=?,
-      ~pollInterval: int=?,
-      ~ssr: bool=?,
-      (module Types.OperationNoRequiredVars with
-         type t = data and type Raw.t_variables = jsVariables)
-    ) =>
-    QueryTuple__optionalVariables.t(data, jsVariables) =
-  (
-    ~client=?,
-    ~context=?,
-    ~displayName=?,
-    ~errorPolicy=?,
-    ~fetchPolicy=?,
-    ~notifyOnNetworkStatusChange=?,
-    ~onCompleted=?,
-    ~onError=?,
-    ~partialRefetch=?,
-    ~pollInterval=?,
-    ~ssr=?,
-    (module Operation),
-  ) => {
-    let jsQueryTuple =
-      Js_.useLazyQuery(.
-        Operation.query,
-        LazyQueryHookOptions.toJs(
-          {
-            client,
-            context,
-            displayName,
-            errorPolicy,
-            fetchPolicy,
-            onCompleted,
-            onError,
-            notifyOnNetworkStatusChange,
-            partialRefetch,
-            pollInterval,
-            query: None,
-            ssr,
-            variables: None,
-          },
-          ~parse=Operation.parse,
-        ),
-      );
-
-    Utils.useGuaranteedMemo1(
-      () => {
-        jsQueryTuple->QueryTuple__optionalVariables.fromJs(
-          ~defaultVariables=Operation.makeDefaultVariables(),
-          ~parse=Operation.parse,
-          ~serialize=Operation.serialize,
         )
       },
       jsQueryTuple,

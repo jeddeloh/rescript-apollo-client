@@ -10,11 +10,8 @@ module Bindings = {
 
 module GraphQL_PPX = {
   module ExtendMutation = ApolloClient__React_Hooks_UseMutation.Extend;
-  module ExtendMutationNoRequiredVariables = ApolloClient__React_Hooks_UseMutation.ExtendNoRequiredVariables;
   module ExtendQuery = ApolloClient__React_Hooks_UseQuery.Extend;
-  module ExtendQueryNoRequiredVariables = ApolloClient__React_Hooks_UseQuery.ExtendNoRequiredVariables;
   module ExtendSubscription = ApolloClient__React_Hooks_UseSubscription.Extend;
-  module ExtendSubscriptionNoRequiredVariables = ApolloClient__React_Hooks_UseSubscription.ExtendNoRequiredVariables;
   type templateTagReturnType = ApolloClient__Graphql.documentNode;
 };
 
@@ -22,13 +19,11 @@ module React = {
   module ApolloProvider = ApolloClient__React_Context_ApolloProvider;
   let useApolloClient = ApolloClient__React_Hooks_UseApolloClient.useApolloClient;
   let useMutation = ApolloClient__React_Hooks_UseMutation.useMutation;
-  let useMutation0 = ApolloClient__React_Hooks_UseMutation.useMutation0;
+  let useMutationWithVariables = ApolloClient__React_Hooks_UseMutation.useMutationWithVariables;
   let useLazyQuery = ApolloClient__React_Hooks_UseLazyQuery.useLazyQuery;
-  let useLazyQuery0 = ApolloClient__React_Hooks_UseLazyQuery.useLazyQuery0;
+  let useLazyQueryWithVariables = ApolloClient__React_Hooks_UseLazyQuery.useLazyQueryWithVariables;
   let useQuery = ApolloClient__React_Hooks_UseQuery.useQuery;
-  let useQuery0 = ApolloClient__React_Hooks_UseQuery.useQuery0;
   let useSubscription = ApolloClient__React_Hooks_UseSubscription.useSubscription;
-  let useSubscription0 = ApolloClient__React_Hooks_UseSubscription.useSubscription0;
 };
 
 module Utilities = ApolloClient__Utilities;

@@ -1,23 +1,18 @@
-module PersonsOlderThanQuery = [%graphql
+module TodosQuery = [%graphql
   {|
-  query getPersonsOlderThan($age: Int!) {
-    allPersons(filter: { age_gte: $age } ) {
-      id
+    query TodosQuery {
+      todos: allTodos {
+        id
+        text
+        completed
+      }
     }
-  }
   |}
 ];
 
-let age = 40;
-
 [@react.component]
 let make = () => {
-  let (executeQuery, queryResult) =
-    PersonsOlderThanQuery.useLazyWithVariables(
-      ~fetchPolicy=CacheAndNetwork,
-      ~errorPolicy=All,
-      PersonsOlderThanQuery.makeVariables(~age, ()),
-    );
+  let (executeQuery, queryResult) = TodosQuery.useLazy();
   <div>
     {switch (queryResult) {
      | Unexecuted(_) =>
@@ -29,26 +24,25 @@ let make = () => {
        </>
      | Executed({loading: true, data: None}) =>
        <p> "Loading"->React.string </p>
-     | Executed({loading, data: Some(data), error}) =>
+     | Executed({loading, data: Some({todos}), error}) =>
        <>
          <dialog>
            {loading ? <p> "Refreshing..."->React.string </p> : React.null}
            {switch (error) {
             | Some(_) =>
               <p>
-                "The query went wrong, data may be incomplete"->React.string
+                "Something went wrong, data may be incomplete"->React.string
               </p>
             | None => React.null
             }}
          </dialog>
-         <h3>
+         <p>
            {React.string(
               "There are "
-              ++ data.allPersons->Belt.Array.length->string_of_int
-              ++ " people older than "
-              ++ age->string_of_int,
+              ++ todos->Belt.Array.length->string_of_int
+              ++ " To-Dos",
             )}
-         </h3>
+         </p>
        </>
      | Executed({loading: false, data: None}) =>
        <p> "Error loading data"->React.string </p>

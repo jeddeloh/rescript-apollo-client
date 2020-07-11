@@ -1,11 +1,10 @@
-let graphqlEndpoint = "api.graph.cool/simple/v1/cjdgba1jw4ggk0185ig4bhpsn";
+let graphqlEndpoint = "localhost:4000";
 
 let headers = {"high": "five"};
 
 let httpLink =
   ApolloClient.Link.HttpLink.make(
-    ~uri=_ => "https://" ++ graphqlEndpoint,
-    ~credentials="include",
+    ~uri=_ => "http://" ++ graphqlEndpoint,
     ~headers=Obj.magic(headers),
     (),
   );
@@ -13,7 +12,7 @@ let httpLink =
 let wsLink =
   ApolloClient.Link.WebSocketLink.(
     make(
-      ~uri="wss://" ++ graphqlEndpoint,
+      ~uri="ws://" ++ graphqlEndpoint,
       ~options=
         ClientOptions.make(
           ~connectionParams=

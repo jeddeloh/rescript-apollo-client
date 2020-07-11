@@ -1,39 +1,29 @@
-module AddPersonMutation = [%graphql
+module AddTodoMutation = [%graphql
   {|
-    mutation addPerson($age: Int!, $name: String!) {
-      person: createPerson(age: $age, name: $name) {
+    mutation AddTodo($text: String!) {
+      todo: addTodoSimple(text: $text) {
         id
-        age
-        name
+        text
       }
     }
   |}
 ];
 
-module PeopleQuery = [%graphql
+module TodosQuery = [%graphql
   {|
-  query PeopleQuery {
-    people: allPersons {
-      id
-      name
+    query TodosQuery {
+      todos: allTodos {
+        id
+        completed
+        text
+      }
     }
-  }
-|}
-];
-
-module PersonsOlderThanQuery = [%graphql
-  {|
-  query getPersonsOlderThan($age: Int!) {
-    allPersons(filter: { age_gte: $age } ) {
-      id
-    }
-  }
-|}
+  |}
 ];
 
 [@react.component]
 let make = () => {
-  let (mutate, result) = AddPersonMutation.use();
+  let (mutate, result) = AddTodoMutation.use();
 
   switch (result) {
   | {called: false} =>
@@ -43,20 +33,20 @@ let make = () => {
         onClick={_ =>
           mutate(
             ~refetchQueries=[|
-              PeopleQuery.refetchQueryDescription(),
+              TodosQuery.refetchQueryDescription(),
               // - OR -
-              String("PeopleQuery") // Should rarely be needed?
+              String("TodosQuery") // Should rarely be needed?
             |],
-            AddPersonMutation.makeVariables(~age=40, ~name="Jane", ()),
+            {text: "Another To-Do"},
           )
           ->ignore
         }>
-        "Add Person"->React.string
+        "Add To-Do"->React.string
       </button>
     </>
   | {loading: true} => "Loading..."->React.string
-  | {data: Some({person: Some(person)}), error: None} =>
-    <h4> {React.string("Person added: " ++ person.name)} </h4>
+  | {data: Some({todo: {text}}), error: None} =>
+    <p> {React.string("To-Do added: \"" ++ text ++ "\"")} </p>
   | {error} =>
     <>
       "Error loading data"->React.string

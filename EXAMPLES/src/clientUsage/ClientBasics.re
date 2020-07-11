@@ -1,58 +1,48 @@
 module Prometo = Yawaramin__Prometo;
 
-module AddPersonMutation = [%graphql
+module AddTodoMutation = [%graphql
   {|
-    mutation addPerson($age: Int!, $name: String!) {
-      person: createPerson(age: $age, name: $name) {
+    mutation AddTodo($text: String!) {
+      todo: addTodoSimple(text: $text) {
         id
-        age
-        name
+        text
       }
     }
   |}
 ];
 
-module PeopleQuery = [%graphql
+module TodosQuery = [%graphql
   {|
-  query PeopleQuery {
-    people: allPersons {
-      id
-      name
+    query TodosQuery {
+      todos: allTodos {
+        id
+        text
+        completed
+      }
     }
-  }
-|}
+  |}
 ];
 
-module PersonsOlderThanQuery = [%graphql
-  {|
-  query getPersonsOlderThan($age: Int!) {
-    allPersons(filter: { age_gte: $age } ) {
-      id
-    }
-  }
-|}
-];
-
-let logPeople_good_reasonPromise = _ =>
+let logTodos_good_reasonPromise = _ =>
   Client.instance
-  ->ApolloClient.query(~query=(module PeopleQuery), ())
+  ->ApolloClient.query(~query=(module TodosQuery), ())
   ->Promise.Js.fromBsPromise
   ->Promise.Js.toResult
   ->Promise.get(
       fun
-      | Ok({data: Some({people})}) => Js.log2("Data: ", people)
-      | Ok(_) => Js.log("Error: no people!")
+      | Ok({data: Some({todos})}) => Js.log2("Data: ", todos)
+      | Ok(_) => Js.log("Error: no To-Dos!")
       | Error(error) => Js.log2("Error: ", error),
     );
 
-let logPeople_good_prometo = _ =>
+let logTodos_good_prometo = _ =>
   Client.instance
-  ->ApolloClient.query(~query=(module PeopleQuery), ())
+  ->ApolloClient.query(~query=(module TodosQuery), ())
   ->Prometo.fromPromise
   ->Prometo.handle(~f=result => {
       switch (result) {
-      | Ok({data: Some({people})}) => Js.log2("Data: ", people)
-      | Ok(_) => Js.log("Error: no people!")
+      | Ok({data: Some({todos})}) => Js.log2("Data: ", todos)
+      | Ok(_) => Js.log("Error: no To-Dos!")
       | Error(error) => Js.log2("Error: ", error)
       };
       result;
@@ -64,14 +54,14 @@ let logPeople_good_prometo = _ =>
  * infer the type of result which means the record fields are not in scope, forcing you
  * to annotate it. I would highly recommend using one of the promise libraries above!
  */
-let logPeople_bad_jsPromise = _ =>
+let logTodos_bad_jsPromise = _ =>
   Client.instance
-  ->ApolloClient.query(~query=(module PeopleQuery), ())
+  ->ApolloClient.query(~query=(module TodosQuery), ())
   ->Js.Promise.then_(
       (result: ApolloClient__ApolloClient.ApolloQueryResult.t(_)) =>
         switch (result) {
-        | {data: Some({PeopleQuery.people})} =>
-          Js.Promise.resolve(Js.log2("Data: ", people))
+        | {data: Some({TodosQuery.todos})} =>
+          Js.Promise.resolve(Js.log2("Data: ", todos))
         | _ => Js.Exn.raiseError("Error: no people!")
         },
       _,
@@ -82,7 +72,7 @@ let logPeople_bad_jsPromise = _ =>
     )
   ->ignore;
 
-let addPerson = _ =>
+let addTodo = _ =>
   /**
    * If the operation module were not the last argument, we could just use a record here
    * instead of requiring the use of `makeVariables`. :thinking_face:
@@ -90,8 +80,8 @@ let addPerson = _ =>
   (
     Client.instance
     ->ApolloClient.mutate(
-        ~mutation=(module AddPersonMutation),
-        {age: 40, name: "Ted"},
+        ~mutation=(module AddTodoMutation),
+        {text: "Another To-Do"},
       )
     ->Promise.Js.fromBsPromise
     ->Promise.Js.toResult
@@ -106,20 +96,20 @@ let addPerson = _ =>
 let make = () => {
   <div>
     <p>
-      <button onClick=logPeople_good_reasonPromise>
-        "Log People (Reason Promise)"->React.string
+      <button onClick=logTodos_good_reasonPromise>
+        "Log To-Dos (Reason Promise)"->React.string
       </button>
     </p>
     <p>
-      <button onClick=logPeople_good_prometo>
-        "Log People (Prometo)"->React.string
+      <button onClick=logTodos_good_prometo>
+        "Log To-Dos (Prometo)"->React.string
       </button>
     </p>
     <p>
-      <button onClick=logPeople_bad_jsPromise>
-        "Log People (Js Module)"->React.string
+      <button onClick=logTodos_bad_jsPromise>
+        "Log To-Dos (Js Module)"->React.string
       </button>
     </p>
-    <p> <button onClick=addPerson> "Add Person"->React.string </button> </p>
+    <p> <button onClick=addTodo> "Add To-Do"->React.string </button> </p>
   </div>;
 };

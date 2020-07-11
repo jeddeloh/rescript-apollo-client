@@ -1,47 +1,41 @@
-module PersonsOlderThanQuery = [%graphql
+module TodosQuery = [%graphql
   {|
-  query getPersonsOlderThan($age: Int!) {
-    allPersons(filter: { age_gte: $age } ) {
-      id
+    query TodosQuery {
+      todos: allTodos {
+        id
+        text
+        completed
+      }
     }
-  }
-|}
+  |}
 ];
-
-let age = 40;
 
 [@react.component]
 let make = () => {
-  let queryResult =
-    PersonsOlderThanQuery.use(
-      ~fetchPolicy=CacheAndNetwork,
-      ~errorPolicy=All,
-      PersonsOlderThanQuery.makeVariables(~age, ()),
-    );
+  let queryResult = TodosQuery.use();
 
   <div>
     {switch (queryResult) {
      | {loading: true, data: None} => <p> "Loading"->React.string </p>
-     | {loading, data: Some(data), error} =>
+     | {loading, data: Some({todos}), error} =>
        <>
          <dialog>
            {loading ? <p> "Refreshing..."->React.string </p> : React.null}
            {switch (error) {
             | Some(_) =>
               <p>
-                "The query went wrong, data may be incomplete"->React.string
+                "Something went wrong, data may be incomplete"->React.string
               </p>
             | None => React.null
             }}
          </dialog>
-         <h4>
+         <p>
            {React.string(
               "There are "
-              ++ data.allPersons->Belt.Array.length->string_of_int
-              ++ " people older than "
-              ++ age->string_of_int,
+              ++ todos->Belt.Array.length->string_of_int
+              ++ " To-Dos",
             )}
-         </h4>
+         </p>
        </>
      | {loading: false, data: None} =>
        <p> "Error loading data"->React.string </p>

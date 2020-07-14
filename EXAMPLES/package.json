@@ -22,7 +22,7 @@
   "dependencies": {
     "@apollo/client": "^3.0.0-rc.6",
     "@apollo/link-ws": "^2.0.0-beta.3",
-    "@jeddeloh/reason-apollo-client": "^0.0.1-alpha.3",
+    "@jeddeloh/reason-apollo-client": "^0.0.1-alpha.4",
     "@yawaramin/prometo": "0.11.0",
     "graphql": "^14.0.0",
     "react": "16.13.1",

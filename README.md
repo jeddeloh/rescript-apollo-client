@@ -1,4 +1,4 @@
-> ⚠️ **WARNING:** This library is currently in alpha. However, it is mostly complete and includes all `reason-apollo` and `reason-apollo-hooks` functionality
+> ⚠️ **WARNING:** This library is currently under active development and things may be changing quickly. However, it is mostly complete and includes all `reason-apollo` and `reason-apollo-hooks` functionality
 
 <p align="center">
     <img src="assets/logo-v1.png" alt="Logo">
@@ -87,7 +87,7 @@ let make = () => {
 }
 ```
 
-Other than that, underlying functionality is almost identical to the [official Apollo Client 3 docs](https://www.apollographql.com/docs/react/v3.0-beta/get-started/), so that is still a good resource for working with this library.
+Other than some slightly different ergonomics, the underlying functionality is almost identical to the [official Apollo Client 3 docs](https://www.apollographql.com/docs/react/v3.0-beta/get-started/), so that is still a good resource for working with this library.
 
 ## Bindings to JavaScript Packages
 
@@ -127,7 +127,7 @@ let httpLink = ApolloClient.Link.HttpLink.make(...)
 
 ## About This Library
 
-Apollo bindings in the Reason / BuckleScript community are pretty confusing as a write this (July 11, 2020), so it's worth providing some context to help you make the right decisions about which library to use.
+Apollo bindings in the Reason / BuckleScript community are pretty confusing as a write this (July 14, 2020), so it's worth providing some context to help you make the right decisions about which library to use.
 
 This library, `reason-apollo-client`, targets Apollo Client 3 (currently a release-candidate) and aims to take full advantage of v1.0.0 `graphql-ppx` features (still in beta) and is intended to be a replacement for `reason-apollo` and `reason-apollo-hooks` (all the functionality is here and more). You should avoid using those libraries at the same time as this one (it's possible, but don't unless you have special circumstances).
 

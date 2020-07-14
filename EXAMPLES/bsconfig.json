@@ -1,9 +1,13 @@
 {
   "name": "examples",
   "graphql": {
+    "apollo-mode": true,
     "extend-mutation": "ApolloClient.GraphQL_PPX.ExtendMutation",
     "extend-query": "ApolloClient.GraphQL_PPX.ExtendQuery",
-    "extend-subscription": "ApolloClient.GraphQL_PPX.ExtendSubscription"
+    "extend-subscription": "ApolloClient.GraphQL_PPX.ExtendSubscription",
+    "template-tag-return-type": "ApolloClient.GraphQL_PPX.templateTagReturnType",
+    "template-tag-import": "gql",
+    "template-tag-location": "@apollo/client"
   },
   "package-specs": [
     {
@@ -11,14 +15,7 @@
       "in-source": true
     }
   ],
-  "ppx-flags": [
-    [
-      "@reasonml-community/graphql-ppx/ppx",
-      "-template-tag-return-type=ApolloClient.GraphQL_PPX.templateTagReturnType",
-      "-template-tag-import=gql",
-      "-template-tag-location=@apollo/client"
-    ]
-  ],
+  "ppx-flags": ["@reasonml-community/graphql-ppx/ppx"],
   "reason": {
     "react-jsx": 3
   },

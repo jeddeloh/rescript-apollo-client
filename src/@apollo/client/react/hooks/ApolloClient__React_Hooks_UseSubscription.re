@@ -1,5 +1,5 @@
 module ApolloClient = ApolloClient__ApolloClient;
-module ApolloError = ApolloClient__ApolloError;
+module ApolloError = ApolloClient__Errors_ApolloError;
 module BaseSubscriptionOptions = ApolloClient__React_Types.BaseSubscriptionOptions;
 module FetchPolicy = ApolloClient__Core_WatchQueryOptions.FetchPolicy;
 module Graphql = ApolloClient__Graphql;
@@ -39,7 +39,7 @@ type useSubscription_result('data, 'variables) = {
   variables: option('variables),
   loading: bool,
   data: option('data),
-  error: option(ApolloError.Js_.t),
+  error: option(ApolloError.t),
 };
 
 let useSubscription:
@@ -91,7 +91,8 @@ let useSubscription:
           variables: jsSubscriptionResult.variables,
           loading: jsSubscriptionResult.loading,
           data: jsSubscriptionResult.data->Belt.Option.map(Operation.parse),
-          error: jsSubscriptionResult.error,
+          error:
+            jsSubscriptionResult.error->Belt.Option.map(ApolloError.fromJs),
         },
       jsSubscriptionResult,
     );

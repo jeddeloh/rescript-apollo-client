@@ -1,15 +1,17 @@
 module ApolloLink = ApolloClient__Link_Core_ApolloLink;
 module GraphQLError = ApolloClient__Graphql.Error.GraphQLError;
-module ExecutionResult = ApolloClient__Execution_Execute.ExecutionResult;
+module ExecutionResult = ApolloClient__Graphql_Execution_Execute.ExecutionResult;
 module NextLink = ApolloClient__Link_Core_Types.NextLink;
 module Operation = ApolloClient__Link_Core_Types.Operation;
 module ServerError = ApolloClient__Link_Utils_ThrowServerError.ServerError;
 module ServerParseError = ApolloClient__Link_Http_ParseAndCheckHttpResponse.ServerParseError;
+
 // export declare class ErrorLink extends ApolloLink {
 //     private link;
 //     constructor(errorHandler: ErrorLink.ErrorHandler);
 //     request(operation: Operation, forward: NextLink): Observable<FetchResult> | null;
 // }
+
 module ErrorResponse = {
   // export interface ErrorResponse {
   //     graphQLErrors?: ReadonlyArray<GraphQLError>;
@@ -41,35 +43,54 @@ module ErrorResponse = {
         | ServerError(ServerError.Js_.t)
         | ServerParseError(ServerParseError.Js_.t);
       let classify = (Any(v): t): case =>
-        if ([%raw {|function (value) { return "bodyText" in value}|}](v)) {
-          ServerParseError(Obj.magic(v): ServerParseError.Js_.t);
-        } else if ([%raw {|function (value) { return "result" in value}|}](v)) {
+        if ([%raw
+              {|function (v) { return "bodyText" in v && "response" in v && "statusCode" in v}|}
+            ](
+              v,
+            )) {
+          ServerError(Obj.magic(v): ServerError.Js_.t);
+        } else if ([%raw
+                     {|function (v) { return "result" in v && "response" in v && "statusCode" in v}|}
+                   ](
+                     v,
+                   )) {
           ServerParseError(Obj.magic(v): ServerParseError.Js_.t);
         } else {
           Error(Obj.magic(v): Js.Exn.t);
         };
     };
+
     type t = {
       graphQLErrors: option(array(GraphQLError.t)),
-      networkError: NetworkErrorUnion.t,
-      response: ExecutionResult.Js_.t(Js.Json.t),
+      networkError: option(NetworkErrorUnion.t),
+      response: option(ExecutionResult.Js_.t(Js.Json.t)),
       operation: Operation.Js_.t,
       forward: NextLink.Js_.t,
     };
   };
 
+  type t_networkError =
+    Js_.NetworkErrorUnion.case =
+      // This is a catch-all for any error coming from a fetch call that is not the other two
+      | Error(Js.Exn.t)
+      // ServerError means you got a bad code
+      | ServerError(ServerError.t)
+      // ServerParseError means apollo couldn't JSON.parse the body
+      | ServerParseError(ServerParseError.t);
+
   type t = {
     graphQLErrors: option(array(GraphQLError.t)),
-    networkError: Js_.NetworkErrorUnion.case,
-    response: ExecutionResult.Js_.t(Js.Json.t),
-    operation: Operation.Js_.t,
-    forward: NextLink.Js_.t,
+    networkError: option(t_networkError),
+    response: option(ExecutionResult.t(Js.Json.t)),
+    operation: Operation.t,
+    forward: NextLink.t,
   };
 
   let fromJs: Js_.t => t =
     js => {
       graphQLErrors: js.graphQLErrors,
-      networkError: js.networkError->Js_.NetworkErrorUnion.classify,
+      networkError:
+        js.networkError->Belt.Option.map(Js_.NetworkErrorUnion.classify),
       response: js.response,
       operation: js.operation,
       forward: js.forward,

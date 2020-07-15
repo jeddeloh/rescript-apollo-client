@@ -1,5 +1,5 @@
 module ApolloClient = ApolloClient__ApolloClient;
-module ApolloError = ApolloClient__ApolloError;
+module ApolloError = ApolloClient__Errors_ApolloError;
 module ErrorPolicy = ApolloClient__Core_WatchQueryOptions.ErrorPolicy;
 module FetchPolicy__noCacheExtracted = ApolloClient__Core_WatchQueryOptions.FetchPolicy__noCacheExtracted;
 module Graphql = ApolloClient__Graphql;

@@ -1,5 +1,5 @@
 module ApolloClient = ApolloClient__ApolloClient;
-module ApolloError = ApolloClient__ApolloError;
+module ApolloError = ApolloClient__Errors_ApolloError;
 module ApolloQueryResult = ApolloClient__Core_Types.ApolloQueryResult;
 module ErrorPolicy = ApolloClient__Core_WatchQueryOptions.ErrorPolicy;
 module FetchPolicy = ApolloClient__Core_WatchQueryOptions.FetchPolicy;
@@ -23,7 +23,7 @@ module QueryHookOptions = {
       displayName: option(string),
       skip: option(bool),
       onCompleted: option('jsData => unit),
-      onError: option(ApolloError.t => unit),
+      onError: option((. ApolloError.Js_.t) => unit),
       // ..extends BaseQueryOptions
       client: option(ApolloClient.t),
       context: option(Js.Json.t), // ACTUAL: Record<string, any>
@@ -71,7 +71,11 @@ module QueryHookOptions = {
     onCompleted:
       t.onCompleted
       ->Belt.Option.map((onCompleted, jsData) => onCompleted(jsData->parse)),
-    onError: t.onError,
+    onError:
+      t.onError
+      ->Belt.Option.map(onError =>
+          (. jsApolloError) => onError(ApolloError.fromJs(jsApolloError))
+        ),
     fetchPolicy: t.fetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
     notifyOnNetworkStatusChange: t.notifyOnNetworkStatusChange,
     query: t.query,
@@ -98,7 +102,7 @@ module LazyQueryHookOptions = {
       [@bs.optional]
       onCompleted: 'jsData => unit,
       [@bs.optional]
-      onError: ApolloError.t => unit,
+      onError: (. ApolloError.Js_.t) => unit,
       // ..extends BaseQueryOptions
       [@bs.optional]
       client: ApolloClient.t,
@@ -157,7 +161,11 @@ module LazyQueryHookOptions = {
         ->Belt.Option.map((onCompleted, jsData) =>
             onCompleted(jsData->parse)
           ),
-      ~onError=?t.onError,
+      ~onError=?
+        t.onError
+        ->Belt.Option.map(onError =>
+            (. jsApolloError) => onError(ApolloError.fromJs(jsApolloError))
+          ),
       ~fetchPolicy=?
         t.fetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
       ~notifyOnNetworkStatusChange=?t.notifyOnNetworkStatusChange,
@@ -220,7 +228,7 @@ module QueryResult = {
       called: bool,
       client: ApolloClient.t,
       data: option('jsData),
-      error: option(ApolloError.t),
+      error: option(ApolloError.Js_.t),
       loading: bool,
       networkStatus: NetworkStatus.t,
       // ...extends ObservableQueryFields
@@ -266,7 +274,7 @@ module QueryResult = {
       called: js.called,
       client: js.client,
       data: js.data->Belt.Option.map(parse),
-      error: js.error,
+      error: js.error->Belt.Option.map(ApolloError.fromJs),
       fetchMore:
         (~context=?, ~variables=?, ~updateQuery as jsUpdateQuery=?, ()) => {
         js.fetchMore({
@@ -511,7 +519,7 @@ module MutationHookOptions = {
       [@bs.optional]
       notifyOnNetworkStatusChange: bool,
       [@bs.optional]
-      onError: ApolloError.Js_.t => unit,
+      onError: (. ApolloError.Js_.t) => unit,
       [@bs.optional]
       optimisticResponse: 'variables => 'jsData,
       [@bs.optional]
@@ -559,7 +567,12 @@ module MutationHookOptions = {
         ~ignoreResults=?t.ignoreResults,
         ~mutation=?t.mutation,
         ~notifyOnNetworkStatusChange=?t.notifyOnNetworkStatusChange,
-        ~onError=?t.onError,
+        ~onError=?
+          t.onError
+          ->Belt.Option.map(onError =>
+              (. jsApolloError) =>
+                onError(ApolloError.fromJs(jsApolloError))
+            ),
         ~optimisticResponse=?
           t.optimisticResponse
           ->Belt.Option.map((optimisticResponse, variables) =>
@@ -603,7 +616,7 @@ module MutationResult = {
   let fromJs: (Js_.t('jsData), ~parse: 'jsData => 'data) => t('data) =
     (js, ~parse) => {
       data: js.data->Js.toOption->Belt.Option.map(parse),
-      error: js.error,
+      error: js.error->Belt.Option.map(ApolloError.fromJs),
       loading: js.loading,
       called: js.called,
       client: js.client,
@@ -827,14 +840,14 @@ module SubscriptionResult = {
   type t('data) = {
     loading: bool,
     data: option('data),
-    error: option(ApolloError.Js_.t),
+    error: option(ApolloError.t),
   };
 
   let fromJs: (Js_.t('jsData), ~parse: 'jsData => 'data) => t('data) =
     (js, ~parse) => {
       loading: js.loading,
       data: js.data->Belt.Option.map(parse),
-      error: js.error,
+      error: js.error->Belt.Option.map(ApolloError.fromJs),
     };
 };
 

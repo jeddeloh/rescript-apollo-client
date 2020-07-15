@@ -39,7 +39,7 @@ type useSubscription_result('data, 'variables) = {
   variables: option('variables),
   loading: bool,
   data: option('data),
-  error: option(ApolloError.Js_.t),
+  error: option(ApolloError.t),
 };
 
 let useSubscription:
@@ -91,7 +91,8 @@ let useSubscription:
           variables: jsSubscriptionResult.variables,
           loading: jsSubscriptionResult.loading,
           data: jsSubscriptionResult.data->Belt.Option.map(Operation.parse),
-          error: jsSubscriptionResult.error,
+          error:
+            jsSubscriptionResult.error->Belt.Option.map(ApolloError.fromJs),
         },
       jsSubscriptionResult,
     );

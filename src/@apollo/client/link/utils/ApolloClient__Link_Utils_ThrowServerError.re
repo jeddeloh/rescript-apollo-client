@@ -19,4 +19,6 @@ module ServerError = {
       stack: option(string),
     };
   };
+
+  type t = Js_.t;
 };

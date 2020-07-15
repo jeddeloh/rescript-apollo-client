@@ -74,9 +74,9 @@ module ErrorResponse = {
       // This is a catch-all for any error coming from a fetch call that is not the other two
       | Error(Js.Exn.t)
       // ServerError means you got a bad code
-      | ServerError(ServerError.Js_.t)
+      | ServerError(ServerError.t)
       // ServerParseError means apollo couldn't JSON.parse the body
-      | ServerParseError(ServerParseError.Js_.t);
+      | ServerParseError(ServerParseError.t);
 
   type t = {
     graphQLErrors: option(array(GraphQLError.t)),

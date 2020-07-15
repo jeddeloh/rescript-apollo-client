@@ -1,6 +1,8 @@
 module Graphql = ApolloClient__Graphql;
 module GraphQLError = ApolloClient__Graphql.Error.GraphQLError;
 module LinkError = ApolloClient__LinkError;
+module ServerError = ApolloClient__Link_Utils_ThrowServerError.ServerError;
+module ServerParseError = ApolloClient__Link_Http_ParseAndCheckHttpResponse.ServerParseError;
 
 module Js_ = {
   // export declare class ApolloError extends Error {
@@ -37,6 +39,15 @@ module Js_ = {
   [@bs.module "@apollo/client"] [@bs.new]
   external make: make_args => t = "ApolloError";
 };
+
+type t_networkError =
+  LinkError.ErrorResponse.t_networkError =
+    // This is a catch-all for any error coming from a fetch call that is not the other two
+    | Error(Js.Exn.t)
+    // ServerError means you got a bad code
+    | ServerError(ServerError.t)
+    // ServerParseError means apollo couldn't JSON.parse the body
+    | ServerParseError(ServerParseError.t);
 
 type t = {
   extraInfo: Js.Json.t,

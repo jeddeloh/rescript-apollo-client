@@ -24,4 +24,6 @@ module ServerParseError = {
       stack: option(string),
     };
   };
+
+  type t = Js_.t;
 };

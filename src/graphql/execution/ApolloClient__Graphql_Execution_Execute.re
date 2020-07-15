@@ -1,4 +1,4 @@
-module GraphQLError = ApolloClient__Error_GraphQLError;
+module GraphQLError = ApolloClient__Graphql_Error_GraphQLError;
 
 module ExecutionResult = {
   module Js_ = {

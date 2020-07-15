@@ -1,6 +1,6 @@
 module ApolloLink = ApolloClient__Link_Core_ApolloLink;
 module GraphQLError = ApolloClient__Graphql.Error.GraphQLError;
-module ExecutionResult = ApolloClient__Execution_Execute.ExecutionResult;
+module ExecutionResult = ApolloClient__Graphql_Execution_Execute.ExecutionResult;
 module NextLink = ApolloClient__Link_Core_Types.NextLink;
 module Operation = ApolloClient__Link_Core_Types.Operation;
 module ServerError = ApolloClient__Link_Utils_ThrowServerError.ServerError;

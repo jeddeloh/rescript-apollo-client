@@ -6,6 +6,7 @@ module ApolloLink = ApolloClient__Link_Core_ApolloLink;
 // export { execute } from './link/core/execute.js';
 let execute = ApolloClient__Link_Core_ApolloLink.Static.execute;
 // export { ApolloError, isApolloError } from './errors/ApolloError.js';
+module ApolloError = ApolloClient__Errors_ApolloError;
 // export { NetworkStatus } from './core/networkStatus.js';
 // export { ObservableQuery } from './core/ObservableQuery.js';
 // export { serializeFetchParameter } from './link/http/serializeFetchParameter.js';

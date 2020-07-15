@@ -1,5 +1,5 @@
 module ApolloClient = ApolloClient__ApolloClient;
-module ApolloError = ApolloClient__ApolloError;
+module ApolloError = ApolloClient__Errors_ApolloError;
 module BaseSubscriptionOptions = ApolloClient__React_Types.BaseSubscriptionOptions;
 module FetchPolicy = ApolloClient__Core_WatchQueryOptions.FetchPolicy;
 module Graphql = ApolloClient__Graphql;

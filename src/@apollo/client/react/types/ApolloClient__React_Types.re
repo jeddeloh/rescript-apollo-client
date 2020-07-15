@@ -1,5 +1,5 @@
 module ApolloClient = ApolloClient__ApolloClient;
-module ApolloError = ApolloClient__ApolloError;
+module ApolloError = ApolloClient__Errors_ApolloError;
 module ApolloQueryResult = ApolloClient__Core_Types.ApolloQueryResult;
 module ErrorPolicy = ApolloClient__Core_WatchQueryOptions.ErrorPolicy;
 module FetchPolicy = ApolloClient__Core_WatchQueryOptions.FetchPolicy;

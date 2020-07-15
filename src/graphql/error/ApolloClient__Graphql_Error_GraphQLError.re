@@ -1,4 +1,4 @@
-module Location = ApolloClient__Location;
+module Location = ApolloClient__Graphql_Location;
 
 type t = {
   message: string,

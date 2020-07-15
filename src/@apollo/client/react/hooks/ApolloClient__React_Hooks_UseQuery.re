@@ -1,5 +1,5 @@
 module ApolloClient = ApolloClient__ApolloClient;
-module ApolloError = ApolloClient__ApolloError;
+module ApolloError = ApolloClient__Errors_ApolloError;
 module ErrorPolicy = ApolloClient__Core_WatchQueryOptions.ErrorPolicy;
 module Graphql = ApolloClient__Graphql;
 module QueryHookOptions = ApolloClient__React_Types.QueryHookOptions;

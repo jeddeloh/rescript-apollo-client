@@ -1,8 +1,8 @@
-module ApolloQueryResult = ApolloClient__Core_Types.ApolloQueryResult;
-module Subscription = ApolloClient__ZenObservable.Subscription;
-module Observer = ApolloClient__ZenObservable.Observer;
-
 module ObservableQuery = {
+  module ApolloQueryResult = ApolloClient__Core_Types.ApolloQueryResult;
+  module Subscription = ApolloClient__ZenObservable.Subscription;
+  module Observer = ApolloClient__ZenObservable.Observer;
+
   module Js_ = {
     // export declare class ObservableQuery<TData = any, TVariables = OperationVariables> extends Observable<ApolloQueryResult<TData>> {
     //     readonly options: WatchQueryOptions<TVariables>;
@@ -88,7 +88,7 @@ module ObservableQuery = {
                   : result;
                 return onNext(parsedResult);
               };
-              originalSubscribe(newOnNext, onError, onComplete);
+              return originalSubscribe(newOnNext, onError, onComplete);
             };
             return js;
           }

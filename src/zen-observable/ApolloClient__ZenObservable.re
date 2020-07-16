@@ -19,11 +19,16 @@ module Subscription = {
     //     unsubscribe(): void;
     // }
     type t = {
-      closed: bool,
-      unsubscribe: unit => unit,
+      closed: bool
     };
+
+    [@bs.send]
+    external unsubscribe: (t) => unit ="unsubscribe";
   };
+
   type t = Js_.t;
+
+  let unsubscribe = Js_.unsubscribe;
 };
 
 module Observer = {

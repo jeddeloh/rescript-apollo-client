@@ -53,6 +53,8 @@ module React = {
 
 module Utilities = ApolloClient__Utilities;
 
+module ObservableQuery = ApolloClient__Core_ObservableQuery.ObservableQuery;
+
 module DefaultWatchQueryOptions = ApolloClient__ApolloClient.DefaultWatchQueryOptions;
 module DefaultQueryOptions = ApolloClient__ApolloClient.DefaultQueryOptions;
 module DefaultMutateOptions = ApolloClient__ApolloClient.DefaultMutateOptions;
@@ -63,4 +65,5 @@ let make = ApolloClient__ApolloClient.make;
 let mutate = ApolloClient__ApolloClient.mutate;
 let query = ApolloClient__ApolloClient.query;
 let readQuery = ApolloClient__ApolloClient.readQuery;
+let watchQuery = ApolloClient__ApolloClient.watchQuery;
 let writeQuery = ApolloClient__ApolloClient.writeQuery;

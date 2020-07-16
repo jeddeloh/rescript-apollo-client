@@ -11,6 +11,7 @@ module FetchResult = ApolloClient__Link_Core_Types.FetchResult;
 module MutationOptions = ApolloClient__Core_WatchQueryOptions.MutationOptions;
 module MutationQueryReducersMap = ApolloClient__Core_WatchQueryOptions.MutationQueryReducersMap;
 module MutationUpdaterFn = ApolloClient__Core_WatchQueryOptions.MutationUpdaterFn;
+module ObservableQuery = ApolloClient__Core_ObservableQuery.ObservableQuery;
 module QueryOptions = ApolloClient__Core_WatchQueryOptions.QueryOptions;
 module PureQueryOptions = ApolloClient__Core_Types.PureQueryOptions;
 module RefetchQueryDescription = ApolloClient__Core_WatchQueryOptions.RefetchQueryDescription;
@@ -19,7 +20,7 @@ module UriFunction = ApolloClient__Link_Http_SelectHttpOptionsAndBody.UriFunctio
 module Types = ApolloClient__Types;
 module Utils = ApolloClient__Utils;
 module WatchQueryFetchPolicy = ApolloClient__Core_WatchQueryOptions.WatchQueryFetchPolicy;
-module WatchQueryOptions = ApolloClient__Core_WatchQueryOptions.QueryOptions;
+module WatchQueryOptions = ApolloClient__Core_WatchQueryOptions.WatchQueryOptions;
 
 module type Operation = Types.Operation;
 module type OperationNoRequiredVars = Types.OperationNoRequiredVars;
@@ -274,7 +275,6 @@ module Js_ = {
   //     private clearStoreCallbacks;
   //     private localState;
   //     stop(): void;
-  //     watchQuery<T = any, TVariables = OperationVariables>(options: WatchQueryOptions<TVariables>): ObservableQuery<T, TVariables>;
   //     subscribe<T = any, TVariables = OperationVariables>(options: SubscriptionOptions<TVariables>): Observable<FetchResult<T>>;
   //     readFragment<T = any, TVariables = OperationVariables>(options: DataProxy.Fragment<TVariables>, optimistic?: boolean): T | null;
   //     writeFragment<TData = any, TVariables = OperationVariables>(options: DataProxy.WriteFragmentOptions<TData, TVariables>): void;
@@ -291,6 +291,7 @@ module Js_ = {
   //     setResolvers(resolvers: Resolvers | Resolvers[]): void;
   //     getResolvers(): Resolvers;
   //     setLocalStateFragmentMatcher(fragmentMatcher: FragmentMatcher): void;
+  //     setLink(newLink: ApolloLink): void;
   // }
   type t;
   // mutate<T = any, TVariables = OperationVariables>(options: MutationOptions<T, TVariables>): Promise<FetchResult<T>>;
@@ -317,6 +318,13 @@ module Js_ = {
     ) =>
     Js.nullable('jsData) =
     "readQuery";
+
+  // <T = any, TVariables = OperationVariables>(options: WatchQueryOptions<TVariables>): ObservableQuery<T, TVariables>;
+  [@bs.send]
+  external watchQuery:
+    (t, ~options: WatchQueryOptions.Js_.t('variables)) =>
+    ObservableQuery.Js_.t('jsData) =
+    "watchQuery";
 
   // writeQuery<TData = any, TVariables = OperationVariables>(options: DataProxy.WriteQueryOptions<TData, TVariables>): void;
   [@bs.send]
@@ -515,6 +523,40 @@ let readQuery:
     )
     ->Js.toOption
     ->Belt.Option.map(Operation.parse);
+  };
+
+let watchQuery:
+  type data jsVariables.
+    (
+      t,
+      ~query: (module Operation with
+                 type t = data and type Raw.t_variables = jsVariables),
+      ~context: Js.Json.t=?,
+      ~errorPolicy: ErrorPolicy.t=?,
+      ~fetchPolicy: WatchQueryFetchPolicy.t=?,
+      jsVariables
+    ) =>
+    ObservableQuery.t(data) =
+  (
+    client,
+    ~query as (module Operation),
+    ~context=?,
+    ~errorPolicy=?,
+    ~fetchPolicy=?,
+    variables,
+  ) => {
+    Js_.watchQuery(
+      client,
+      ~options=
+        WatchQueryOptions.toJs({
+          fetchPolicy,
+          query: Operation.query,
+          variables: Some(variables),
+          errorPolicy,
+          context,
+        }),
+    )
+    ->ObservableQuery.fromJs(~parse=Operation.parse);
   };
 
 let writeQuery:

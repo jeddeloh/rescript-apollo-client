@@ -30,7 +30,7 @@ let logTodos_good_reasonPromise = _ =>
   ->Promise.Js.toResult
   ->Promise.get(
       fun
-      | Ok({data: Some({todos})}) => Js.log2("Data: ", todos)
+      | Ok({data: Some({todos})}) => Js.log2("query To-Dos: ", todos)
       | Ok(_) => Js.log("Error: no To-Dos!")
       | Error(error) => Js.log2("Error: ", error),
     );
@@ -41,7 +41,7 @@ let logTodos_good_prometo = _ =>
   ->Prometo.fromPromise
   ->Prometo.handle(~f=result => {
       switch (result) {
-      | Ok({data: Some({todos})}) => Js.log2("Data: ", todos)
+      | Ok({data: Some({todos})}) => Js.log2("query To-Dos: ", todos)
       | Ok(_) => Js.log("Error: no To-Dos!")
       | Error(error) => Js.log2("Error: ", error)
       };
@@ -61,7 +61,7 @@ let logTodos_bad_jsPromise = _ =>
       (result: ApolloClient__ApolloClient.ApolloQueryResult.t(_)) =>
         switch (result) {
         | {data: Some({TodosQuery.todos})} =>
-          Js.Promise.resolve(Js.log2("Data: ", todos))
+          Js.Promise.resolve(Js.log2("query To-Dos: ", todos))
         | _ => Js.Exn.raiseError("Error: no people!")
         },
       _,
@@ -73,24 +73,33 @@ let logTodos_bad_jsPromise = _ =>
   ->ignore;
 
 let addTodo = _ =>
-  /**
-   * If the operation module were not the last argument, we could just use a record here
-   * instead of requiring the use of `makeVariables`. :thinking_face:
-   */
-  (
-    Client.instance
-    ->ApolloClient.mutate(
-        ~mutation=(module AddTodoMutation),
-        {text: "Another To-Do"},
-      )
-    ->Promise.Js.fromBsPromise
-    ->Promise.Js.toResult
-    ->Promise.get(
-        fun
-        | Ok(result) => Js.log2("Data: ", result.data)
-        | Error(error) => Js.log2("Error: ", error),
-      )
-  );
+  Client.instance
+  ->ApolloClient.mutate(
+      ~mutation=(module AddTodoMutation),
+      {text: "Another To-Do"},
+    )
+  ->Promise.Js.fromBsPromise
+  ->Promise.Js.toResult
+  ->Promise.get(
+      fun
+      | Ok(result) => Js.log2("mutate result: ", result.data)
+      | Error(error) => Js.log2("Error: ", error),
+    );
+
+let watchQuerySubscription =
+  Client.instance
+  ->ApolloClient.watchQuery(~query=(module TodosQuery), ())
+  ->ApolloClient.ObservableQuery.subscribe(
+      ~onNext=
+        result =>
+          switch (result) {
+          | {data: Some({todos})} => Js.log2("watchQuery To-Dos: ", todos)
+          | _ => ()
+          },
+      (),
+    );
+// Unsubscribe like so:
+// watchQuerySubscription.unsubscribe();
 
 [@react.component]
 let make = () => {
@@ -111,5 +120,6 @@ let make = () => {
       </button>
     </p>
     <p> <button onClick=addTodo> "Add To-Do"->React.string </button> </p>
+    <p> "[ Logging To-Dos in console with watchQuery]"->React.string </p>
   </div>;
 };

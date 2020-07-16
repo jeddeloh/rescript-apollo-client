@@ -99,7 +99,7 @@ let watchQuerySubscription =
       (),
     );
 // Unsubscribe like so:
-// watchQuerySubscription.unsubscribe();
+// watchQuerySubscription->ApolloClient.ObservableQuery.Subscription.unsubscribe;
 
 [@react.component]
 let make = () => {
@@ -120,6 +120,6 @@ let make = () => {
       </button>
     </p>
     <p> <button onClick=addTodo> "Add To-Do"->React.string </button> </p>
-    <p> "[ Logging To-Dos in console with watchQuery]"->React.string </p>
+    <p> "[ To-Dos also logged in console with watchQuery ]"->React.string </p>
   </div>;
 };

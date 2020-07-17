@@ -17,6 +17,9 @@ module Cache = {
   module InMemoryCache = ApolloClient__Cache_InMemory_InMemoryCache;
   type t('serialized) =
     ApolloClient__Cache_Core_Cache.ApolloCache.t('serialized);
+  let readQuery = ApolloClient__Cache_Core_Cache.ApolloCache.readQuery;
+  let writeFragment = ApolloClient__Cache_Core_Cache.ApolloCache.writeFragment;
+  let writeQuery = ApolloClient__Cache_Core_Cache.ApolloCache.writeQuery;
 };
 
 module GraphQL_PPX = {
@@ -66,4 +69,5 @@ let mutate = ApolloClient__ApolloClient.mutate;
 let query = ApolloClient__ApolloClient.query;
 let readQuery = ApolloClient__ApolloClient.readQuery;
 let watchQuery = ApolloClient__ApolloClient.watchQuery;
+let writeFragment = ApolloClient__ApolloClient.writeFragment;
 let writeQuery = ApolloClient__ApolloClient.writeQuery;

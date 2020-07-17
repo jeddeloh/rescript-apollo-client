@@ -22,6 +22,7 @@ module Utils = ApolloClient__Utils;
 module WatchQueryFetchPolicy = ApolloClient__Core_WatchQueryOptions.WatchQueryFetchPolicy;
 module WatchQueryOptions = ApolloClient__Core_WatchQueryOptions.WatchQueryOptions;
 
+module type Fragment = Types.Fragment;
 module type Operation = Types.Operation;
 module type OperationNoRequiredVars = Types.OperationNoRequiredVars;
 
@@ -274,9 +275,15 @@ module Js_ = {
   //     private resetStoreCallbacks;
   //     private clearStoreCallbacks;
   //     private localState;
+  //     constructor(options: ApolloClientOptions<TCacheShape>);
   //     stop(): void;
+  //     watchQuery<T = any, TVariables = OperationVariables>(options: WatchQueryOptions<TVariables>): ObservableQuery<T, TVariables>;
+  //     query<T = any, TVariables = OperationVariables>(options: QueryOptions<TVariables>): Promise<ApolloQueryResult<T>>;
+  //     mutate<T = any, TVariables = OperationVariables>(options: MutationOptions<T, TVariables>): Promise<FetchResult<T>>;
   //     subscribe<T = any, TVariables = OperationVariables>(options: SubscriptionOptions<TVariables>): Observable<FetchResult<T>>;
+  //     readQuery<T = any, TVariables = OperationVariables>(options: DataProxy.Query<TVariables>, optimistic?: boolean): T | null;
   //     readFragment<T = any, TVariables = OperationVariables>(options: DataProxy.Fragment<TVariables>, optimistic?: boolean): T | null;
+  //     writeQuery<TData = any, TVariables = OperationVariables>(options: DataProxy.WriteQueryOptions<TData, TVariables>): void;
   //     writeFragment<TData = any, TVariables = OperationVariables>(options: DataProxy.WriteFragmentOptions<TData, TVariables>): void;
   //     __actionHookForDevTools(cb: () => any): void;
   //     __requestRaw(payload: GraphQLRequest): Observable<ExecutionResult>;
@@ -293,7 +300,9 @@ module Js_ = {
   //     setLocalStateFragmentMatcher(fragmentMatcher: FragmentMatcher): void;
   //     setLink(newLink: ApolloLink): void;
   // }
+
   type t;
+
   // mutate<T = any, TVariables = OperationVariables>(options: MutationOptions<T, TVariables>): Promise<FetchResult<T>>;
   [@bs.send]
   external mutate:
@@ -325,6 +334,16 @@ module Js_ = {
     (t, ~options: WatchQueryOptions.Js_.t('variables)) =>
     ObservableQuery.Js_.t('jsData) =
     "watchQuery";
+
+  // writeFragment<TData = any, TVariables = OperationVariables>(options: DataProxy.WriteFragmentOptions<TData, TVariables>): void;
+  [@bs.send]
+  external writeFragment:
+    (
+      t,
+      ~options: DataProxy.WriteFragmentOptions.Js_.t('jsData, 'variables)
+    ) =>
+    unit =
+    "writeFragment";
 
   // writeQuery<TData = any, TVariables = OperationVariables>(options: DataProxy.WriteQueryOptions<TData, TVariables>): void;
   [@bs.send]
@@ -557,6 +576,39 @@ let watchQuery:
         }),
     )
     ->ObservableQuery.fromJs(~parse=Operation.parse);
+  };
+
+let writeFragment:
+  type data jsVariables.
+    (
+      t,
+      ~fragment: (module Fragment with type t = data),
+      ~data: data,
+      ~broadcast: bool=?,
+      ~id: string,
+      ~fragmentName: string=?,
+      unit
+    ) =>
+    unit =
+  (
+    client,
+    ~fragment as (module Fragment),
+    ~data: data,
+    ~broadcast=?,
+    ~id,
+    ~fragmentName=?,
+    (),
+  ) => {
+    Js_.writeFragment(
+      client,
+      ~options={
+        broadcast,
+        data: data->Fragment.serialize,
+        id,
+        fragment: Fragment.query,
+        fragmentName,
+      },
+    );
   };
 
 let writeQuery:

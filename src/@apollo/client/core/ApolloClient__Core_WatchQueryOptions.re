@@ -157,8 +157,7 @@ module MutationUpdaterFn = {
 
   type t('data) = (ApolloCache.t(Js.Json.t), FetchResult.t('data)) => unit;
 
-  let toJs:
-    (t('data), ~parse: Types.parse('jsData, 'data)) => Js_.t('jsData) =
+  let toJs: (t('data), ~parse: 'jsData => 'data) => Js_.t('jsData) =
     (mutationUpdaterFn, ~parse) =>
       (. cache, jsFetchResult) =>
         mutationUpdaterFn(cache, jsFetchResult->FetchResult.fromJs(~parse));
@@ -240,8 +239,8 @@ module MutationOptions = {
   let toJs:
     (
       t('data, 'variables),
-      ~parse: Types.parse('jsData, 'data),
-      ~serialize: Types.serialize('data, 'jsData)
+      ~parse: 'jsData => 'data,
+      ~serialize: 'data => 'jsData
     ) =>
     Js_.t('jsData, 'variables) =
     (t, ~parse, ~serialize) => {

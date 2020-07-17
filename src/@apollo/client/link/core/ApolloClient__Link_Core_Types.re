@@ -72,9 +72,7 @@ module FetchResult = {
     errors: option(GraphQLError.t),
   };
 
-  let fromJs:
-    (Js_.t('jsData), ~parse: ApolloClient__Types.parse('jsData, 'data)) =>
-    t('data) =
+  let fromJs: (Js_.t('jsData), ~parse: 'jsData => 'data) => t('data) =
     (js, ~parse) => {
       {
         data: js.data->Js.toOption->Belt.Option.map(parse),

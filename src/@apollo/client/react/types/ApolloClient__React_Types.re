@@ -552,8 +552,8 @@ module MutationHookOptions = {
   let toJs:
     (
       t('data, 'variables),
-      ~parse: Types.parse('jsData, 'data),
-      ~serialize: Types.serialize('data, 'jsData)
+      ~parse: 'jsData => 'data,
+      ~serialize: 'data => 'jsData
     ) =>
     Js_.t('jsData, 'variables) =
     (t, ~parse, ~serialize) => {

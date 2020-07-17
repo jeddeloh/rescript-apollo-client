@@ -97,7 +97,7 @@ module MutationQueryReducer = {
   type t('data) = (Js.Json.t, options('data)) => Js.Json.t;
 
   let toJs:
-    (t('data), ~parse: Types.parse('jsData, 'data)) =>
+    (t('data), ~parse: 'jsData => 'data) =>
     (. Js.Json.t, Js_.options('jsData)) => Js.Json.t =
     (t, ~parse) =>
       (. previousResult, jsOptions) =>
@@ -124,8 +124,7 @@ module MutationQueryReducersMap = {
 
   type t('data) = Js.Dict.t(MutationQueryReducer.t('data));
 
-  let toJs:
-    (t('data), ~parse: Types.parse('jsData, 'data)) => Js_.t('jsData) =
+  let toJs: (t('data), ~parse: 'jsData => 'data) => Js_.t('jsData) =
     (t, ~parse) => {
       Js.Dict.map(
         (. mutationQueryReducer) =>

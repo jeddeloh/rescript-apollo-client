@@ -3,6 +3,7 @@ module AddTodoMutation = [%graphql
     mutation AddTodo($text: String!) {
       todo: addTodoSimple(text: $text) {
         id
+        completed
         text
       }
     }
@@ -29,9 +30,61 @@ let make = () => {
   | {called: false} =>
     <>
       "Not called... "->React.string
+      <button onClick={_ => mutate({text: "Another To-Do"})->ignore}>
+        "Add To-Do"->React.string
+      </button>
+      " "->React.string
       <button
         onClick={_ =>
           mutate(
+            ~optimisticResponse=
+              _variables =>
+                {
+                  todo: {
+                    __typename: "TodoItem",
+                    id: "optimisticResponseTodo",
+                    completed: None,
+                    text: "To-Do from optimisticRespomse",
+                  },
+                },
+            ~update=
+              (cache, {data}) =>
+                switch (data) {
+                | Some({todo}) =>
+                  /**
+                   * Apollo docs use cache.modify, but it's not typesafe. I recommend some
+                   * combination of readQuery / writeQuery / writeFragment
+                   */
+                  Js.log2("mutate.update To-Do: ", todo);
+                  let _unusedRef =
+                    cache->ApolloClient__Cache_Core_Cache.ApolloCache.writeFragment(
+                      ~fragment=(module Fragments.TodoItem),
+                      ~data={
+                        __typename: todo.__typename,
+                        id: "fragmentToDo",
+                        completed: None,
+                        text: "To-Do from writeFragment",
+                      },
+                      (),
+                    );
+                  let _unusedRef =
+                    cache->ApolloClient__Cache_Core_Cache.ApolloCache.writeQuery(
+                      ~query=(module TodosQuery),
+                      ~data={
+                        todos: [|
+                          {
+                            __typename: todo.__typename,
+                            id: "writeQueryToDo",
+                            completed: None,
+                            text: "To-Do from writeQuery",
+                          },
+                        |],
+                      },
+                      (),
+                    );
+                  ();
+                | None => ()
+                },
             ~refetchQueries=[|
               TodosQuery.refetchQueryDescription(),
               // - OR -
@@ -41,7 +94,7 @@ let make = () => {
           )
           ->ignore
         }>
-        "Add To-Do"->React.string
+        "Add To-Do (all the bells and whistles)"->React.string
       </button>
     </>
   | {loading: true} => "Loading..."->React.string

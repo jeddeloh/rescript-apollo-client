@@ -194,26 +194,29 @@ module QueryLazyOptions = {
 
 module QueryResult = {
   module Js_ = {
-    // TODO: 'parsedData ??? check this
-    type t_fetchMoreOptions_updateQueryOptions('parsedData, 'variables) = {
-      fetchMoreResult: option('parsedData),
+    type t_fetchMoreOptions_updateQueryOptions('jsData, 'variables) = {
+      fetchMoreResult: option('jsData),
       variables: option('variables),
     };
 
+    // We use abstract because Apollo is looking at query key, not just value
+    [@bs.deriving abstract]
     type t_fetchMoreOptions('jsData, 'variables) = {
-      query: option(Graphql.Language.documentNode),
+      [@bs.optional]
+      query: Graphql.Language.documentNode,
       // ...extends FetchMoreQueryOptions
-      variables: option('variables),
-      context: option(Js.Json.t),
+      [@bs.optional]
+      variables: 'variables,
+      [@bs.optional]
+      context: Js.Json.t,
       // ...extends FetchMoreOptions
+      [@bs.optional]
       updateQuery:
-        option(
-          (
-            'jsData,
-            t_fetchMoreOptions_updateQueryOptions('jsData, 'variables)
-          ) =>
-          'jsData,
-        ),
+        (
+          . 'jsData,
+          t_fetchMoreOptions_updateQueryOptions('jsData, 'variables)
+        ) =>
+        'jsData,
     };
 
     // export interface QueryResult<TData = any, TVariables = OperationVariables> extends ObservableQueryFields<TData, TVariables> {
@@ -237,28 +240,45 @@ module QueryResult = {
         Js.Promise.t(ApolloQueryResult.Js_.t('jsData)),
     };
   };
+  type t_fetchMoreOptions_updateQueryOptions('data, 'variables) = {
+    fetchMoreResult: option('data),
+    variables: option('variables),
+  };
 
-  type t('parsedData, 'variables) = {
+  type t_fetchMoreOptions('data, 'variables) = {
+    query: option(Graphql.Language.documentNode),
+    // ...extends FetchMoreQueryOptions
+    variables: option('variables),
+    context: option(Js.Json.t),
+    // ...extends FetchMoreOptions
+    updateQuery:
+      option(
+        ('data, t_fetchMoreOptions_updateQueryOptions('data, 'variables)) =>
+        'data,
+      ),
+  };
+
+  type t('data, 'variables) = {
     called: bool,
     client: ApolloClient.t,
-    data: option('parsedData),
+    data: option('data),
     error: option(ApolloError.t),
     fetchMore:
       (
         ~context: Js.Json.t=?,
         ~variables: 'variables=?,
         ~updateQuery: (
-                        'parsedData,
-                        Js_.t_fetchMoreOptions_updateQueryOptions(
-                          'parsedData,
+                        'data,
+                        t_fetchMoreOptions_updateQueryOptions(
+                          'data,
                           'variables,
                         )
                       ) =>
-                      'parsedData
+                      'data
                         =?,
         unit
       ) =>
-      Js.Promise.t(ApolloQueryResult.t('parsedData)),
+      Js.Promise.t(ApolloQueryResult.t('data)),
     loading: bool,
     networkStatus: NetworkStatus.t,
   };
@@ -275,29 +295,36 @@ module QueryResult = {
       client: js.client,
       data: js.data->Belt.Option.map(parse),
       error: js.error->Belt.Option.map(ApolloError.fromJs),
-      fetchMore:
-        (~context=?, ~variables=?, ~updateQuery as jsUpdateQuery=?, ()) => {
-        js.fetchMore({
-          context,
-          query: None,
-          updateQuery:
-            jsUpdateQuery->Belt.Option.map(
-              (
-                jsUpdateQuery,
-                previousResult,
-                Js_.{fetchMoreResult, variables},
-              ) =>
-              jsUpdateQuery(
-                parse(previousResult),
-                {
-                  fetchMoreResult: fetchMoreResult->Belt.Option.map(parse),
-                  variables,
-                },
-              )
-              ->serialize
-            ),
-          variables,
-        })
+      fetchMore: (~context=?, ~variables=?, ~updateQuery=?, ()) => {
+        js.fetchMore(
+          Js_.t_fetchMoreOptions(
+            ~context?,
+            // ~query,
+            ~updateQuery=?
+              updateQuery->Belt.Option.map(updateQuery =>
+                (.
+                  previousResult,
+                  jsFetchMoreOptions:
+                    Js_.t_fetchMoreOptions_updateQueryOptions(
+                      'jsData,
+                      'variables,
+                    ),
+                ) =>
+                  updateQuery(
+                    parse(previousResult),
+                    {
+                      fetchMoreResult:
+                        jsFetchMoreOptions.fetchMoreResult
+                        ->Belt.Option.map(parse),
+                      variables: jsFetchMoreOptions.variables,
+                    },
+                  )
+                  ->serialize
+              ),
+            ~variables?,
+            (),
+          ),
+        )
         ->Js.Promise.then_(
             jsResult =>
               Js.Promise.resolve(ApolloQueryResult.fromJs(jsResult, ~parse)),

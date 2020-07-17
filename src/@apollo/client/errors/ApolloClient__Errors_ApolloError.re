@@ -77,13 +77,9 @@ module Js_ = {
 };
 
 type t_networkError =
-  Js_.NetworkErrorUnion.case =
-    // This is a catch-all for any error coming from a fetch call that is not the other two
-    | Error(Js.Exn.t)
-    // ServerError means you got a bad code
-    | ServerError(ServerError.t)
-    // ServerParseError means apollo couldn't JSON.parse the body
-    | ServerParseError(ServerParseError.t);
+  | FetchFailure(Js.Exn.t)
+  | BadStatus(int, ServerError.t)
+  | BadBody(ServerParseError.t);
 
 type t = {
   extraInfo: Js.Json.t,
@@ -101,7 +97,13 @@ let fromJs: Js_.t => t =
     networkError:
       js.networkError
       ->Js.toOption
-      ->Belt.Option.map(Js_.NetworkErrorUnion.classify),
+      ->Belt.Option.map(networkError =>
+          switch (networkError->Js_.NetworkErrorUnion.classify) {
+          | Error(error) => FetchFailure(error)
+          | ServerError(error) => BadStatus(error.statusCode, error)
+          | ServerParseError(error) => BadBody(error)
+          }
+        ),
     name: js.name,
     message: js.message,
     stack: js.stack,

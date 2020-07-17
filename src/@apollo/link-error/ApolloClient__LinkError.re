@@ -1,4 +1,5 @@
 module ApolloLink = ApolloClient__Link_Core_ApolloLink;
+module ApolloError = ApolloClient__Errors_ApolloError;
 module GraphQLError = ApolloClient__Graphql.Error.GraphQLError;
 module ExecutionResult = ApolloClient__Graphql_Execution_Execute.ExecutionResult;
 module NextLink = ApolloClient__Link_Core_Types.NextLink;
@@ -70,13 +71,10 @@ module ErrorResponse = {
   };
 
   type t_networkError =
-    Js_.NetworkErrorUnion.case =
-      // This is a catch-all for any error coming from a fetch call that is not the other two
-      | Error(Js.Exn.t)
-      // ServerError means you got a bad code
-      | ServerError(ServerError.t)
-      // ServerParseError means apollo couldn't JSON.parse the body
-      | ServerParseError(ServerParseError.t);
+    ApolloError.t_networkError =
+      | FetchFailure(Js.Exn.t)
+      | BadStatus(int, ServerError.t)
+      | BadBody(ServerParseError.t);
 
   type t = {
     graphQLErrors: option(array(GraphQLError.t)),
@@ -90,7 +88,14 @@ module ErrorResponse = {
     js => {
       graphQLErrors: js.graphQLErrors,
       networkError:
-        js.networkError->Belt.Option.map(Js_.NetworkErrorUnion.classify),
+        js.networkError
+        ->Belt.Option.map(networkError =>
+            switch (networkError->Js_.NetworkErrorUnion.classify) {
+            | Error(error) => FetchFailure(error)
+            | ServerError(error) => BadStatus(error.statusCode, error)
+            | ServerParseError(error) => BadBody(error)
+            }
+          ),
       response: js.response,
       operation: js.operation,
       forward: js.forward,

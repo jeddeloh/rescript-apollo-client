@@ -22,10 +22,12 @@ module Js_ = {
 };
 
 let useQuery:
-  type data jsVariables.
+  type data jsData jsVariables.
     (
       ~query: (module Operation with
-                 type t = data and type Raw.t_variables = jsVariables),
+                 type t = data and
+                 type Raw.t = jsData and
+                 type Raw.t_variables = jsVariables),
       ~client: ApolloClient.t=?,
       ~context: Js.Json.t=?,
       ~displayName: string=?,
@@ -40,7 +42,7 @@ let useQuery:
       ~ssr: bool=?,
       jsVariables
     ) =>
-    QueryResult.t(data, jsVariables) =
+    QueryResult.t(data, jsData, jsVariables) =
   (
     ~query as (module Operation),
     ~client=?,

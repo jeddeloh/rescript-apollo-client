@@ -17,7 +17,7 @@ let make = () => {
   <div>
     {switch (queryResult) {
      | {loading: true, data: None} => <p> "Loading"->React.string </p>
-     | {loading, data: Some({todos}), error, fetchMore} =>
+     | {loading, data: Some({todos}), error} =>
        <>
          <dialog>
            {loading ? <p> "Refreshing..."->React.string </p> : React.null}
@@ -39,19 +39,20 @@ let make = () => {
          <p>
            <button
              onClick={_ =>
-               fetchMore(
-                 ~updateQuery=
-                   (previousData, {fetchMoreResult}) => {
-                     switch (fetchMoreResult) {
-                     | Some({todos: newTodos}) => {
-                         todos:
-                           Belt.Array.concat(previousData.todos, newTodos),
+               queryResult
+               ->ApolloClient.QueryResult.fetchMore(
+                   ~updateQuery=
+                     (previousData, {fetchMoreResult}) => {
+                       switch (fetchMoreResult) {
+                       | Some({todos: newTodos}) => {
+                           todos:
+                             Belt.Array.concat(previousData.todos, newTodos),
+                         }
+                       | None => previousData
                        }
-                     | None => previousData
-                     }
-                   },
-                 (),
-               )
+                     },
+                   (),
+                 )
                ->ignore
              }>
              "Fetch More!"->React.string

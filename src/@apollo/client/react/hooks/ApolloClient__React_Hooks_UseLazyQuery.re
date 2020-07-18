@@ -25,10 +25,12 @@ module Js_ = {
 };
 
 let useLazyQuery:
-  type data jsVariables.
+  type data jsData jsVariables.
     (
       ~query: (module Operation with
-                 type t = data and type Raw.t_variables = jsVariables),
+                 type t = data and
+                 type Raw.t = jsData and
+                 type Raw.t_variables = jsVariables),
       ~client: ApolloClient.t=?,
       ~context: Js.Json.t=?,
       ~displayName: string=?,
@@ -42,7 +44,7 @@ let useLazyQuery:
       ~ssr: bool=?,
       unit
     ) =>
-    QueryTuple.t(data, jsVariables) =
+    QueryTuple.t(data, jsData, jsVariables) =
   (
     ~query as (module Operation),
     ~client=?,
@@ -93,10 +95,12 @@ let useLazyQuery:
   };
 
 let useLazyQueryWithVariables:
-  type data jsVariables.
+  type data jsData jsVariables.
     (
       ~query: (module Operation with
-                 type t = data and type Raw.t_variables = jsVariables),
+                 type t = data and
+                 type Raw.t = jsData and
+                 type Raw.t_variables = jsVariables),
       ~client: ApolloClient.t=?,
       ~context: Js.Json.t=?,
       ~displayName: string=?,
@@ -110,7 +114,7 @@ let useLazyQueryWithVariables:
       ~ssr: bool=?,
       jsVariables
     ) =>
-    QueryTuple__noVariables.t(data, jsVariables) =
+    QueryTuple__noVariables.t(data, jsData, jsVariables) =
   (
     ~query as (module Operation),
     ~client=?,

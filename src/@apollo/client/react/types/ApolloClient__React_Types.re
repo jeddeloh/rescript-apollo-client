@@ -9,8 +9,12 @@ module Graphql = ApolloClient__Graphql;
 module MutationUpdaterFn = ApolloClient__Core_WatchQueryOptions.MutationUpdaterFn;
 module NetworkStatus = ApolloClient__Core_NetworkStatus;
 module RefetchQueryDescription = ApolloClient__Core_WatchQueryOptions.RefetchQueryDescription;
+module SubscribeToMoreOptions = ApolloClient__Core_WatchQueryOptions.SubscribeToMoreOptions;
 module Types = ApolloClient__Types;
+module UpdateQueryFn = ApolloClient__Core_WatchQueryOptions.UpdateQueryFn;
 module WatchQueryFetchPolicy = ApolloClient__Core_WatchQueryOptions.WatchQueryFetchPolicy;
+
+module type Operation = Types.Operation;
 
 module QueryHookOptions = {
   module Js_ = {
@@ -193,6 +197,8 @@ module QueryLazyOptions = {
 };
 
 module QueryResult = {
+  type useMethodFunctionsInThisModuleInstead;
+
   module Js_ = {
     type t_fetchMoreOptions_updateQueryOptions('jsData, 'variables) = {
       fetchMoreResult: option('jsData),
@@ -219,6 +225,8 @@ module QueryResult = {
         'jsData,
     };
 
+    type t_updateQueryOptions('variables) = {variables: 'variables};
+
     // export interface QueryResult<TData = any, TVariables = OperationVariables> extends ObservableQueryFields<TData, TVariables> {
     //     client: ApolloClient<any>;
     //     data: TData | undefined;
@@ -234,12 +242,63 @@ module QueryResult = {
       error: option(ApolloError.Js_.t),
       loading: bool,
       networkStatus: NetworkStatus.t,
-      // ...extends ObservableQueryFields
-      fetchMore:
-        t_fetchMoreOptions('jsData, 'variables) =>
-        Js.Promise.t(ApolloQueryResult.Js_.t('jsData)),
+      // ...extends ObservableQueryFields<TData, TVariables> = Pick<ObservableQuery<TData, TVariables>, 'startPolling' | 'stopPolling' | 'subscribeToMore' | 'updateQuery' | 'refetch' | 'variables'>
+      fetchMore: useMethodFunctionsInThisModuleInstead,
+      refetch: useMethodFunctionsInThisModuleInstead,
+      startPolling: useMethodFunctionsInThisModuleInstead,
+      stopPolling: useMethodFunctionsInThisModuleInstead,
+      subscribeToMore: useMethodFunctionsInThisModuleInstead,
+      updateQuery: useMethodFunctionsInThisModuleInstead,
+      variables: 'variables,
     };
+
+    [@bs.send]
+    external fetchMore:
+      (t('jsData, 'variables), t_fetchMoreOptions('jsData, 'variables)) =>
+      Js.Promise.t(ApolloQueryResult.Js_.t('jsData)) =
+      "fetchMore";
+
+    [@bs.send]
+    external refetch:
+      (t('jsData, 'variables), 'variables) =>
+      Js.Promise.t(ApolloQueryResult.Js_.t('jsData)) =
+      "refetch";
+
+    [@bs.send]
+    external startPolling: (t('jsData, 'variables), int) => unit =
+      "startPolling";
+
+    [@bs.send]
+    external stopPolling: (t('jsData, 'variables), unit) => unit =
+      "stopPolling";
+
+    [@bs.send]
+    external updateQuery:
+      (
+        t('jsData, 'variables),
+        ('jsData, t_updateQueryOptions('variables)) => 'jsData
+      ) =>
+      unit =
+      "updateQuery";
+
+    // subscribeToMore<TSubscriptionData = TData, TSubscriptionVariables = TVariables>(options: SubscribeToMoreOptions<TData, TSubscriptionVariables, TSubscriptionData>): () => void;
+    [@bs.send]
+    external subscribeToMore:
+      (
+        t('jsData, 'variables),
+        SubscribeToMoreOptions.Js_.t(
+          'jsData,
+          'subscriptionVariables,
+          'jsSubscriptionData,
+        )
+      ) =>
+      unit =
+      "subscribeToMore";
   };
+
+  type t_updateQueryOptions('variables) =
+    Js_.t_updateQueryOptions('variables);
+
   type t_fetchMoreOptions_updateQueryOptions('data, 'variables) = {
     fetchMoreResult: option('data),
     variables: option('variables),
@@ -258,48 +317,74 @@ module QueryResult = {
       ),
   };
 
-  type t('data, 'variables) = {
+  type t('data, 'jsData, 'variables) = {
     called: bool,
     client: ApolloClient.t,
     data: option('data),
     error: option(ApolloError.t),
-    fetchMore:
-      (
-        ~context: Js.Json.t=?,
-        ~variables: 'variables=?,
-        ~updateQuery: (
-                        'data,
-                        t_fetchMoreOptions_updateQueryOptions(
-                          'data,
-                          'variables,
-                        )
-                      ) =>
-                      'data
-                        =?,
-        unit
-      ) =>
-      Js.Promise.t(ApolloQueryResult.t('data)),
     loading: bool,
     networkStatus: NetworkStatus.t,
+    fetchMore: useMethodFunctionsInThisModuleInstead,
+    refetch: useMethodFunctionsInThisModuleInstead,
+    startPolling: useMethodFunctionsInThisModuleInstead,
+    stopPolling: useMethodFunctionsInThisModuleInstead,
+    subscribeToMore: useMethodFunctionsInThisModuleInstead,
+    updateQuery: useMethodFunctionsInThisModuleInstead,
+    __parse: 'jsData => 'data,
+    __serialize: 'data => 'jsData,
   };
+
+  external unsafeCastForMethod:
+    t('data, 'jsData, 'variables) => Js_.t('jsData, 'variables) =
+    "%identity";
 
   let fromJs:
     (
       Js_.t('jsData, 'variables),
-      ~parse: 'jsData => 'parsedData,
-      ~serialize: 'parsedData => 'jsData
+      ~parse: 'jsData => 'data,
+      ~serialize: 'data => 'jsData
     ) =>
-    t('parsedData, 'variables) =
+    t('data, 'jsData, 'variables) =
     (js, ~parse, ~serialize) => {
       called: js.called,
       client: js.client,
       data: js.data->Belt.Option.map(parse),
       error: js.error->Belt.Option.map(ApolloError.fromJs),
-      fetchMore: (~context=?, ~variables=?, ~updateQuery=?, ()) => {
-        js.fetchMore(
+      loading: js.loading,
+      networkStatus: js.networkStatus,
+      fetchMore: js.fetchMore,
+      refetch: js.refetch,
+      startPolling: js.startPolling,
+      stopPolling: js.stopPolling,
+      subscribeToMore: js.subscribeToMore,
+      updateQuery: js.updateQuery,
+      __parse: parse,
+      __serialize: serialize,
+    };
+
+  let fetchMore:
+    (
+      t('queryData, 'jsQueryData, 'variables),
+      ~context: Js.Json.t=?,
+      ~variables: 'variables=?,
+      ~updateQuery: (
+                      'data,
+                      t_fetchMoreOptions_updateQueryOptions('data, 'variables)
+                    ) =>
+                    'data
+                      =?,
+      unit
+    ) =>
+    Js.Promise.t(ApolloQueryResult.t('data)) =
+    (queryResult, ~context=?, ~variables=?, ~updateQuery=?, ()) => {
+      let serialize = queryResult.__serialize;
+      let parse = queryResult.__parse;
+
+      queryResult
+      ->unsafeCastForMethod
+      ->Js_.fetchMore(
           Js_.t_fetchMoreOptions(
             ~context?,
-            // ~query,
             ~updateQuery=?
               updateQuery->Belt.Option.map(updateQuery =>
                 (.
@@ -325,14 +410,96 @@ module QueryResult = {
             (),
           ),
         )
-        ->Js.Promise.then_(
-            jsResult =>
-              Js.Promise.resolve(ApolloQueryResult.fromJs(jsResult, ~parse)),
-            _,
-          );
-      },
-      loading: js.loading,
-      networkStatus: js.networkStatus,
+      ->Js.Promise.then_(
+          jsResult =>
+            Js.Promise.resolve(ApolloQueryResult.fromJs(jsResult, ~parse)),
+          _,
+        );
+    };
+
+  let refetch:
+    (t('data, 'jsData, 'variables), 'variables) =>
+    Js.Promise.t(ApolloQueryResult.t('data)) =
+    (queryResult, variables) =>
+      queryResult
+      ->unsafeCastForMethod
+      ->Js_.refetch(variables)
+      ->Js.Promise.then_(
+          jsApolloQueryResult =>
+            Js.Promise.resolve(
+              jsApolloQueryResult->ApolloQueryResult.fromJs(
+                ~parse=queryResult.__parse,
+              ),
+            ),
+          _,
+        );
+
+  [@bs.send]
+  external startPolling: (t('data, 'jsData, 'variables), int) => unit =
+    "startPolling";
+
+  [@bs.send]
+  external stopPolling: (t('data, 'jsData, 'variables), unit) => unit =
+    "stopPolling";
+
+  let subscribeToMore:
+    type subscriptionData subscriptionVariables.
+      (
+        t('queryData, 'jsQueryData, 'variables),
+        ~subscription: (module Operation with
+                          type t = subscriptionData and
+                          type Raw.t_variables = subscriptionVariables),
+        ~updateQuery: UpdateQueryFn.t(
+                        'queryData,
+                        subscriptionVariables,
+                        subscriptionData,
+                      )
+                        =?,
+        ~onError: Js.Exn.t => unit=?,
+        ~context: Js.Json.t=?,
+        subscriptionVariables
+      ) =>
+      unit =
+    (
+      queryResult,
+      ~subscription as (module Operation),
+      ~updateQuery=?,
+      ~onError=?,
+      ~context=?,
+      variables,
+    ) => {
+      queryResult
+      ->unsafeCastForMethod
+      ->Js_.subscribeToMore(
+          SubscribeToMoreOptions.toJs(
+            {
+              document: Operation.query,
+              variables,
+              updateQuery,
+              onError,
+              context,
+            },
+            ~queryParse=queryResult.__parse,
+            ~querySerialize=queryResult.__serialize,
+            ~subscriptionParse=Operation.parse,
+          ),
+        );
+    };
+
+  let updateQuery:
+    (
+      t('data, 'jsData, 'variables),
+      ('data, t_updateQueryOptions('variables)) => 'data
+    ) =>
+    unit =
+    (queryResult, updateQueryFn) => {
+      let parse = queryResult.__parse;
+      let serialize = queryResult.__serialize;
+      queryResult
+      ->unsafeCastForMethod
+      ->Js_.updateQuery((jsPreviousData, options) => {
+          updateQueryFn(jsPreviousData->parse, options)->serialize
+        });
     };
 };
 
@@ -396,8 +563,8 @@ module LazyQueryResult = {
     type t('jsData, 'variables) = Union.t;
   };
 
-  type t('data, 'variables) =
-    | Executed(QueryResult.t('data, 'variables))
+  type t('data, 'jsData, 'variables) =
+    | Executed(QueryResult.t('data, 'jsData, 'variables))
     | Unexecuted(UnexecutedLazyResult.t);
 
   let fromJs:
@@ -406,7 +573,7 @@ module LazyQueryResult = {
       ~parse: 'jsData => 'data,
       ~serialize: 'data => 'jsData
     ) =>
-    t('data, 'variables) =
+    t('data, 'jsData, 'variables) =
     (js, ~parse, ~serialize) => {
       switch (js->Js_.Union.classify) {
       | UnexecutedLazyResult(v) => Unexecuted(v->UnexecutedLazyResult.fromJs)
@@ -424,9 +591,9 @@ module QueryTuple = {
     );
   };
 
-  type t('data, 'variables) = (
+  type t('data, 'jsData, 'variables) = (
     (~context: Js.Json.t=?, 'variables) => unit,
-    LazyQueryResult.t('data, 'variables),
+    LazyQueryResult.t('data, 'jsData, 'variables),
   );
 
   let fromJs:
@@ -435,7 +602,7 @@ module QueryTuple = {
       ~parse: 'jsData => 'data,
       ~serialize: 'data => 'jsData
     ) =>
-    t('data, 'variables) =
+    t('data, 'jsData, 'variables) =
     ((jsExecuteQuery, jsLazyQueryResult), ~parse, ~serialize) => (
       (~context=?, variables) => jsExecuteQuery({context, variables}),
       jsLazyQueryResult->LazyQueryResult.fromJs(~parse, ~serialize),
@@ -447,9 +614,9 @@ module QueryTuple__noVariables = {
     type t('jsData, 'variables) = QueryTuple.Js_.t('jsData, 'variables);
   };
 
-  type t('data, 'variables) = (
+  type t('data, 'jsData, 'variables) = (
     (~context: Js.Json.t=?, unit) => unit,
-    LazyQueryResult.t('data, 'variables),
+    LazyQueryResult.t('data, 'jsData, 'variables),
   );
 
   let fromJs:
@@ -459,7 +626,7 @@ module QueryTuple__noVariables = {
       ~serialize: 'data => 'jsData,
       ~variables: 'variables
     ) =>
-    t('data, 'variables) =
+    t('data, 'jsData, 'variables) =
     ((jsExecuteQuery, jsLazyQueryResult), ~parse, ~serialize, ~variables) => (
       (~context=?, ()) => jsExecuteQuery({context, variables}),
       jsLazyQueryResult->LazyQueryResult.fromJs(~parse, ~serialize),

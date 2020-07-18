@@ -149,6 +149,126 @@ module WatchQueryOptions = {
     };
 };
 
+module UpdateQueryFn = {
+  module Js_ = {
+    type t_options_subscriptionData('jsSubscriptionData) = {
+      data: 'jsSubscriptionData,
+    };
+    type t_options('jsSubscriptionData, 'variables) = {
+      subscriptionData: t_options_subscriptionData('jsSubscriptionData),
+    };
+    // export declare type UpdateQueryFn<TData = any, TSubscriptionVariables = OperationVariables, TSubscriptionData = TData> = (previousQueryResult: TData, options: {
+    //     subscriptionData: {
+    //         data: TSubscriptionData;
+    //     };
+    //     variables?: TSubscriptionVariables;
+    // }) => TData;
+    type t('jsQueryData, 'subscriptionVariables, 'jsSubscriptionData) =
+      (
+        . 'jsQueryData,
+        t_options('jsSubscriptionData, 'subscriptionVariables)
+      ) =>
+      'jsQueryData;
+  };
+  type t_options_subscriptionData('jsSubscriptionData) = {
+    data: 'jsSubscriptionData,
+  };
+  type t_options('jsSubscriptionData, 'variables) = {
+    subscriptionData: t_options_subscriptionData('jsSubscriptionData),
+  };
+
+  type t('queryData, 'subscriptionVariables, 'subscriptionData) =
+    ('queryData, t_options('subscriptionData, 'subscriptionVariables)) =>
+    'queryData;
+
+  let toJs:
+    (
+      t('queryData, 'subscriptionVariables, 'subscriptionData),
+      ~queryParse: 'jsQueryData => 'queryData,
+      ~querySerialize: 'queryData => 'jsQueryData,
+      ~subscriptionParse: 'jsSubscriptionData => 'subscriptionData
+    ) =>
+    Js_.t('jsQueryData, 'subscriptionVariables, 'jsSubscriptionData) =
+    (t, ~queryParse, ~querySerialize, ~subscriptionParse) =>
+      (. jsQueryData, {subscriptionData: {data}}) =>
+        t(
+          jsQueryData->queryParse,
+          {
+            subscriptionData: {
+              data: data->subscriptionParse,
+            },
+          },
+        )
+        ->querySerialize;
+};
+
+module SubscribeToMoreOptions = {
+  module Js_ = {
+    // export declare type SubscribeToMoreOptions<TData = any, TSubscriptionVariables = OperationVariables, TSubscriptionData = TData> = {
+    //     document: DocumentNode;
+    //     variables?: TSubscriptionVariables;
+    //     updateQuery?: UpdateQueryFn<TData, TSubscriptionVariables, TSubscriptionData>;
+    //     onError?: (error: Error) => void;
+    //     context?: Record<string, any>;
+    // };
+
+    type t('jsQueryData, 'subscriptionVariables, 'jsSubscriptionData) = {
+      document: Graphql.documentNode,
+      // We don't allow optional variables because it's not typesafe
+      variables: 'subscriptionVariables,
+      updateQuery:
+        option(
+          UpdateQueryFn.Js_.t(
+            'jsQueryData,
+            'subscriptionVariables,
+            'jsSubscriptionData,
+          ),
+        ),
+      onError: option(Js.Exn.t => unit),
+      context: option(Js.Json.t),
+    };
+  };
+
+  type t('queryData, 'subscriptionVariables, 'subscriptionData) = {
+    document: Graphql.documentNode,
+    variables: 'subscriptionVariables,
+    updateQuery:
+      option(
+        UpdateQueryFn.t(
+          'queryData,
+          'subscriptionVariables,
+          'subscriptionData,
+        ),
+      ),
+    onError: option(Js.Exn.t => unit),
+    context: option(Js.Json.t),
+  };
+
+  let toJs:
+    (
+      t('queryData, 'subscriptionVariables, 'subscriptionData),
+      ~queryParse: 'jsQueryData => 'queryData,
+      ~querySerialize: 'queryData => 'jsQueryData,
+      ~subscriptionParse: 'jsSubscriptionData => 'subscriptionData
+    ) =>
+    Js_.t('jsQueryData, 'subscriptionVariables, 'jsSubscriptionData) =
+    (t, ~queryParse, ~querySerialize, ~subscriptionParse) => {
+      document: t.document,
+      variables: t.variables,
+      updateQuery:
+        t.updateQuery
+        ->Belt.Option.map(
+            UpdateQueryFn.toJs(
+              ~queryParse,
+              ~querySerialize,
+              ~subscriptionParse,
+            ),
+          ),
+      onError: t.onError,
+      context: t.context,
+    };
+};
+
 module MutationUpdaterFn = {
   module Js_ = {
     type t('jsData) =

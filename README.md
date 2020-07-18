@@ -39,7 +39,7 @@ npm install @apollo/link-context @apollo/link-error @apollo/link-ws subscription
 
 ### 3. Apollo-Specific `graphql-ppx` Configuration
 
-Add the following to `bs-dependencies`, `graphql`, and `ppx-flags` in your `bsconfig.json`
+Add the following under `bs-dependencies` and `graphql`, in your `bsconfig.json`
 
 ```diff
 {
@@ -101,7 +101,7 @@ Contains partial bindings to the following:
 - [subscriptions-transport-ws](https://github.com/apollographql/subscriptions-transport-ws)
 - [zen-observable](https://github.com/zenparsing/zen-observable)
 
-While we strive to provide ergonomics that are intuitive and "reasonable", we do expose a 1:1 mapping to the javascript package structures if that is your preference. For instance, if you're looking in the Apollo docs and see `import { setContext } from '@apollo/link-context'` and you'd prefer to interact with this libaray in the same way, you can always access with the same filepath and name like so:
+While we strive to provide ergonomics that are intuitive and "reasonable", we do expose a 1:1 mapping to the javascript package structures if that is your preference. For instance, if you're looking in the Apollo docs and see `import { setContext } from '@apollo/link-context'` and you'd prefer to interact with this library in the same way, you can always access with the same filepath and name like so:
 
 ```reason
 module Apollo = {
@@ -129,7 +129,9 @@ let httpLink = ApolloClient.Link.HttpLink.make(...)
 
 Apollo bindings in the Reason / BuckleScript community are pretty confusing as a write this (July 14, 2020), so it's worth providing some context to help you make the right decisions about which library to use.
 
-This library, `reason-apollo-client`, targets Apollo Client 3 (currently a release-candidate) and aims to take full advantage of v1.0.0 `graphql-ppx` features (still in beta) and is intended to be a replacement for `reason-apollo` and `reason-apollo-hooks` (all the functionality is here and more). You should avoid using those libraries at the same time as this one (it's possible, but don't unless you have special circumstances).
+This library, `reason-apollo-client`, targets Apollo Client 3 and aims to take full advantage of v1.0.0 `graphql-ppx` features (still in beta) and is intended to be a replacement for `reason-apollo` and `reason-apollo-hooks` (all the functionality (minus HOCs) _should_ be here and more). You should avoid using those libraries at the same time as this one (it's possible, but don't unless you have special circumstances).
+
+#### Alternatives
 
 [reason-apollo](https://github.com/apollographql/reason-apollo), despite being under the apollographql github org, doesn't have any official Apollo team support behind it and currently seems like it may be abandoned. It binds to the `react-apollo` js package and some of the older apollo packages not under the `@apollo` npm namespace.
 

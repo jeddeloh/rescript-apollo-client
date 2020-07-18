@@ -1,7 +1,7 @@
 {
-  "name": "@jeddeloh/reason-apollo-client",
+  "name": "reason-apollo-client",
   "description": "ReasonML / BuckleScript bindings for the Apollo Client ecosystem",
-  "version": "0.0.1-beta.0",
+  "version": "0.0.1-beta.1",
   "keywords": [
     "Apollo",
     "BuckleScript",
@@ -12,7 +12,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jeddeloh/reason-apollo-client"
+    "url": "https://github.com/reasonml-community/reason-apollo-client"
   },
   "scripts": {
     "build": "bsb -make-world",

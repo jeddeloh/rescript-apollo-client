@@ -1,5 +1,5 @@
 {
-  "name": "@jeddeloh/reason-apollo-client",
+  "name": "reason-apollo-client",
   "package-specs": [
     {
       "module": "commonjs",

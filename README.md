@@ -1,5 +1,3 @@
-> ⚠️ **WARNING:** This library is currently under active development and things may be changing quickly. However, it is mostly complete and includes all `reason-apollo` and `reason-apollo-hooks` functionality
-
 <p align="center">
     <img src="assets/logo-v1.png" alt="Logo">
   	<br><br>
@@ -7,8 +5,8 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/@jeddeloh/reason-apollo-client">
-    <img src="https://badge.fury.io/js/%40jeddeloh%2Freason-apollo-client.svg" alt="npm version" />
+  <a href="https://www.npmjs.com/package/reason-apollo-client">
+    <img src="https://badge.fury.io/js/reason-apollo-client.svg" alt="npm version" />
   </a>
 </p>
 
@@ -32,7 +30,7 @@ You should now have a `graphql_schema.json` in your project somewhere. Make sure
 ### 2. `@apollo/client` and Optional Dependencies
 
 ```sh
-npm install @jeddeloh/reason-apollo-client @apollo/client
+npm install reason-apollo-client @apollo/client
 # optional
 npm install @apollo/link-context @apollo/link-error @apollo/link-ws subscriptions-transport-ws
 ```
@@ -55,7 +53,7 @@ Add the following under `bs-dependencies` and `graphql`, in your `bsconfig.json`
   "ppx-flags": ["@reasonml-community/graphql-ppx/ppx"],
   "bs-dependencies: [
     "@reasonml-community/graphql-ppx"
-+   "@jeddeloh/reason-apollo-client"
++   "reason-apollo-client"
   ]
 }
 ```
@@ -66,7 +64,7 @@ Add the following under `bs-dependencies` and `graphql`, in your `bsconfig.json`
 
 ## Usage
 
-The [EXAMPLES/](https://github.com/jeddeloh/reason-apollo-client/tree/master/EXAMPLES) directory is the best documentation at the moment (real docs are coming), but in short, the appropriate hook is exposed as a `use` function on the graphql module. If variables are required, they are the last argument:
+The [EXAMPLES/](https://github.com/reasonml-community/reason-apollo-client/tree/master/EXAMPLES) directory is the best documentation at the moment (real docs are coming), but in short, the appropriate hook is exposed as a `use` function on the graphql module. If variables are required, they are the last argument:
 
 ```reason
 module ExampleQuery = [%graphql {|
@@ -89,6 +87,12 @@ let make = () => {
 
 Other than some slightly different ergonomics, the underlying functionality is almost identical to the [official Apollo Client 3 docs](https://www.apollographql.com/docs/react/v3.0-beta/get-started/), so that is still a good resource for working with this library.
 
+## Recommended Editor Extensions (Visual Studio Code)
+
+[vscode-reasonml-graphql](https://marketplace.visualstudio.com/items?itemName=GabrielNordeborn.vscode-reasonml-graphql) provides syntax highlighting, autocompletion, formatting and more for your graphql operations
+
+[vscode-graphiql-explorer](https://marketplace.visualstudio.com/items?itemName=GabrielNordeborn.vscode-graphiql-explorer) provides a visual interface to explore the schema and generate operations
+
 ## Bindings to JavaScript Packages
 
 Contains partial bindings to the following:
@@ -101,7 +105,7 @@ Contains partial bindings to the following:
 - [subscriptions-transport-ws](https://github.com/apollographql/subscriptions-transport-ws)
 - [zen-observable](https://github.com/zenparsing/zen-observable)
 
-While we strive to provide ergonomics that are intuitive and "reasonable", we do expose a 1:1 mapping to the javascript package structures if that is your preference. For instance, if you're looking in the Apollo docs and see `import { setContext } from '@apollo/link-context'` and you'd prefer to interact with this library in the same way, you can always access with the same filepath and name like so:
+While we strive to provide ergonomics that are intuitive and "reasonable", the intent is to also expose a 1:1 mapping to the javascript package structures if that is your preference. For instance, if you're looking in the Apollo docs and see `import { setContext } from '@apollo/link-context'` and you'd prefer to interact with this library in the same way, you can always access with the same filepath and name like so:
 
 ```reason
 module Apollo = {
@@ -129,7 +133,7 @@ let httpLink = ApolloClient.Link.HttpLink.make(...)
 
 Apollo bindings in the Reason / BuckleScript community are pretty confusing as a write this (July 14, 2020), so it's worth providing some context to help you make the right decisions about which library to use.
 
-This library, `reason-apollo-client`, targets Apollo Client 3 and aims to take full advantage of v1.0.0 `graphql-ppx` features (still in beta) and is intended to be a replacement for `reason-apollo` and `reason-apollo-hooks` (all the functionality (minus HOCs) _should_ be here and more). You should avoid using those libraries at the same time as this one (it's possible, but don't unless you have special circumstances).
+This library, `reason-apollo-client`, targets Apollo Client 3 and aims to take full advantage of v1.0.0 `graphql-ppx` features (still in beta) and is intended to be a replacement for `reason-apollo` and `reason-apollo-hooks` (all non-deprecated functionality should be here and more). You should avoid using those libraries at the same time as this one.
 
 #### Alternatives
 
@@ -139,4 +143,4 @@ This library, `reason-apollo-client`, targets Apollo Client 3 and aims to take f
 
 ## Contributing
 
-Yes, please! Check out the [Contributing Guide](CONTRIBUTING.md) or issues to get started.
+Lets work to make the Apollo experience in ReasonML the best experience out there! This is a solid base, but there's a lot of low-hanging fruit remaining—more bindings, docs, examples, tests, better ergonomics—there's so much left to do! Check out the [Contributing Guide](CONTRIBUTING.md) or issues to get started.

@@ -1,3 +1,5 @@
+module Cache = ApolloClient.Cache;
+
 module AddTodoMutation = [%graphql
   {|
     mutation AddTodo($text: String!) {
@@ -57,7 +59,7 @@ let make = () => {
                    */
                   Js.log2("mutate.update To-Do: ", todo);
                   let _unusedRef =
-                    cache->ApolloClient__Cache_Core_Cache.ApolloCache.writeFragment(
+                    cache->Cache.writeFragment(
                       ~fragment=(module Fragments.TodoItem),
                       ~data={
                         __typename: todo.__typename,
@@ -68,7 +70,7 @@ let make = () => {
                       (),
                     );
                   let _unusedRef =
-                    cache->ApolloClient__Cache_Core_Cache.ApolloCache.writeQuery(
+                    cache->Cache.writeQuery(
                       ~query=(module TodosQuery),
                       ~data={
                         todos: [|

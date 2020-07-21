@@ -87,6 +87,30 @@ let make = () => {
 
 Other than some slightly different ergonomics, the underlying functionality is almost identical to the [official Apollo Client 3 docs](https://www.apollographql.com/docs/react/v3.0-beta/get-started/), so that is still a good resource for working with this library.
 
+It's probably worth noting this library leverages records heavily which allows for very similar syntax to working with javascript objects and other benefits, but comes with a couple drawbacks.
+
+- You may need to annotate the types if you're using a record outside of the exact place it is used, so we expose every type from the `ApolloClient.Types` module for convenience
+- Bindings to methods on javascript objects work a little differently. You have to use the method function in the module for that type.
+
+Example:
+
+```reason
+  /** Inspecting the types reveals this is a QueryResult.t */
+  let queryResult = SomeQuery.use();
+
+  /** I can destructure, pattern match, or access properties that are values like normal */
+  switch (queryResult) {
+    | {loading: true} =>
+    /** do something */
+  }
+
+  /** But if I want to use a method on the javascript object,
+      I need to use a function defined in the module for that type */
+  queryResult->ApolloClient.Types.QueryResult.fetchMore;
+  /** ☝️Note that you don't have to go searching for the type.
+      The intent is to have everything accessible under Types */
+```
+
 ## Recommended Editor Extensions (Visual Studio Code)
 
 [vscode-reasonml-graphql](https://marketplace.visualstudio.com/items?itemName=GabrielNordeborn.vscode-reasonml-graphql) provides syntax highlighting, autocompletion, formatting and more for your graphql operations

@@ -1,3 +1,5 @@
+module QueryResult = ApolloClient.Types.QueryResult;
+
 module TodosQuery = [%graphql
   {|
     query TodosQuery {
@@ -28,7 +30,7 @@ let make = () => {
    * Sorry, this example is nonsensical given the current schema, but I'm gonna proceed anyway
    */
   React.useEffect0(() => {
-    queryResult->ApolloClient.QueryResult.subscribeToMore(
+    queryResult->QueryResult.subscribeToMore(
       ~subscription=(module SorryItsNotASubscriptionForTodos),
       ~updateQuery=
         (previous, {subscriptionData: {data: {siteStatisticsUpdated}}}) => {

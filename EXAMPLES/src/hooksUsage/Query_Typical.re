@@ -1,3 +1,5 @@
+module QueryResult = ApolloClient.Types.QueryResult;
+
 module TodosQuery = [%graphql
   {|
     query TodosQuery {
@@ -40,7 +42,7 @@ let make = () => {
            <button
              onClick={_ =>
                queryResult
-               ->ApolloClient.QueryResult.fetchMore(
+               ->QueryResult.fetchMore(
                    ~updateQuery=
                      (previousData, {fetchMoreResult}) => {
                        switch (fetchMoreResult) {

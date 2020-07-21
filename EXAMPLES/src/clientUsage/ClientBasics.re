@@ -1,3 +1,5 @@
+module ApolloQueryResult = ApolloClient.Types.ApolloQueryResult;
+module ObservableQuery = ApolloClient.Types.ObservableQuery;
 module Prometo = Yawaramin__Prometo;
 
 module AddTodoMutation = [%graphql
@@ -58,7 +60,7 @@ let logTodos_bad_jsPromise = _ =>
   Client.instance
   ->ApolloClient.query(~query=(module TodosQuery), ())
   ->Js.Promise.then_(
-      (result: ApolloClient__ApolloClient.ApolloQueryResult.t(_)) =>
+      (result: ApolloQueryResult.t(_)) =>
         switch (result) {
         | {data: Some({TodosQuery.todos})} =>
           Js.Promise.resolve(Js.log2("query To-Dos: ", todos))
@@ -89,7 +91,7 @@ let addTodo = _ =>
 let watchQuerySubscription =
   Client.instance
   ->ApolloClient.watchQuery(~query=(module TodosQuery), ())
-  ->ApolloClient.ObservableQuery.subscribe(
+  ->ObservableQuery.subscribe(
       ~onNext=
         result =>
           switch (result) {

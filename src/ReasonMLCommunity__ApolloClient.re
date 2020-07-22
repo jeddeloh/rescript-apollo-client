@@ -1,13 +1,14 @@
-// Creating a client
+[@text {|{1 Creating a client}|}];
+type t = ApolloClient__ApolloClient.t;
+let make = ApolloClient__ApolloClient.make;
+let setLink = ApolloClient__ApolloClient.setLink;
+
 module DefaultWatchQueryOptions = ApolloClient__ApolloClient.DefaultWatchQueryOptions;
 module DefaultQueryOptions = ApolloClient__ApolloClient.DefaultQueryOptions;
 module DefaultMutateOptions = ApolloClient__ApolloClient.DefaultMutateOptions;
 module DefaultOptions = ApolloClient__ApolloClient.DefaultOptions;
 
-type t = ApolloClient__ApolloClient.t;
-let make = ApolloClient__ApolloClient.make;
-
-// Fetching data
+[@text {|{1 Fetching data }|}];
 let mutate = ApolloClient__ApolloClient.mutate;
 let query = ApolloClient__ApolloClient.query;
 let readQuery = ApolloClient__ApolloClient.readQuery;
@@ -26,7 +27,7 @@ module React = {
   let useSubscription = ApolloClient__React_Hooks_UseSubscription.useSubscription;
 };
 
-// Caching
+[@text {|{1 Caching }|}];
 module Cache = {
   type t('serialized) =
     ApolloClient__Cache_Core_Cache.ApolloCache.t('serialized);
@@ -38,7 +39,7 @@ module Cache = {
   let writeQuery = ApolloClient__Cache_Core_Cache.ApolloCache.writeQuery;
 };
 
-// Customize Apollo Client's data flow
+[@text {|{1 Customize Apollo Client's data flow }|}];
 module Link = {
   module ContextLink = ApolloClient__LinkContext.ContextLink;
   module ErrorLink = ApolloClient__LinkError.ErrorLink;
@@ -53,10 +54,11 @@ module Link = {
   let split = ApolloClient__Link_Core_ApolloLink.Static.split;
 };
 
-// Helpers and utilities
+[@text {|{1 Helpers and utility functions}|}];
 module Utilities = ApolloClient__Utilities;
 
-// 1:1 Javascript package structure
+[@text {|{1 Reason Extras}|}];
+/** 1:1 Javascript package structure */
 module Bindings = {
   module Client = ApolloClient__Client;
   module Graphql = ApolloClient__Graphql;
@@ -67,7 +69,7 @@ module Bindings = {
   module ZenObservable = ApolloClient__ZenObservable;
 };
 
-// Extension modules used by graphql-ppx
+/** Extension modules used by graphql-ppx */
 module GraphQL_PPX = {
   module ExtendMutation = ApolloClient__React_Hooks_UseMutation.Extend;
   module ExtendQuery = ApolloClient__React_Hooks_UseQuery.Extend;
@@ -75,7 +77,7 @@ module GraphQL_PPX = {
   type templateTagReturnType = ApolloClient__Graphql.documentNode;
 };
 
-// Convenient access to all types and the methods for working with those types
+/** Convenient access to all types and the methods for working with those types */
 module Types = {
   module ApolloError = ApolloClient__Errors_ApolloError;
   module ApolloQueryResult = ApolloClient__Core_Types.ApolloQueryResult;

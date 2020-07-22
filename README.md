@@ -107,8 +107,8 @@ Example:
   /** But if I want to use a method on the javascript object,
       I need to use a function defined in the module for that type */
   queryResult->ApolloClient.Types.QueryResult.fetchMore;
-  /** ☝️Note that you don't have to go searching for the type.
-      The intent is to have everything accessible under Types */
+  /** ☝️ Note that once you know the type, you don't have to go searching for it.
+      Everything is accessible under ApolloClient.Types */
 ```
 
 ## Recommended Editor Extensions (Visual Studio Code)

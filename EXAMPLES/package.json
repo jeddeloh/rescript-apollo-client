@@ -26,7 +26,7 @@
     "graphql": "^14.0.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
-    "reason-apollo-client": "^0.0.1-beta.1",
+    "reason-apollo-client": "^0.0.1-beta.2",
     "reason-promise": "1.1.1",
     "reason-react": "0.9.1",
     "subscriptions-transport-ws": "0.9.16"

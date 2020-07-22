@@ -66,12 +66,12 @@ module Js_ = {
     extraInfo: option(Js.Json.t),
   };
 
-  //     constructor({ graphQLErrors, networkError, errorMessage, extraInfo, }: {
-  //         graphQLErrors?: ReadonlyArray<GraphQLError>;
-  //         networkError?: Error | null;
-  //         errorMessage?: string;
-  //         extraInfo?: any;
-  //     });
+  // constructor({ graphQLErrors, networkError, errorMessage, extraInfo, }: {
+  //     graphQLErrors?: ReadonlyArray<GraphQLError>;
+  //     networkError?: Error | null;
+  //     errorMessage?: string;
+  //     extraInfo?: any;
+  // });
   [@bs.module "@apollo/client"] [@bs.new]
   external make: make_args => t = "ApolloError";
 };

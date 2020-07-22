@@ -328,6 +328,9 @@ module Js_ = {
     Js.nullable('jsData) =
     "readQuery";
 
+  // setLink(newLink: ApolloLink): void;
+  [@bs.send] external setLink: (t, ApolloLink.Js_.t) => unit = "setLink";
+
   // <T = any, TVariables = OperationVariables>(options: WatchQueryOptions<TVariables>): ObservableQuery<T, TVariables>;
   [@bs.send]
   external watchQuery:
@@ -543,6 +546,8 @@ let readQuery:
     ->Js.toOption
     ->Belt.Option.map(Operation.parse);
   };
+
+let setLink: (t, ApolloLink.t) => unit = Js_.setLink;
 
 let watchQuery:
   type data jsVariables.

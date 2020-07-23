@@ -79,6 +79,7 @@ module GraphQL_PPX = {
 
 /** Convenient access to all types and the methods for working with those types */
 module Types = {
+  module RequestHandler = ApolloClient__Link_Core_Types.RequestHandler;
   module ApolloError = ApolloClient__Errors_ApolloError;
   module ApolloQueryResult = ApolloClient__Core_Types.ApolloQueryResult;
   module ApolloLink = ApolloClient__Link_Core_ApolloLink;
@@ -90,6 +91,7 @@ module Types = {
   module FetchPolicy__noCacheExtracted = ApolloClient__Core_WatchQueryOptions.FetchPolicy__noCacheExtracted;
   module FragmentMatcher = ApolloClient__Core_LocalState.FragmentMatcher;
   module GraphqlError = ApolloClient__Graphql_Error_GraphQLError;
+  module GraphQLRequest = ApolloClient__Link_Core_Types.GraphQLRequest;
   module FetchResult = ApolloClient__Link_Core_Types.FetchResult;
   module LazyQueryHookOptions = ApolloClient__React_Types.LazyQueryHookOptions;
   module MutationHookOptions = ApolloClient__React_Types.MutationHookOptions;
@@ -98,8 +100,10 @@ module Types = {
   module MutationTuple = ApolloClient__React_Types.MutationTuple;
   module MutationTuple__noVariables = ApolloClient__React_Types.MutationTuple__noVariables;
   module MutationUpdaterFn = ApolloClient__Core_WatchQueryOptions.MutationUpdaterFn;
+  module Observable = ApolloClient__ZenObservable.Observable;
   module ObservableQuery = ApolloClient__Core_ObservableQuery.ObservableQuery;
   module OnSubscriptionDataOptions = ApolloClient__React_Types.OnSubscriptionDataOptions;
+  module Operation = ApolloClient__Link_Core_Types.Operation;
   module OperationVariables = ApolloClient__Core_Types.OperationVariables;
   module QueryHookOptions = ApolloClient__React_Types.QueryHookOptions;
   module QueryOptions = ApolloClient__Core_WatchQueryOptions.QueryOptions;

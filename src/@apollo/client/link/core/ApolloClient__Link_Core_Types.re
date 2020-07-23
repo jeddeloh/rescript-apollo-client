@@ -24,6 +24,7 @@ module GraphQLRequest = {
 };
 
 module Operation = {
+  type useMethodFunctionInThisModuleInstead;
   module Js_ = {
     // export interface Operation {
     //     query: DocumentNode;
@@ -38,12 +39,24 @@ module Operation = {
       variables: Js.Json.t,
       operationName: string,
       extensions: Js.Json.t,
-      setContext: Js.Json.t => Js.Json.t,
-      getContext: unit => Js.Json.t,
+      setContext: useMethodFunctionInThisModuleInstead,
+      getContext: useMethodFunctionInThisModuleInstead,
     };
   };
 
-  type t = Js_.t;
+  type t =
+    Js_.t = {
+      query: Graphql.documentNode,
+      variables: Js.Json.t,
+      operationName: string,
+      extensions: Js.Json.t,
+      setContext: useMethodFunctionInThisModuleInstead,
+      getContext: useMethodFunctionInThisModuleInstead,
+    };
+
+  [@bs.send] external getContext: t => Js.Json.t = "getContext";
+
+  [@bs.send] external setContext: (t, Js.Json.t) => Js.Json.t = "setContext";
 };
 
 module FetchResult = {
@@ -88,6 +101,8 @@ module NextLink = {
     // export declare type NextLink = (operation: Operation) => Observable<FetchResult>;
     type t = Operation.Js_.t => Observable.t(FetchResult.Js_.t(Js.Json.t));
   };
+
+  // These are intentionally Js_.t because we can't know what to parse
   type t = Js_.t;
 };
 
@@ -95,9 +110,15 @@ module RequestHandler = {
   module Js_ = {
     // export declare type RequestHandler = (operation: Operation, forward: NextLink) => Observable<FetchResult> | null;
     type t =
-      (Operation.Js_.t, NextLink.Js_.t) =>
-      Js.nullable(Observable.t(FetchResult.Js_.t(Js.Json.t)));
+      (. Operation.Js_.t, NextLink.Js_.t) =>
+      Js.Null.t(Observable.t(FetchResult.Js_.t(Js.Json.t)));
   };
 
-  type t = Js_.t;
+  // These are intentionally Js_.t because we can't know what to parse
+  type t =
+    (Operation.Js_.t, NextLink.Js_.t) =>
+    option(Observable.t(FetchResult.Js_.t(Js.Json.t)));
+
+  let toJs: t => Js_.t =
+    t => (. operation, forward) => t(operation, forward)->Js.Null.fromOption;
 };

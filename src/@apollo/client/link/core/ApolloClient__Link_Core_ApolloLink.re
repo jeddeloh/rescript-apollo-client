@@ -61,7 +61,8 @@ module Static = Js_.Static;
 
 type t = Js_.t;
 
-let make: RequestHandler.t => t = Js_.make;
+let make: RequestHandler.t => t =
+  requestHandler => Js_.make(requestHandler->RequestHandler.toJs);
 
 let concat = Js_.concat;
 

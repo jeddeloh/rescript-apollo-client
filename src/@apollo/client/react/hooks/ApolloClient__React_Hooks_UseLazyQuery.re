@@ -18,18 +18,19 @@ module Js_ = {
   external useLazyQuery:
     (
       . Graphql.documentNode,
-      LazyQueryHookOptions.Js_.t('jsData, 'variables)
+      LazyQueryHookOptions.Js_.t('jsData, 'jsVariables)
     ) =>
-    QueryTuple.Js_.t('jsData, 'variables) =
+    QueryTuple.Js_.t('jsData, 'variables, 'jsVariables) =
     "useLazyQuery";
 };
 
 let useLazyQuery:
-  type data jsData jsVariables.
+  type data jsData variables jsVariables.
     (
       ~query: (module Operation with
                  type t = data and
                  type Raw.t = jsData and
+                 type t_variables = variables and
                  type Raw.t_variables = jsVariables),
       ~client: ApolloClient.t=?,
       ~context: Js.Json.t=?,
@@ -44,7 +45,7 @@ let useLazyQuery:
       ~ssr: bool=?,
       unit
     ) =>
-    QueryTuple.t(data, jsData, jsVariables) =
+    QueryTuple.t(data, jsData, variables, jsVariables) =
   (
     ~query as (module Operation),
     ~client=?,
@@ -88,6 +89,7 @@ let useLazyQuery:
         jsQueryTuple->QueryTuple.fromJs(
           ~parse=Operation.parse,
           ~serialize=Operation.serialize,
+          ~serializeVariables=Operation.serializeVariables,
         )
       },
       jsQueryTuple,
@@ -95,24 +97,26 @@ let useLazyQuery:
   };
 
 let useLazyQueryWithVariables:
-  type data jsData jsVariables.
+  type data jsData variables jsVariables.
     (
       ~query: (module Operation with
                  type t = data and
                  type Raw.t = jsData and
+                 type t_variables = variables and
                  type Raw.t_variables = jsVariables),
       ~client: ApolloClient.t=?,
       ~context: Js.Json.t=?,
       ~displayName: string=?,
       ~errorPolicy: ErrorPolicy.t=?,
       ~fetchPolicy: WatchQueryFetchPolicy.t=?,
+      ~mapNullVariables: jsVariables => jsVariables=?,
       ~notifyOnNetworkStatusChange: bool=?,
       ~onCompleted: data => unit=?,
       ~onError: ApolloError.t => unit=?,
       ~partialRefetch: bool=?,
       ~pollInterval: int=?,
       ~ssr: bool=?,
-      jsVariables
+      variables
     ) =>
     QueryTuple__noVariables.t(data, jsData, jsVariables) =
   (
@@ -122,6 +126,7 @@ let useLazyQueryWithVariables:
     ~displayName=?,
     ~errorPolicy=?,
     ~fetchPolicy=?,
+    ~mapNullVariables=Utils.identity,
     ~notifyOnNetworkStatusChange=?,
     ~onCompleted=?,
     ~onError=?,
@@ -130,6 +135,9 @@ let useLazyQueryWithVariables:
     ~ssr=?,
     variables,
   ) => {
+    let jsVariables =
+      variables->Operation.serializeVariables->mapNullVariables;
+
     let jsQueryTuple =
       Js_.useLazyQuery(.
         Operation.query,
@@ -147,7 +155,7 @@ let useLazyQueryWithVariables:
             pollInterval,
             query: None,
             ssr,
-            variables: Some(variables),
+            variables: Some(jsVariables),
           },
           ~parse=Operation.parse,
         ),
@@ -159,7 +167,7 @@ let useLazyQueryWithVariables:
           ~parse=Operation.parse,
           ~serialize=Operation.serialize,
           // Passing in the same variables from above allows us to reuse some types
-          ~variables,
+          ~variables=jsVariables,
         )
       },
       jsQueryTuple,

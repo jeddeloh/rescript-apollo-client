@@ -12,6 +12,7 @@ module RefetchQueryDescription = ApolloClient__Core_WatchQueryOptions.RefetchQue
 module SubscribeToMoreOptions = ApolloClient__Core_WatchQueryOptions.SubscribeToMoreOptions;
 module Types = ApolloClient__Types;
 module UpdateQueryFn = ApolloClient__Core_WatchQueryOptions.UpdateQueryFn;
+module Utils = ApolloClient__Utils;
 module WatchQueryFetchPolicy = ApolloClient__Core_WatchQueryOptions.WatchQueryFetchPolicy;
 
 module type Operation = Types.Operation;
@@ -21,7 +22,7 @@ module QueryHookOptions = {
     // export interface QueryHookOptions<TData = any, TVariables = OperationVariables> extends QueryFunctionOptions<TData, TVariables> {
     //     query?: DocumentNode;
     // }
-    type t('jsData, 'variables) = {
+    type t('jsData, 'jsVariables) = {
       query: option(Graphql.documentNode),
       // ...extends QueryFunctionOptions
       displayName: option(string),
@@ -40,11 +41,11 @@ module QueryHookOptions = {
       // returnPartialData: option(bool),
       ssr: option(bool),
       // We don't allow optional variables because it's not typesafe
-      variables: 'variables,
+      variables: 'jsVariables,
     };
   };
 
-  type t('data, 'variables) = {
+  type t('data, 'jsVariables) = {
     query: option(Graphql.documentNode),
     // ...extends QueryFunctionOptions
     displayName: option(string),
@@ -62,12 +63,12 @@ module QueryHookOptions = {
     // INTENTIONALLY IGNORED
     // returnPartialData: option(bool),
     ssr: option(bool),
-    variables: 'variables,
+    variables: 'jsVariables,
   };
 
   let toJs =
-      (t: t('data, 'variables), ~parse: 'jsData => 'data)
-      : Js_.t('jsData, 'variables) => {
+      (t: t('data, 'jsVariables), ~parse: 'jsData => 'data)
+      : Js_.t('jsData, 'jsVariables) => {
     client: t.client,
     context: t.context,
     displayName: t.displayName,
@@ -97,7 +98,7 @@ module LazyQueryHookOptions = {
     //     query?: DocumentNode;
     // }
     [@bs.deriving abstract]
-    type t('jsData, 'variables) = {
+    type t('jsData, 'jsVariables) = {
       [@bs.optional]
       query: Graphql.documentNode,
       // ...extends QueryFunctionOptions
@@ -127,12 +128,12 @@ module LazyQueryHookOptions = {
       [@bs.optional]
       ssr: bool,
       [@bs.optional]
-      variables: 'variables,
+      variables: 'jsVariables,
     };
     let make = t;
   };
 
-  type t('data, 'variables) = {
+  type t('data, 'jsVariables) = {
     query: option(Graphql.documentNode),
     // ...extends QueryFunctionOptions
     displayName: option(string),
@@ -149,12 +150,12 @@ module LazyQueryHookOptions = {
     // INTENTIONALLY IGNORED
     // returnPartialData: option(bool),
     ssr: option(bool),
-    variables: option('variables),
+    variables: option('jsVariables),
   };
 
   let toJs =
-      (t: t('data, 'variables), ~parse: 'jsData => 'data)
-      : Js_.t('jsData, 'variables) =>
+      (t: t('data, 'jsVariables), ~parse: 'jsData => 'data)
+      : Js_.t('jsData, 'jsVariables) =>
     Js_.make(
       ~client=?t.client,
       ~context=?t.context,
@@ -187,32 +188,32 @@ module QueryLazyOptions = {
     //     variables?: TVariables;
     //     context?: Context;
     // }
-    type t('variables) = {
-      variables: 'variables,
+    type t('jsVariables) = {
+      variables: 'jsVariables,
       context: option(Js.Json.t),
     };
   };
 
-  type t('variables) = Js_.t('variables);
+  type t('jsVariables) = Js_.t('jsVariables);
 };
 
 module QueryResult = {
   type useMethodFunctionsInThisModuleInstead;
 
   module Js_ = {
-    type t_fetchMoreOptions_updateQueryOptions('jsData, 'variables) = {
+    type t_fetchMoreOptions_updateQueryOptions('jsData, 'jsVariables) = {
       fetchMoreResult: option('jsData),
-      variables: option('variables),
+      variables: option('jsVariables),
     };
 
     // We use abstract because Apollo is looking at query key, not just value
     [@bs.deriving abstract]
-    type t_fetchMoreOptions('jsData, 'variables) = {
+    type t_fetchMoreOptions('jsData, 'jsVariables) = {
       [@bs.optional]
       query: Graphql.Language.documentNode,
       // ...extends FetchMoreQueryOptions
       [@bs.optional]
-      variables: 'variables,
+      variables: 'jsVariables,
       [@bs.optional]
       context: Js.Json.t,
       // ...extends FetchMoreOptions
@@ -220,12 +221,12 @@ module QueryResult = {
       updateQuery:
         (
           . 'jsData,
-          t_fetchMoreOptions_updateQueryOptions('jsData, 'variables)
+          t_fetchMoreOptions_updateQueryOptions('jsData, 'jsVariables)
         ) =>
         'jsData,
     };
 
-    type t_updateQueryOptions('variables) = {variables: 'variables};
+    type t_updateQueryOptions('jsVariables) = {variables: 'jsVariables};
 
     // export interface QueryResult<TData = any, TVariables = OperationVariables> extends ObservableQueryFields<TData, TVariables> {
     //     client: ApolloClient<any>;
@@ -235,48 +236,51 @@ module QueryResult = {
     //     networkStatus: NetworkStatus;
     //     called: true;
     // }
-    type t('jsData, 'variables) = {
+    type t('jsData, 'jsVariables) = {
       called: bool,
       client: ApolloClient.t,
       data: option('jsData),
       error: option(ApolloError.Js_.t),
       loading: bool,
       networkStatus: NetworkStatus.t,
-      // ...extends ObservableQueryFields<TData, TVariables> = Pick<ObservableQuery<TData, TVariables>, 'startPolling' | 'stopPolling' | 'subscribeToMore' | 'updateQuery' | 'refetch' | 'variables'>
+      // ...extends ObservableQueryFields<TData, TVariables> = Pick<ObservableQuery<TData, TVariables>, 'startPolling' | 'stopPolling' | 'subscribeToMore' | 'updateQuery' | 'refetch' | 'jsVariables'>
       fetchMore: useMethodFunctionsInThisModuleInstead,
       refetch: useMethodFunctionsInThisModuleInstead,
       startPolling: useMethodFunctionsInThisModuleInstead,
       stopPolling: useMethodFunctionsInThisModuleInstead,
       subscribeToMore: useMethodFunctionsInThisModuleInstead,
       updateQuery: useMethodFunctionsInThisModuleInstead,
-      variables: 'variables,
+      variables: 'jsVariables,
     };
 
     [@bs.send]
     external fetchMore:
-      (t('jsData, 'variables), t_fetchMoreOptions('jsData, 'variables)) =>
+      (
+        t('jsData, 'jsVariables),
+        t_fetchMoreOptions('jsData, 'jsVariables)
+      ) =>
       Js.Promise.t(ApolloQueryResult.Js_.t('jsData)) =
       "fetchMore";
 
     [@bs.send]
     external refetch:
-      (t('jsData, 'variables), 'variables) =>
+      (t('jsData, 'jsVariables), 'jsVariables) =>
       Js.Promise.t(ApolloQueryResult.Js_.t('jsData)) =
       "refetch";
 
     [@bs.send]
-    external startPolling: (t('jsData, 'variables), int) => unit =
+    external startPolling: (t('jsData, 'jsVariables), int) => unit =
       "startPolling";
 
     [@bs.send]
-    external stopPolling: (t('jsData, 'variables), unit) => unit =
+    external stopPolling: (t('jsData, 'jsVariables), unit) => unit =
       "stopPolling";
 
     [@bs.send]
     external updateQuery:
       (
-        t('jsData, 'variables),
-        ('jsData, t_updateQueryOptions('variables)) => 'jsData
+        t('jsData, 'jsVariables),
+        ('jsData, t_updateQueryOptions('jsVariables)) => 'jsData
       ) =>
       unit =
       "updateQuery";
@@ -285,7 +289,7 @@ module QueryResult = {
     [@bs.send]
     external subscribeToMore:
       (
-        t('jsData, 'variables),
+        t('jsData, 'jsVariables),
         SubscribeToMoreOptions.Js_.t(
           'jsData,
           'subscriptionVariables,
@@ -296,28 +300,28 @@ module QueryResult = {
       "subscribeToMore";
   };
 
-  type t_updateQueryOptions('variables) =
-    Js_.t_updateQueryOptions('variables);
+  type t_updateQueryOptions('jsVariables) =
+    Js_.t_updateQueryOptions('jsVariables);
 
-  type t_fetchMoreOptions_updateQueryOptions('data, 'variables) = {
+  type t_fetchMoreOptions_updateQueryOptions('data, 'jsVariables) = {
     fetchMoreResult: option('data),
-    variables: option('variables),
+    variables: option('jsVariables),
   };
 
-  type t_fetchMoreOptions('data, 'variables) = {
+  type t_fetchMoreOptions('data, 'jsVariables) = {
     query: option(Graphql.Language.documentNode),
     // ...extends FetchMoreQueryOptions
-    variables: option('variables),
+    variables: option('jsVariables),
     context: option(Js.Json.t),
     // ...extends FetchMoreOptions
     updateQuery:
       option(
-        ('data, t_fetchMoreOptions_updateQueryOptions('data, 'variables)) =>
+        ('data, t_fetchMoreOptions_updateQueryOptions('data, 'jsVariables)) =>
         'data,
       ),
   };
 
-  type t('data, 'jsData, 'variables) = {
+  type t('data, 'jsData, 'jsVariables) = {
     called: bool,
     client: ApolloClient.t,
     data: option('data),
@@ -335,16 +339,16 @@ module QueryResult = {
   };
 
   external unsafeCastForMethod:
-    t('data, 'jsData, 'variables) => Js_.t('jsData, 'variables) =
+    t('data, 'jsData, 'jsVariables) => Js_.t('jsData, 'jsVariables) =
     "%identity";
 
   let fromJs:
     (
-      Js_.t('jsData, 'variables),
+      Js_.t('jsData, 'jsVariables),
       ~parse: 'jsData => 'data,
       ~serialize: 'data => 'jsData
     ) =>
-    t('data, 'jsData, 'variables) =
+    t('data, 'jsData, 'jsVariables) =
     (js, ~parse, ~serialize) => {
       called: js.called,
       client: js.client,
@@ -364,12 +368,15 @@ module QueryResult = {
 
   let fetchMore:
     (
-      t('queryData, 'jsQueryData, 'variables),
+      t('queryData, 'jsQueryData, 'jsVariables),
       ~context: Js.Json.t=?,
-      ~variables: 'variables=?,
+      ~variables: 'jsVariables=?,
       ~updateQuery: (
                       'data,
-                      t_fetchMoreOptions_updateQueryOptions('data, 'variables)
+                      t_fetchMoreOptions_updateQueryOptions(
+                        'data,
+                        'jsVariables,
+                      )
                     ) =>
                     'data
                       =?,
@@ -392,7 +399,7 @@ module QueryResult = {
                   jsFetchMoreOptions:
                     Js_.t_fetchMoreOptions_updateQueryOptions(
                       'jsData,
-                      'variables,
+                      'jsVariables,
                     ),
                 ) =>
                   updateQuery(
@@ -418,7 +425,7 @@ module QueryResult = {
     };
 
   let refetch:
-    (t('data, 'jsData, 'variables), 'variables) =>
+    (t('data, 'jsData, 'jsVariables), 'jsVariables) =>
     Js.Promise.t(ApolloQueryResult.t('data)) =
     (queryResult, variables) =>
       queryResult
@@ -435,17 +442,17 @@ module QueryResult = {
         );
 
   [@bs.send]
-  external startPolling: (t('data, 'jsData, 'variables), int) => unit =
+  external startPolling: (t('data, 'jsData, 'jsVariables), int) => unit =
     "startPolling";
 
   [@bs.send]
-  external stopPolling: (t('data, 'jsData, 'variables), unit) => unit =
+  external stopPolling: (t('data, 'jsData, 'jsVariables), unit) => unit =
     "stopPolling";
 
   let subscribeToMore:
     type subscriptionData subscriptionVariables.
       (
-        t('queryData, 'jsQueryData, 'variables),
+        t('queryData, 'jsQueryData, 'jsVariables),
         ~subscription: (module Operation with
                           type t = subscriptionData and
                           type Raw.t_variables = subscriptionVariables),
@@ -488,8 +495,8 @@ module QueryResult = {
 
   let updateQuery:
     (
-      t('data, 'jsData, 'variables),
-      ('data, t_updateQueryOptions('variables)) => 'data
+      t('data, 'jsData, 'jsVariables),
+      ('data, t_updateQueryOptions('jsVariables)) => 'data
     ) =>
     unit =
     (queryResult, updateQueryFn) => {
@@ -537,43 +544,45 @@ module LazyQueryResult = {
     module Union: {
       type t;
       let unexecutedLazyResult: UnexecutedLazyResult.Js_.t => t;
-      let queryResult: QueryResult.Js_.t('jsData, 'variables) => t;
-      type case('jsData, 'variables) =
+      let queryResult: QueryResult.Js_.t('jsData, 'jsVariables) => t;
+      type case('jsData, 'jsVariables) =
         | UnexecutedLazyResult(UnexecutedLazyResult.Js_.t)
-        | QueryResult(QueryResult.Js_.t('jsData, 'variables));
-      let classify: t => case('jsData, 'variables);
+        | QueryResult(QueryResult.Js_.t('jsData, 'jsVariables));
+      let classify: t => case('jsData, 'jsVariables);
     } = {
       [@unboxed]
       type t =
         | Any('a): t;
       let unexecutedLazyResult = (v: UnexecutedLazyResult.Js_.t) => Any(v);
-      let queryResult = (v: QueryResult.Js_.t('jsData, 'variables)) =>
+      let queryResult = (v: QueryResult.Js_.t('jsData, 'jsVariables)) =>
         Any(v);
-      type case('jsData, 'variables) =
+      type case('jsData, 'jsVariables) =
         | UnexecutedLazyResult(UnexecutedLazyResult.Js_.t)
-        | QueryResult(QueryResult.Js_.t('jsData, 'variables));
-      let classify = (Any(v): t): case('jsData, 'variables) =>
+        | QueryResult(QueryResult.Js_.t('jsData, 'jsVariables));
+      let classify = (Any(v): t): case('jsData, 'jsVariables) =>
         if ([%raw {|function (value) { return "client" in value}|}](v)) {
-          QueryResult(Obj.magic(v): QueryResult.Js_.t('jsData, 'variables));
+          QueryResult(
+            Obj.magic(v): QueryResult.Js_.t('jsData, 'jsVariables),
+          );
         } else {
           UnexecutedLazyResult(Obj.magic(v): UnexecutedLazyResult.Js_.t);
         };
     };
     // export declare type LazyQueryResult<TData, TVariables> = UnexecutedLazyResult | QueryResult<TData, TVariables>;
-    type t('jsData, 'variables) = Union.t;
+    type t('jsData, 'jsVariables) = Union.t;
   };
 
-  type t('data, 'jsData, 'variables) =
-    | Executed(QueryResult.t('data, 'jsData, 'variables))
+  type t('data, 'jsData, 'jsVariables) =
+    | Executed(QueryResult.t('data, 'jsData, 'jsVariables))
     | Unexecuted(UnexecutedLazyResult.t);
 
   let fromJs:
     (
-      Js_.t('jsData, 'variables),
+      Js_.t('jsData, 'jsVariables),
       ~parse: 'jsData => 'data,
       ~serialize: 'data => 'jsData
     ) =>
-    t('data, 'jsData, 'variables) =
+    t('data, 'jsData, 'jsVariables) =
     (js, ~parse, ~serialize) => {
       switch (js->Js_.Union.classify) {
       | UnexecutedLazyResult(v) => Unexecuted(v->UnexecutedLazyResult.fromJs)
@@ -585,48 +594,64 @@ module LazyQueryResult = {
 module QueryTuple = {
   module Js_ = {
     // export declare type QueryTuple<TData, TVariables> = [(options?: QueryLazyOptions<TVariables>) => void, LazyQueryResult<TData, TVariables>];
-    type t('jsData, 'variables) = (
-      QueryLazyOptions.Js_.t('variables) => unit,
-      LazyQueryResult.Js_.t('jsData, 'variables),
+    type t('jsData, 'variables, 'jsVariables) = (
+      QueryLazyOptions.Js_.t('jsVariables) => unit,
+      LazyQueryResult.Js_.t('jsData, 'jsVariables),
     );
   };
 
-  type t('data, 'jsData, 'variables) = (
-    (~context: Js.Json.t=?, 'variables) => unit,
-    LazyQueryResult.t('data, 'jsData, 'variables),
+  type t('data, 'jsData, 'variables, 'jsVariables) = (
+    (
+      ~context: Js.Json.t=?,
+      ~mapNullVariables: 'jsVariables => 'jsVariables=?,
+      'variables
+    ) =>
+    unit,
+    LazyQueryResult.t('data, 'jsData, 'jsVariables),
   );
 
   let fromJs:
     (
-      Js_.t('jsData, 'variables),
+      Js_.t('jsData, 'variables, 'jsVariables),
       ~parse: 'jsData => 'data,
-      ~serialize: 'data => 'jsData
+      ~serialize: 'data => 'jsData,
+      ~serializeVariables: 'variables => 'jsVariables
     ) =>
-    t('data, 'jsData, 'variables) =
-    ((jsExecuteQuery, jsLazyQueryResult), ~parse, ~serialize) => (
-      (~context=?, variables) => jsExecuteQuery({context, variables}),
+    t('data, 'jsData, 'variables, 'jsVariables) =
+    (
+      (jsExecuteQuery, jsLazyQueryResult),
+      ~parse,
+      ~serialize,
+      ~serializeVariables,
+    ) => (
+      (~context=?, ~mapNullVariables=ApolloClient__Utils.identity, variables) =>
+        jsExecuteQuery({
+          context,
+          variables: variables->serializeVariables->mapNullVariables,
+        }),
       jsLazyQueryResult->LazyQueryResult.fromJs(~parse, ~serialize),
     );
 };
 
 module QueryTuple__noVariables = {
   module Js_ = {
-    type t('jsData, 'variables) = QueryTuple.Js_.t('jsData, 'variables);
+    type t('jsData, 'variables, 'jsVariables) =
+      QueryTuple.Js_.t('jsData, 'variables, 'jsVariables);
   };
 
-  type t('data, 'jsData, 'variables) = (
+  type t('data, 'jsData, 'jsVariables) = (
     (~context: Js.Json.t=?, unit) => unit,
-    LazyQueryResult.t('data, 'jsData, 'variables),
+    LazyQueryResult.t('data, 'jsData, 'jsVariables),
   );
 
   let fromJs:
     (
-      Js_.t('jsData, 'variables),
+      Js_.t('jsData, 'variables, 'jsVariables),
       ~parse: 'jsData => 'data,
       ~serialize: 'data => 'jsData,
-      ~variables: 'variables
+      ~variables: 'jsVariables
     ) =>
-    t('data, 'jsData, 'variables) =
+    t('data, 'jsData, 'jsVariables) =
     ((jsExecuteQuery, jsLazyQueryResult), ~parse, ~serialize, ~variables) => (
       (~context=?, ()) => jsExecuteQuery({context, variables}),
       jsLazyQueryResult->LazyQueryResult.fromJs(~parse, ~serialize),
@@ -650,7 +675,7 @@ module BaseMutationOptions = {
     //     update?: MutationUpdaterFn<TData>;
     //     variables?: TVariables;
     // }
-    type t('jsData, 'variables) = {
+    type t('jsData, 'jsVariables) = {
       awaitRefetchQueries: option(bool),
       client: option(ApolloClient.Js_.t),
       context: option(Js.Json.t), // actual: option(Context)
@@ -659,14 +684,14 @@ module BaseMutationOptions = {
       ignoreResults: option(bool),
       notifyOnNetworkStatusChange: option(bool),
       onError: option(ApolloError.Js_.t => unit),
-      optimisticResponse: option('variables => 'jsData),
+      optimisticResponse: option('jsVariables => 'jsData),
       refetchQueries: option(RefetchQueryDescription.Js_.t),
       update: option(MutationUpdaterFn.Js_.t('jsData)),
-      variables: option('variables),
+      variables: option('jsVariables),
     };
   };
 
-  type t('data, 'variables) = {
+  type t('data, 'jsVariables) = {
     awaitRefetchQueries: option(bool),
     context: option(Js.Json.t),
     client: option(ApolloClient.t),
@@ -676,10 +701,10 @@ module BaseMutationOptions = {
     notifyOnNetworkStatusChange: option(bool),
     onError: option(ApolloError.t => unit),
     onCompleted: option('data => unit),
-    optimisticResponse: option('variables => 'data),
+    optimisticResponse: option('jsVariables => 'data),
     refetchQueries: option(RefetchQueryDescription.t),
     update: option(MutationUpdaterFn.t('data)),
-    variables: option('variables),
+    variables: option('jsVariables),
   };
 };
 
@@ -689,12 +714,12 @@ module MutationHookOptions = {
     //   mutation?: DocumentNode;
     // }
     /**
-     * We use deriving abstract here because option('variables) is not typesafe,
+     * We use deriving abstract here because option('jsVariables) is not typesafe,
      * but still needs to be optional since a user has the option of providing
      * the variables to the results of the hook rather than the hook itself
      */
     [@bs.deriving abstract]
-    type t('jsData, 'variables) = {
+    type t('jsData, 'jsVariables) = {
       [@bs.optional]
       mutation: Graphql.documentNode,
       // ...extends BaseMutationOptions
@@ -715,18 +740,18 @@ module MutationHookOptions = {
       [@bs.optional]
       onError: (. ApolloError.Js_.t) => unit,
       [@bs.optional]
-      optimisticResponse: 'variables => 'jsData,
+      optimisticResponse: 'jsVariables => 'jsData,
       [@bs.optional]
       refetchQueries: RefetchQueryDescription.Js_.t,
       [@bs.optional]
       update: MutationUpdaterFn.Js_.t('jsData),
       [@bs.optional]
-      variables: 'variables,
+      variables: 'jsVariables,
     };
     let make = t;
   };
 
-  type t('data, 'variables) = {
+  type t('data, 'jsVariables) = {
     mutation: option(Graphql.documentNode),
     awaitRefetchQueries: option(bool),
     context: option(Js.Json.t),
@@ -737,19 +762,19 @@ module MutationHookOptions = {
     notifyOnNetworkStatusChange: option(bool),
     onError: option(ApolloError.t => unit),
     onCompleted: option('data => unit),
-    optimisticResponse: option('variables => 'data),
+    optimisticResponse: option('jsVariables => 'data),
     refetchQueries: option(RefetchQueryDescription.t),
     update: option(MutationUpdaterFn.t('data)),
-    variables: option('variables),
+    variables: option('jsVariables),
   };
 
   let toJs:
     (
-      t('data, 'variables),
+      t('data, 'jsVariables),
       ~parse: 'jsData => 'data,
       ~serialize: 'data => 'jsData
     ) =>
-    Js_.t('jsData, 'variables) =
+    Js_.t('jsData, 'jsVariables) =
     (t, ~parse, ~serialize) => {
       Js_.make(
         ~awaitRefetchQueries=?t.awaitRefetchQueries,
@@ -832,10 +857,10 @@ module MutationFunctionOptions = {
      * We use deriving abstract here because this is used in a context where passing in explicit
      * properties could override one already passed in
      */
-    type t('jsData, 'variables) = {
+    type t('jsData, 'jsVariables) = {
       // We don't allow optional variables because it's not typesafe
-      variables: 'variables,
-      optimisticResponse: option((. 'variables) => 'jsData),
+      variables: 'jsVariables,
+      optimisticResponse: option((. 'jsVariables) => 'jsData),
       refetchQueries: option(RefetchQueryDescription.Js_.t),
       awaitRefetchQueries: option(bool),
       update: option(MutationUpdaterFn.Js_.t('jsData)),
@@ -844,9 +869,9 @@ module MutationFunctionOptions = {
     };
   };
 
-  type t('data, 'variables) = {
-    variables: 'variables,
-    optimisticResponse: option('variables => 'data),
+  type t('data, 'jsVariables) = {
+    variables: 'jsVariables,
+    optimisticResponse: option('jsVariables => 'data),
     refetchQueries: option(RefetchQueryDescription.t),
     awaitRefetchQueries: option(bool),
     update: option(MutationUpdaterFn.t('data)),
@@ -856,11 +881,11 @@ module MutationFunctionOptions = {
 
   let toJs:
     (
-      t('data, 'variables),
+      t('data, 'jsVariables),
       ~parse: 'jsData => 'data,
       ~serialize: 'data => 'jsData
     ) =>
-    Js_.t('jsData, 'variables) =
+    Js_.t('jsData, 'jsVariables) =
     (t, ~parse, ~serialize) => {
       variables: t.variables,
       optimisticResponse:
@@ -880,51 +905,60 @@ module MutationFunctionOptions = {
 module MutationTuple = {
   module Js_ = {
     // export declare type MutationTuple<TData, TVariables> = [(options?: MutationFunctionOptions<TData, TVariables>) => Promise<FetchResult<TData>>, MutationResult<TData>];
-    type t('jsData, 'variables) = (
-      option(MutationFunctionOptions.Js_.t('jsData, 'variables)) =>
+    type t('jsData, 'jsVariables) = (
+      option(MutationFunctionOptions.Js_.t('jsData, 'jsVariables)) =>
       Js.Promise.t(FetchResult.Js_.t('jsData)),
       MutationResult.Js_.t('jsData),
     );
   };
-  type t_mutationFn('data, 'variables) =
+  type t_mutationFn('data, 'variables, 'jsVariables) =
     (
-      ~optimisticResponse: 'variables => 'data=?,
-      ~refetchQueries: RefetchQueryDescription.t=?,
       ~awaitRefetchQueries: bool=?,
-      ~update: MutationUpdaterFn.t('data)=?,
       ~context: Js.Json.t=?,
       ~fetchPolicy: WatchQueryFetchPolicy.t=?,
+      ~mapNullVariables: 'jsVariables => 'jsVariables=?,
+      ~optimisticResponse: 'jsVariables => 'data=?,
+      ~refetchQueries: RefetchQueryDescription.t=?,
+      ~update: MutationUpdaterFn.t('data)=?,
       'variables
     ) =>
     Js.Promise.t(FetchResult.t('data));
-  type t('data, 'variables) = (
-    t_mutationFn('data, 'variables),
+
+  type t('data, 'variables, 'jsVariables) = (
+    t_mutationFn('data, 'variables, 'jsVariables),
     MutationResult.t('data),
   );
 
   let fromJs:
     (
-      Js_.t('jsData, 'variables),
+      Js_.t('jsData, 'jsVariables),
       ~parse: 'jsData => 'data,
-      ~serialize: 'data => 'jsData
+      ~serialize: 'data => 'jsData,
+      ~serializeVariables: 'variables => 'jsVariables
     ) =>
-    t('data, 'variables) =
-    ((jsMutationFn, jsMutationResult), ~parse, ~serialize) => {
+    t('data, 'variables, 'jsVariables) =
+    (
+      (jsMutationFn, jsMutationResult),
+      ~parse,
+      ~serialize,
+      ~serializeVariables,
+    ) => {
       let mutationFn =
           (
-            ~optimisticResponse=?,
-            ~refetchQueries=?,
             ~awaitRefetchQueries=?,
-            ~update=?,
             ~context=?,
             ~fetchPolicy=?,
+            ~mapNullVariables=Utils.identity,
+            ~optimisticResponse=?,
+            ~refetchQueries=?,
+            ~update=?,
             variables,
           ) => {
         jsMutationFn(
           Some(
             MutationFunctionOptions.toJs(
               {
-                variables,
+                variables: variables->serializeVariables->mapNullVariables,
                 optimisticResponse,
                 refetchQueries,
                 awaitRefetchQueries,
@@ -950,12 +984,13 @@ module MutationTuple = {
 
 module MutationTuple__noVariables = {
   module Js_ = {
-    type t('jsData, 'variables) = MutationTuple.Js_.t('jsData, 'variables);
+    type t('jsData, 'jsVariables) =
+      MutationTuple.Js_.t('jsData, 'jsVariables);
   };
 
-  type t_mutationFn('data, 'variables) =
+  type t_mutationFn('data, 'jsVariables) =
     (
-      ~optimisticResponse: 'variables => 'data=?,
+      ~optimisticResponse: 'jsVariables => 'data=?,
       ~refetchQueries: RefetchQueryDescription.t=?,
       ~awaitRefetchQueries: bool=?,
       ~update: MutationUpdaterFn.t('data)=?,
@@ -965,19 +1000,19 @@ module MutationTuple__noVariables = {
     ) =>
     Js.Promise.t(FetchResult.t('data));
 
-  type t('data, 'variables) = (
-    t_mutationFn('data, 'variables),
+  type t('data, 'jsVariables) = (
+    t_mutationFn('data, 'jsVariables),
     MutationResult.t('data),
   );
 
   let fromJs:
     (
-      Js_.t('jsData, 'variables),
+      Js_.t('jsData, 'jsVariables),
       ~parse: 'jsData => 'data,
       ~serialize: 'data => 'jsData,
-      ~variables: 'variables
+      ~variables: 'jsVariables
     ) =>
-    t('data, 'variables) =
+    t('data, 'jsVariables) =
     ((jsMutationFn, jsMutationResult), ~parse, ~serialize, ~variables) => {
       let mutationFn =
           (
@@ -1081,10 +1116,10 @@ module BaseSubscriptionOptions = {
     //     onSubscriptionData?: (options: OnSubscriptionDataOptions<TData>) => any;
     //     onSubscriptionComplete?: () => void;
     // }
-    type t('jsData, 'variables) = {
-      variables: option('variables),
+    type t('jsData, 'jsVariables) = {
+      variables: option('jsVariables),
       fetchPolicy: option(FetchPolicy.t),
-      shouldResubscribe: option((. t('jsData, 'variables)) => bool),
+      shouldResubscribe: option((. t('jsData, 'jsVariables)) => bool),
       client: option(ApolloClient.t),
       skip: option(bool),
       onSubscriptionData:
@@ -1093,17 +1128,17 @@ module BaseSubscriptionOptions = {
     };
   };
 
-  type t('data, 'variables) = {
-    variables: option('variables),
+  type t('data, 'jsVariables) = {
+    variables: option('jsVariables),
     fetchPolicy: option(FetchPolicy.t),
-    shouldResubscribe: option(t('data, 'variables) => bool),
+    shouldResubscribe: option(t('data, 'jsVariables) => bool),
     client: option(ApolloClient.t),
     skip: option(bool),
     onSubscriptionData: option(OnSubscriptionDataOptions.t('data) => unit),
     onSubscriptionComplete: option(unit => unit),
   };
 
-  let fromJs: Js_.t('jsData, 'variables) => t('data, 'variables) =
+  let fromJs: Js_.t('jsData, 'jsVariables) => t('data, 'jsVariables) =
     js => {
       variables: js.variables,
       fetchPolicy: js.fetchPolicy,
@@ -1122,15 +1157,15 @@ module SubscriptionHookOptions = {
     // export interface SubscriptionHookOptions<TData = any, TVariables = OperationVariables> extends BaseSubscriptionOptions<TData, TVariables> {
     //     subscription?: DocumentNode;
     // }
-    type t('jsData, 'variables) = {
+    type t('jsData, 'jsVariables) = {
       subscription: option(Graphql.documentNode),
       // ...extends BaseSubscriptionOptions
       // Intentionally restricted to not be non-optional. `option(unit)` does not compile cleanly to `undefined`
-      variables: 'variables,
+      variables: 'jsVariables,
       fetchPolicy: option(FetchPolicy.t),
       shouldResubscribe:
         option(
-          (. BaseSubscriptionOptions.Js_.t('jsData, 'variables)) => bool,
+          (. BaseSubscriptionOptions.Js_.t('jsData, 'jsVariables)) => bool,
         ),
       client: option(ApolloClient.t),
       skip: option(bool),
@@ -1140,12 +1175,12 @@ module SubscriptionHookOptions = {
     };
   };
 
-  type t('data, 'variables) = {
+  type t('data, 'jsVariables) = {
     subscription: option(Graphql.documentNode),
-    variables: 'variables,
+    variables: 'jsVariables,
     fetchPolicy: option(FetchPolicy.t),
     shouldResubscribe:
-      option(BaseSubscriptionOptions.t('data, 'variables) => bool),
+      option(BaseSubscriptionOptions.t('data, 'jsVariables) => bool),
     client: option(ApolloClient.t),
     skip: option(bool),
     onSubscriptionData: option(OnSubscriptionDataOptions.t('data) => unit),
@@ -1153,8 +1188,8 @@ module SubscriptionHookOptions = {
   };
 
   let toJs:
-    (t('data, 'variables), ~parse: 'jsData => 'data) =>
-    Js_.t('jsData, 'variables) =
+    (t('data, 'jsVariables), ~parse: 'jsData => 'data) =>
+    Js_.t('jsData, 'jsVariables) =
     (t, ~parse) => {
       subscription: t.subscription,
       variables: t.variables,

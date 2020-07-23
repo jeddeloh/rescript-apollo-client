@@ -11,3 +11,5 @@ let useGuaranteedMemo1 = (f, dependency) => {
 
   value.current;
 };
+
+external identity: 'a => 'a = "%identity";

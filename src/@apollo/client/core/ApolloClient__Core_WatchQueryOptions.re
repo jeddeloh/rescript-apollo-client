@@ -90,26 +90,26 @@ module WatchQueryFetchPolicy = {
 
 module QueryOptions = {
   module Js_ = {
-    type t('variables) = {
+    type t('jsVariables) = {
       fetchPolicy: option(FetchPolicy.Js_.t),
       // ...extends QueryBaseOptions
       query: Graphql.documentNode,
       // We don't allow optional variables because it's not typesafe
-      variables: 'variables,
+      variables: 'jsVariables,
       errorPolicy: option(ErrorPolicy.Js_.t),
       context: option(Js.Json.t),
     };
   };
 
-  type t('variables) = {
+  type t('jsVariables) = {
     fetchPolicy: option(FetchPolicy.t),
     query: Graphql.documentNode,
-    variables: 'variables,
+    variables: 'jsVariables,
     errorPolicy: option(ErrorPolicy.t),
     context: option(Js.Json.t),
   };
 
-  let toJs: t('variables) => Js_.t('variables) =
+  let toJs: t('jsVariables) => Js_.t('jsVariables) =
     t => {
       fetchPolicy: t.fetchPolicy->Belt.Option.map(FetchPolicy.toJs),
       query: t.query,
@@ -121,25 +121,25 @@ module QueryOptions = {
 
 module WatchQueryOptions = {
   module Js_ = {
-    type t('variables) = {
+    type t('jsVariables) = {
       fetchPolicy: option(WatchQueryFetchPolicy.Js_.t),
       // ...extends QueryBaseOptions
       query: Graphql.documentNode,
-      variables: option('variables),
+      variables: option('jsVariables),
       errorPolicy: option(ErrorPolicy.Js_.t),
       context: option(Js.Json.t),
     };
   };
 
-  type t('variables) = {
+  type t('jsVariables) = {
     fetchPolicy: option(WatchQueryFetchPolicy.t),
     query: Graphql.documentNode,
-    variables: option('variables),
+    variables: option('jsVariables),
     errorPolicy: option(ErrorPolicy.t),
     context: option(Js.Json.t),
   };
 
-  let toJs: t('variables) => Js_.t('variables) =
+  let toJs: t('jsVariables) => Js_.t('jsVariables) =
     t => {
       fetchPolicy: t.fetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
       query: t.query,
@@ -154,7 +154,7 @@ module UpdateQueryFn = {
     type t_options_subscriptionData('jsSubscriptionData) = {
       data: 'jsSubscriptionData,
     };
-    type t_options('jsSubscriptionData, 'variables) = {
+    type t_options('jsSubscriptionData, 'jsVariables) = {
       subscriptionData: t_options_subscriptionData('jsSubscriptionData),
     };
     // export declare type UpdateQueryFn<TData = any, TSubscriptionVariables = OperationVariables, TSubscriptionData = TData> = (previousQueryResult: TData, options: {
@@ -173,7 +173,7 @@ module UpdateQueryFn = {
   type t_options_subscriptionData('jsSubscriptionData) = {
     data: 'jsSubscriptionData,
   };
-  type t_options('jsSubscriptionData, 'variables) = {
+  type t_options('jsSubscriptionData, 'jsVariables) = {
     subscriptionData: t_options_subscriptionData('jsSubscriptionData),
   };
 
@@ -302,7 +302,7 @@ module RefetchQueryDescription = {
   };
 
   type t_variant =
-    | PureQueryOptions(PureQueryOptions.t('variables)): t_variant
+    | PureQueryOptions(PureQueryOptions.t('jsVariables)): t_variant
     | String(string): t_variant;
 
   type t = array(t_variant);
@@ -326,43 +326,43 @@ module MutationOptions = {
     //     context?: any;
     //     fetchPolicy?: Extract<FetchPolicy, 'no-cache'>;
     // }
-    type t('jsData, 'variables) = {
+    type t('jsData, 'jsVariables) = {
       mutation: Graphql.documentNode,
       context: option(Js.Json.t),
       fetchPolicy: option(FetchPolicy__noCacheExtracted.Js_.t),
       // ...extends MutationBaseOption,
       awaitRefetchQueries: option(bool),
       errorPolicy: option(ErrorPolicy.Js_.t),
-      optimisticResponse: option((. 'variables) => 'jsData),
+      optimisticResponse: option((. 'jsVariables) => 'jsData),
       update: option(MutationUpdaterFn.Js_.t('jsData)),
       updateQueries: option(MutationQueryReducersMap.Js_.t('jsData)),
       refetchQueries: option(RefetchQueryDescription.Js_.t),
       // We don't allow optional variables because it's not typesafe
-      variables: 'variables,
+      variables: 'jsVariables,
     };
   };
 
-  type t('data, 'variables) = {
+  type t('data, 'jsVariables) = {
     context: option(Js.Json.t),
     fetchPolicy: option(FetchPolicy__noCacheExtracted.t),
     mutation: Graphql.documentNode,
     // ...extends MutationBaseOptions,
     awaitRefetchQueries: option(bool),
     errorPolicy: option(ErrorPolicy.t),
-    optimisticResponse: option('variables => 'data),
+    optimisticResponse: option('jsVariables => 'data),
     refetchQueries: option(RefetchQueryDescription.t),
     update: option(MutationUpdaterFn.t('data)),
     updateQueries: option(MutationQueryReducersMap.t('data)),
-    variables: 'variables,
+    variables: 'jsVariables,
   };
 
   let toJs:
     (
-      t('data, 'variables),
+      t('data, 'jsVariables),
       ~parse: 'jsData => 'data,
       ~serialize: 'data => 'jsData
     ) =>
-    Js_.t('jsData, 'variables) =
+    Js_.t('jsData, 'jsVariables) =
     (t, ~parse, ~serialize) => {
       awaitRefetchQueries: t.awaitRefetchQueries,
       context: t.context,

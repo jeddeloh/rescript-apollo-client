@@ -7,15 +7,15 @@ module Query = {
     //   variables?: TVariables;
     //   id?: string;
     // }
-    type t('variables) = {
+    type t('jsVariables) = {
       query: Graphql.documentNode,
       // We don't allow optional variables because it's not typesafe
-      variables: 'variables,
+      variables: 'jsVariables,
       id: option(string),
     };
   };
 
-  type t('variables) = Js_.t('variables);
+  type t('jsVariables) = Js_.t('jsVariables);
 };
 
 module Fragment = {
@@ -26,16 +26,16 @@ module Fragment = {
     //   fragmentName?: string;
     //   variables?: TVariables;
     // }
-    type t('variables) = {
+    type t('jsVariables) = {
       id: string,
       fragment: Graphql.documentNode,
       // We don't allow optional variables because it's not typesafe
       fragmentName: string,
-      variables: option('variables),
+      variables: option('jsVariables),
     };
   };
 
-  type t('variables) = Js_.t('variables);
+  type t('jsVariables) = Js_.t('jsVariables);
 };
 
 module WriteQueryOptions = {
@@ -44,28 +44,28 @@ module WriteQueryOptions = {
     //   data: TData;
     //   broadcast?: boolean;
     // }
-    type t('jsData, 'variables) = {
+    type t('jsData, 'jsVariables) = {
       data: 'jsData,
       broadcast: option(bool),
       // ...extends Query
       query: Graphql.documentNode,
       // We don't allow optional variables because it's not typesafe
-      variables: 'variables,
+      variables: 'jsVariables,
       id: option(string),
     };
   };
 
-  type t('data, 'variables) = {
+  type t('data, 'jsVariables) = {
     data: 'data,
     broadcast: option(bool),
     query: Graphql.documentNode,
-    variables: 'variables,
+    variables: 'jsVariables,
     id: option(string),
   };
 
   let toJs:
-    (t('data, 'variables), ~parse: 'jsData => 'data) =>
-    Js_.t('jsData, 'variables) =
+    (t('data, 'jsVariables), ~parse: 'jsData => 'data) =>
+    Js_.t('jsData, 'jsVariables) =
     (t, ~parse) => {
       data: t.data->parse,
       broadcast: t.broadcast,
@@ -81,7 +81,7 @@ module WriteFragmentOptions = {
     //    data: TData;
     //    broadcast?: boolean;
     // }
-    type t('jsData, 'variables) = {
+    type t('jsData, 'jsVariables) = {
       data: 'jsData,
       broadcast: option(bool),
       // ...extends Fragment
@@ -90,11 +90,11 @@ module WriteFragmentOptions = {
       fragmentName: option(string),
       // I think fragment variables are still experimental?
       // // We don't allow optional variables because it's not typesafe
-      // variables: 'variables,
+      // variables: 'jsVariables,
     };
   };
 
-  type t('data, 'variables) = {
+  type t('data, 'jsVariables) = {
     data: 'data,
     broadcast: option(bool),
     id: string,
@@ -103,8 +103,8 @@ module WriteFragmentOptions = {
   };
 
   let toJs:
-    (t('data, 'variables), ~parse: 'jsData => 'data) =>
-    Js_.t('jsData, 'variables) =
+    (t('data, 'jsVariables), ~parse: 'jsData => 'data) =>
+    Js_.t('jsData, 'jsVariables) =
     (t, ~parse) => {
       data: t.data->parse,
       broadcast: t.broadcast,

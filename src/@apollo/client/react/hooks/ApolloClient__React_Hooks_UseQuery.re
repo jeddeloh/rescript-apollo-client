@@ -16,23 +16,25 @@ module Js_ = {
   // export declare function useQuery<TData = any, TVariables = OperationVariables>(query: DocumentNode, options?: QueryHookOptions<TData, TVariables>): QueryResult<TData, TVariables>;
   [@bs.module "@apollo/client"]
   external useQuery:
-    (. Graphql.documentNode, QueryHookOptions.Js_.t('jsData, 'variables)) =>
-    QueryResult.Js_.t('jsData, 'variables) =
+    (. Graphql.documentNode, QueryHookOptions.Js_.t('jsData, 'jsVariables)) =>
+    QueryResult.Js_.t('jsData, 'jsVariables) =
     "useQuery";
 };
 
 let useQuery:
-  type data jsData jsVariables.
+  type data jsData variables jsVariables.
     (
       ~query: (module Operation with
                  type t = data and
                  type Raw.t = jsData and
+                 type t_variables = variables and
                  type Raw.t_variables = jsVariables),
       ~client: ApolloClient.t=?,
       ~context: Js.Json.t=?,
       ~displayName: string=?,
       ~errorPolicy: ErrorPolicy.t=?,
       ~fetchPolicy: WatchQueryFetchPolicy.t=?,
+      ~mapNullVariables: jsVariables => jsVariables=?,
       ~notifyOnNetworkStatusChange: bool=?,
       ~onCompleted: data => unit=?,
       ~onError: ApolloError.t => unit=?,
@@ -40,7 +42,7 @@ let useQuery:
       ~pollInterval: int=?,
       ~skip: bool=?,
       ~ssr: bool=?,
-      jsVariables
+      variables
     ) =>
     QueryResult.t(data, jsData, jsVariables) =
   (
@@ -50,6 +52,7 @@ let useQuery:
     ~displayName=?,
     ~errorPolicy=?,
     ~fetchPolicy=?,
+    ~mapNullVariables=Utils.identity,
     ~notifyOnNetworkStatusChange=?,
     ~onCompleted=?,
     ~onError=?,
@@ -59,6 +62,9 @@ let useQuery:
     ~ssr=?,
     variables,
   ) => {
+    let jsVariables =
+      variables->Operation.serializeVariables->mapNullVariables;
+
     let jsQueryResult =
       Js_.useQuery(.
         Operation.query,
@@ -77,7 +83,7 @@ let useQuery:
             query: None,
             skip,
             ssr,
-            variables,
+            variables: jsVariables,
           },
           ~parse=Operation.parse,
         ),
@@ -96,14 +102,21 @@ let useQuery:
 
 module Extend = (M: Operation) => {
   let refetchQueryDescription:
-    (~context: Js.Json.t=?, M.Raw.t_variables) =>
+    (
+      ~context: Js.Json.t=?,
+      ~mapNullVariables: 'jsVariables => 'jsVariables=?,
+      M.t_variables
+    ) =>
     RefetchQueryDescription.t_variant =
-    (~context=?, variables: M.Raw.t_variables) =>
+    (~context=?, ~mapNullVariables=Utils.identity, variables) => {
+      let jsVariables = variables->M.serializeVariables->mapNullVariables;
+
       RefetchQueryDescription.PureQueryOptions({
         query: M.query,
-        variables,
+        variables: jsVariables,
         context,
       });
+    };
 
   let use =
       (
@@ -112,6 +125,7 @@ module Extend = (M: Operation) => {
         ~displayName=?,
         ~errorPolicy=?,
         ~fetchPolicy=?,
+        ~mapNullVariables=?,
         ~notifyOnNetworkStatusChange=?,
         ~onCompleted=?,
         ~onError=?,
@@ -128,6 +142,7 @@ module Extend = (M: Operation) => {
       ~displayName?,
       ~errorPolicy?,
       ~fetchPolicy?,
+      ~mapNullVariables?,
       ~notifyOnNetworkStatusChange?,
       ~onCompleted?,
       ~onError?,
@@ -178,6 +193,7 @@ module Extend = (M: Operation) => {
         ~displayName=?,
         ~errorPolicy=?,
         ~fetchPolicy=?,
+        ~mapNullVariables=?,
         ~notifyOnNetworkStatusChange=?,
         ~onCompleted=?,
         ~onError=?,
@@ -193,6 +209,7 @@ module Extend = (M: Operation) => {
       ~displayName?,
       ~errorPolicy?,
       ~fetchPolicy?,
+      ~mapNullVariables?,
       ~notifyOnNetworkStatusChange?,
       ~onCompleted?,
       ~onError?,

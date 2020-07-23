@@ -12,8 +12,8 @@ module type Operation = Types.Operation;
 module type OperationNoRequiredVars = Types.OperationNoRequiredVars;
 
 module Js_ = {
-  type useSubscription_result('jsData, 'variables) = {
-    variables: option('variables),
+  type useSubscription_result('jsData, 'jsVariables) = {
+    variables: option('jsVariables),
     loading: bool,
     data: option('jsData),
     error: option(ApolloError.Js_.t),
@@ -29,44 +29,51 @@ module Js_ = {
   external useSubscription:
     (
       . Graphql.Language.documentNode,
-      SubscriptionHookOptions.Js_.t('jsData, 'variables)
+      SubscriptionHookOptions.Js_.t('jsData, 'jsVariables)
     ) =>
-    useSubscription_result('jsData, 'variables) =
+    useSubscription_result('jsData, 'jsVariables) =
     "useSubscription";
 };
 
-type useSubscription_result('data, 'variables) = {
-  variables: option('variables),
+type useSubscription_result('data, 'jsVariables) = {
+  variables: option('jsVariables),
   loading: bool,
   data: option('data),
   error: option(ApolloError.t),
 };
 
 let useSubscription:
-  type data jsVariables.
+  type data variables jsVariables.
     (
       ~subscription: (module Operation with
-                        type t = data and type Raw.t_variables = jsVariables),
+                        type t = data and
+                        type t_variables = variables and
+                        type Raw.t_variables = jsVariables),
       ~client: ApolloClient.t=?,
       ~fetchPolicy: FetchPolicy.t=?,
+      ~mapNullVariables: jsVariables => jsVariables=?,
       ~onSubscriptionData: OnSubscriptionDataOptions.t(data) => unit=?,
       ~onSubscriptionComplete: unit => unit=?,
       ~shouldResubscribe: BaseSubscriptionOptions.t(data, jsVariables) => bool
                             =?,
       ~skip: bool=?,
-      jsVariables
+      variables
     ) =>
     useSubscription_result(data, jsVariables) =
   (
     ~subscription as (module Operation),
     ~client=?,
     ~fetchPolicy=?,
+    ~mapNullVariables=Utils.identity,
     ~onSubscriptionData=?,
     ~onSubscriptionComplete=?,
     ~shouldResubscribe=?,
     ~skip=?,
     variables,
   ) => {
+    let jsVariables =
+      variables->Operation.serializeVariables->mapNullVariables;
+
     let jsSubscriptionResult =
       Js_.useSubscription(.
         Operation.query,
@@ -79,7 +86,7 @@ let useSubscription:
             subscription: None,
             shouldResubscribe,
             skip,
-            variables,
+            variables: jsVariables,
           },
           ~parse=Operation.parse,
         ),

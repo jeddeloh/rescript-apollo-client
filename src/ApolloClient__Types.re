@@ -20,12 +20,14 @@ module type Operation = {
     type t_variables;
   };
   type t;
+  type t_variables;
 
   let parse: Raw.t => t;
   let serialize: t => Raw.t;
+  let serializeVariables: t_variables => Raw.t_variables;
 };
 
 module type OperationNoRequiredVars = {
   include Operation;
-  let makeDefaultVariables: unit => Raw.t_variables;
+  let makeDefaultVariables: unit => t_variables;
 };

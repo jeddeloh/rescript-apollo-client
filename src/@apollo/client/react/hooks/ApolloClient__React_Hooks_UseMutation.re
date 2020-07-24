@@ -115,7 +115,7 @@ let useMutationWithVariables:
       ~errorPolicy: ErrorPolicy.t=?,
       ~fetchPolicy: FetchPolicy__noCacheExtracted.t=?,
       ~ignoreResults: bool=?,
-      ~mapNullVariables: jsVariables => jsVariables=?,
+      ~mapJsVariables: jsVariables => jsVariables=?,
       ~notifyOnNetworkStatusChange: bool=?,
       ~onError: ApolloError.t => unit=?,
       ~onCompleted: data => unit=?,
@@ -133,7 +133,7 @@ let useMutationWithVariables:
     ~errorPolicy=?,
     ~fetchPolicy=?,
     ~ignoreResults=?,
-    ~mapNullVariables=Utils.identity,
+    ~mapJsVariables=Utils.identity,
     ~notifyOnNetworkStatusChange=?,
     ~onError=?,
     ~onCompleted=?,
@@ -143,7 +143,7 @@ let useMutationWithVariables:
     variables,
   ) => {
     let jsVariables =
-      variables->Operation.serializeVariables->mapNullVariables;
+      variables->Operation.serializeVariables->mapJsVariables;
 
     let jsMutationTuple =
       Js_.useMutation(.
@@ -228,7 +228,7 @@ module Extend = (M: Types.Operation) => {
         ~errorPolicy=?,
         ~fetchPolicy=?,
         ~ignoreResults=?,
-        ~mapNullVariables=?,
+        ~mapJsVariables=?,
         ~notifyOnNetworkStatusChange=?,
         ~onError=?,
         ~onCompleted=?,
@@ -245,7 +245,7 @@ module Extend = (M: Types.Operation) => {
       ~errorPolicy?,
       ~fetchPolicy?,
       ~ignoreResults?,
-      ~mapNullVariables?,
+      ~mapJsVariables?,
       ~notifyOnNetworkStatusChange?,
       ~onError?,
       ~onCompleted?,

@@ -109,7 +109,7 @@ let useLazyQueryWithVariables:
       ~displayName: string=?,
       ~errorPolicy: ErrorPolicy.t=?,
       ~fetchPolicy: WatchQueryFetchPolicy.t=?,
-      ~mapNullVariables: jsVariables => jsVariables=?,
+      ~mapJsVariables: jsVariables => jsVariables=?,
       ~notifyOnNetworkStatusChange: bool=?,
       ~onCompleted: data => unit=?,
       ~onError: ApolloError.t => unit=?,
@@ -126,7 +126,7 @@ let useLazyQueryWithVariables:
     ~displayName=?,
     ~errorPolicy=?,
     ~fetchPolicy=?,
-    ~mapNullVariables=Utils.identity,
+    ~mapJsVariables=Utils.identity,
     ~notifyOnNetworkStatusChange=?,
     ~onCompleted=?,
     ~onError=?,
@@ -136,7 +136,7 @@ let useLazyQueryWithVariables:
     variables,
   ) => {
     let jsVariables =
-      variables->Operation.serializeVariables->mapNullVariables;
+      variables->Operation.serializeVariables->mapJsVariables;
 
     let jsQueryTuple =
       Js_.useLazyQuery(.

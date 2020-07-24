@@ -603,7 +603,7 @@ module QueryTuple = {
   type t('data, 'jsData, 'variables, 'jsVariables) = (
     (
       ~context: Js.Json.t=?,
-      ~mapNullVariables: 'jsVariables => 'jsVariables=?,
+      ~mapJsVariables: 'jsVariables => 'jsVariables=?,
       'variables
     ) =>
     unit,
@@ -624,10 +624,10 @@ module QueryTuple = {
       ~serialize,
       ~serializeVariables,
     ) => (
-      (~context=?, ~mapNullVariables=ApolloClient__Utils.identity, variables) =>
+      (~context=?, ~mapJsVariables=ApolloClient__Utils.identity, variables) =>
         jsExecuteQuery({
           context,
-          variables: variables->serializeVariables->mapNullVariables,
+          variables: variables->serializeVariables->mapJsVariables,
         }),
       jsLazyQueryResult->LazyQueryResult.fromJs(~parse, ~serialize),
     );
@@ -916,7 +916,7 @@ module MutationTuple = {
       ~awaitRefetchQueries: bool=?,
       ~context: Js.Json.t=?,
       ~fetchPolicy: WatchQueryFetchPolicy.t=?,
-      ~mapNullVariables: 'jsVariables => 'jsVariables=?,
+      ~mapJsVariables: 'jsVariables => 'jsVariables=?,
       ~optimisticResponse: 'jsVariables => 'data=?,
       ~refetchQueries: RefetchQueryDescription.t=?,
       ~update: MutationUpdaterFn.t('data)=?,
@@ -948,7 +948,7 @@ module MutationTuple = {
             ~awaitRefetchQueries=?,
             ~context=?,
             ~fetchPolicy=?,
-            ~mapNullVariables=Utils.identity,
+            ~mapJsVariables=Utils.identity,
             ~optimisticResponse=?,
             ~refetchQueries=?,
             ~update=?,
@@ -958,7 +958,7 @@ module MutationTuple = {
           Some(
             MutationFunctionOptions.toJs(
               {
-                variables: variables->serializeVariables->mapNullVariables,
+                variables: variables->serializeVariables->mapJsVariables,
                 optimisticResponse,
                 refetchQueries,
                 awaitRefetchQueries,

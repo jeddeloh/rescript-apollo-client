@@ -51,7 +51,7 @@ let useSubscription:
                         type Raw.t_variables = jsVariables),
       ~client: ApolloClient.t=?,
       ~fetchPolicy: FetchPolicy.t=?,
-      ~mapNullVariables: jsVariables => jsVariables=?,
+      ~mapJsVariables: jsVariables => jsVariables=?,
       ~onSubscriptionData: OnSubscriptionDataOptions.t(data) => unit=?,
       ~onSubscriptionComplete: unit => unit=?,
       ~shouldResubscribe: BaseSubscriptionOptions.t(data, jsVariables) => bool
@@ -64,7 +64,7 @@ let useSubscription:
     ~subscription as (module Operation),
     ~client=?,
     ~fetchPolicy=?,
-    ~mapNullVariables=Utils.identity,
+    ~mapJsVariables=Utils.identity,
     ~onSubscriptionData=?,
     ~onSubscriptionComplete=?,
     ~shouldResubscribe=?,
@@ -72,7 +72,7 @@ let useSubscription:
     variables,
   ) => {
     let jsVariables =
-      variables->Operation.serializeVariables->mapNullVariables;
+      variables->Operation.serializeVariables->mapJsVariables;
 
     let jsSubscriptionResult =
       Js_.useSubscription(.

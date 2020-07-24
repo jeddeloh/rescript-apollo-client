@@ -439,7 +439,7 @@ let mutate:
       ~context: Js.Json.t=?,
       ~errorPolicy: ErrorPolicy.t=?,
       ~fetchPolicy: FetchPolicy__noCacheExtracted.t=?,
-      ~mapNullVariables: jsVariables => jsVariables=?,
+      ~mapJsVariables: jsVariables => jsVariables=?,
       ~optimisticResponse: jsVariables => data=?,
       ~refetchQueries: RefetchQueryDescription.t=?,
       ~updateQueries: MutationQueryReducersMap.t(data)=?,
@@ -454,7 +454,7 @@ let mutate:
     ~context=?,
     ~errorPolicy=?,
     ~fetchPolicy=?,
-    ~mapNullVariables=Utils.identity,
+    ~mapJsVariables=Utils.identity,
     ~optimisticResponse=?,
     ~refetchQueries=?,
     ~updateQueries=?,
@@ -462,7 +462,7 @@ let mutate:
     variables,
   ) => {
     let jsVariables =
-      variables->Operation.serializeVariables->mapNullVariables;
+      variables->Operation.serializeVariables->mapJsVariables;
 
     Js_.mutate(
       client,
@@ -504,7 +504,7 @@ let query:
       ~context: Js.Json.t=?,
       ~errorPolicy: ErrorPolicy.t=?,
       ~fetchPolicy: FetchPolicy.t=?,
-      ~mapNullVariables: jsVariables => jsVariables=?,
+      ~mapJsVariables: jsVariables => jsVariables=?,
       variables
     ) =>
     Js.Promise.t(ApolloQueryResult.t(data)) =
@@ -514,11 +514,11 @@ let query:
     ~context=?,
     ~errorPolicy=?,
     ~fetchPolicy=?,
-    ~mapNullVariables=Utils.identity,
+    ~mapJsVariables=Utils.identity,
     variables,
   ) => {
     let jsVariables =
-      variables->Operation.serializeVariables->mapNullVariables;
+      variables->Operation.serializeVariables->mapJsVariables;
 
     Js_.query(
       client,
@@ -549,7 +549,7 @@ let readQuery:
                  type t_variables = variables and
                  type Raw.t_variables = jsVariables),
       ~id: string=?,
-      ~mapNullVariables: jsVariables => jsVariables=?,
+      ~mapJsVariables: jsVariables => jsVariables=?,
       ~optimistic: bool=?,
       variables
     ) =>
@@ -558,12 +558,12 @@ let readQuery:
     client,
     ~query as (module Operation),
     ~id=?,
-    ~mapNullVariables=Utils.identity,
+    ~mapJsVariables=Utils.identity,
     ~optimistic=?,
     variables,
   ) => {
     let jsVariables =
-      variables->Operation.serializeVariables->mapNullVariables;
+      variables->Operation.serializeVariables->mapJsVariables;
 
     Js_.readQuery(
       client,
@@ -587,7 +587,7 @@ let watchQuery:
       ~context: Js.Json.t=?,
       ~errorPolicy: ErrorPolicy.t=?,
       ~fetchPolicy: WatchQueryFetchPolicy.t=?,
-      ~mapNullVariables: jsVariables => jsVariables=?,
+      ~mapJsVariables: jsVariables => jsVariables=?,
       variables
     ) =>
     ObservableQuery.t(data) =
@@ -597,11 +597,11 @@ let watchQuery:
     ~context=?,
     ~errorPolicy=?,
     ~fetchPolicy=?,
-    ~mapNullVariables=Utils.identity,
+    ~mapJsVariables=Utils.identity,
     variables,
   ) => {
     let jsVariables =
-      variables->Operation.serializeVariables->mapNullVariables;
+      variables->Operation.serializeVariables->mapJsVariables;
 
     Js_.watchQuery(
       client,
@@ -661,7 +661,7 @@ let writeQuery:
       ~broadcast: bool=?,
       ~data: data,
       ~id: string=?,
-      ~mapNullVariables: jsVariables => jsVariables=?,
+      ~mapJsVariables: jsVariables => jsVariables=?,
       variables
     ) =>
     unit =
@@ -671,11 +671,11 @@ let writeQuery:
     ~broadcast=?,
     ~data,
     ~id=?,
-    ~mapNullVariables=Utils.identity,
+    ~mapJsVariables=Utils.identity,
     variables,
   ) => {
     let jsVariables =
-      variables->Operation.serializeVariables->mapNullVariables;
+      variables->Operation.serializeVariables->mapJsVariables;
 
     Js_.writeQuery(
       client,

@@ -34,7 +34,7 @@ let useQuery:
       ~displayName: string=?,
       ~errorPolicy: ErrorPolicy.t=?,
       ~fetchPolicy: WatchQueryFetchPolicy.t=?,
-      ~mapNullVariables: jsVariables => jsVariables=?,
+      ~mapJsVariables: jsVariables => jsVariables=?,
       ~notifyOnNetworkStatusChange: bool=?,
       ~onCompleted: data => unit=?,
       ~onError: ApolloError.t => unit=?,
@@ -52,7 +52,7 @@ let useQuery:
     ~displayName=?,
     ~errorPolicy=?,
     ~fetchPolicy=?,
-    ~mapNullVariables=Utils.identity,
+    ~mapJsVariables=Utils.identity,
     ~notifyOnNetworkStatusChange=?,
     ~onCompleted=?,
     ~onError=?,
@@ -63,7 +63,7 @@ let useQuery:
     variables,
   ) => {
     let jsVariables =
-      variables->Operation.serializeVariables->mapNullVariables;
+      variables->Operation.serializeVariables->mapJsVariables;
 
     let jsQueryResult =
       Js_.useQuery(.
@@ -104,12 +104,12 @@ module Extend = (M: Operation) => {
   let refetchQueryDescription:
     (
       ~context: Js.Json.t=?,
-      ~mapNullVariables: 'jsVariables => 'jsVariables=?,
+      ~mapJsVariables: 'jsVariables => 'jsVariables=?,
       M.t_variables
     ) =>
     RefetchQueryDescription.t_variant =
-    (~context=?, ~mapNullVariables=Utils.identity, variables) => {
-      let jsVariables = variables->M.serializeVariables->mapNullVariables;
+    (~context=?, ~mapJsVariables=Utils.identity, variables) => {
+      let jsVariables = variables->M.serializeVariables->mapJsVariables;
 
       RefetchQueryDescription.PureQueryOptions({
         query: M.query,
@@ -125,7 +125,7 @@ module Extend = (M: Operation) => {
         ~displayName=?,
         ~errorPolicy=?,
         ~fetchPolicy=?,
-        ~mapNullVariables=?,
+        ~mapJsVariables=?,
         ~notifyOnNetworkStatusChange=?,
         ~onCompleted=?,
         ~onError=?,
@@ -142,7 +142,7 @@ module Extend = (M: Operation) => {
       ~displayName?,
       ~errorPolicy?,
       ~fetchPolicy?,
-      ~mapNullVariables?,
+      ~mapJsVariables?,
       ~notifyOnNetworkStatusChange?,
       ~onCompleted?,
       ~onError?,
@@ -193,7 +193,7 @@ module Extend = (M: Operation) => {
         ~displayName=?,
         ~errorPolicy=?,
         ~fetchPolicy=?,
-        ~mapNullVariables=?,
+        ~mapJsVariables=?,
         ~notifyOnNetworkStatusChange=?,
         ~onCompleted=?,
         ~onError=?,
@@ -209,7 +209,7 @@ module Extend = (M: Operation) => {
       ~displayName?,
       ~errorPolicy?,
       ~fetchPolicy?,
-      ~mapNullVariables?,
+      ~mapJsVariables?,
       ~notifyOnNetworkStatusChange?,
       ~onCompleted?,
       ~onError?,

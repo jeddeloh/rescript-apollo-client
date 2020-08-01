@@ -51,17 +51,11 @@ module FetchPolicy__noCacheExtracted = {
     type t = string;
   };
   type t =
-    | CacheFirst
-    | CacheOnly
-    | NetworkOnly
-    | Standby;
+    | NoCache;
 
   let toJs =
     fun
-    | CacheFirst => "cache-first"
-    | CacheOnly => "cache-only"
-    | NetworkOnly => "network-only"
-    | Standby => "standby";
+    | NoCache => "no-cache";
 };
 
 module WatchQueryFetchPolicy = {

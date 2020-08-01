@@ -49,7 +49,6 @@ let instance =
           ~mutate=
             DefaultMutateOptions.make(
               ~awaitRefetchQueries=true,
-              ~fetchPolicy=NetworkOnly,
               ~errorPolicy=All,
               (),
             ),

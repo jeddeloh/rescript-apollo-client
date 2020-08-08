@@ -27,12 +27,10 @@ We rely on Graphql-ppx for typesafe GraphQL operations and fragments in ReasonML
 
 You should now have a `graphql_schema.json` in your project somewhere. Make sure it's always up-to-date!
 
-### 2. `@apollo/client` and Optional Dependencies
+### 2. Apollo Client
 
 ```sh
 npm install reason-apollo-client @apollo/client
-# optional
-npm install @apollo/link-context @apollo/link-error @apollo/link-ws subscriptions-transport-ws
 ```
 
 ### 3. Apollo-Specific `graphql-ppx` Configuration
@@ -122,9 +120,6 @@ Example:
 Contains partial bindings to the following:
 
 - [@apollo/client](https://github.com/apollographql/apollo-client)
-- [@apollo/link-context](https://github.com/apollographql/apollo-link)
-- [@apollo/link-error](https://github.com/apollographql/apollo-link)
-- [@apollo/link-ws](https://github.com/apollographql/apollo-link)
 - [graphql](https://github.com/graphql/graphql-js)
 - [subscriptions-transport-ws](https://github.com/apollographql/subscriptions-transport-ws)
 - [zen-observable](https://github.com/zenparsing/zen-observable)

@@ -41,10 +41,10 @@ module Cache = {
 
 [@text {|{1 Customize Apollo Client's data flow }|}];
 module Link = {
-  module ContextLink = ApolloClient__LinkContext.ContextLink;
-  module ErrorLink = ApolloClient__LinkError.ErrorLink;
+  module ContextLink = ApolloClient__Link_Context.ContextLink;
+  module ErrorLink = ApolloClient__Link_Error.ErrorLink;
   module HttpLink = ApolloClient__Link_Http_HttpLink;
-  module WebSocketLink = ApolloClient__LinkWs.WebSocketLink;
+  module WebSocketLink = ApolloClient__Link_Ws.WebSocketLink;
   type t = ApolloClient__Link_Core_ApolloLink.t;
   let concat = ApolloClient__Link_Core_ApolloLink.Static.concat;
   let execute = ApolloClient__Link_Core_ApolloLink.Static.execute;
@@ -62,9 +62,6 @@ module Utilities = ApolloClient__Utilities;
 module Bindings = {
   module Client = ApolloClient__Client;
   module Graphql = ApolloClient__Graphql;
-  module LinkError = ApolloClient__LinkError;
-  module LinkContext = ApolloClient__LinkContext;
-  module LinkWs = ApolloClient__LinkWs;
   module SubscriptionTransportWs = ApolloClient__SubscriptionsTransportWs;
   module ZenObservable = ApolloClient__ZenObservable;
 };

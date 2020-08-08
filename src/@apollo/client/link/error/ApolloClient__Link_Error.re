@@ -115,7 +115,7 @@ module ErrorHandler = {
 
 module Js_ = {
   // export declare function onError(errorHandler: ErrorHandler): ApolloLink;
-  [@bs.module "@apollo/link-error"]
+  [@bs.module "@apollo/client/link/error"]
   external onError:
     (ErrorResponse.Js_.t => option(NextLink.Js_.t)) => ApolloLink.Js_.t =
     "onError";

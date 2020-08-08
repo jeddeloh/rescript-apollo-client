@@ -6,6 +6,8 @@ Here you'll find pretty sparse example of a fully functioning app and basic usag
 
 ```sh
 yarn
+
+yarn start
 # (in another tab) Run the development server
 yarn dev-server
 # (in yet another tab!) Run the example GraphQL server

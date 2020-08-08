@@ -59,4 +59,8 @@ let useSubscription = ApolloClient__React_Hooks_UseSubscription.useSubscription;
 // export { useApolloClient } from './react/hooks/useApolloClient.js';
 // export { RenderPromises } from './react/ssr/RenderPromises.js';
 
+module Core = ApolloClient__Core;
+module Cache = ApolloClient__Cache;
+module Link = ApolloClient__Link;
+module React = ApolloClient__React;
 module Utilities = ApolloClient__Utilities;

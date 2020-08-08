@@ -3,13 +3,13 @@ module GraphQLRequest = ApolloClient__Link_Core_Types.GraphQLRequest;
 
 // export declare type ContextSetter = (operation: GraphQLRequest, prevContext: any) => Promise<any> | any;
 // export declare function setContext(setter: ContextSetter): ApolloLink;
-[@bs.module "@apollo/link-context"]
+[@bs.module "@apollo/client/link/context"]
 external setContext:
   ((~operation: GraphQLRequest.t, ~prevContext: Js.Json.t) => Js.Json.t) =>
   ApolloLink.t =
   "setContext";
 
-[@bs.module "@apollo/link-context"]
+[@bs.module "@apollo/client/link/context"]
 external setContextAsync:
   (
     (~operation: GraphQLRequest.t, ~prevContext: Js.Json.t) =>

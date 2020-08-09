@@ -5,7 +5,6 @@ module ServerParseError = ApolloClient__Link_Http_ParseAndCheckHttpResponse.Serv
 
 module Js_ = {
   module NetworkErrorUnion: {
-    // This is copied from `@apollo/link-error`
     type t;
     let error: Js.Exn.t => t;
     let serverError: ServerError.Js_.t => t;
@@ -46,7 +45,7 @@ module Js_ = {
   // export declare class ApolloError extends Error {
   //     message: string;
   //     graphQLErrors: ReadonlyArray<GraphQLError>;
-  //     networkError: Error | null;
+  //     networkError: Error | ServerParseError | ServerError | null;
   //     extraInfo: any;
   // }
   type t = {
@@ -68,7 +67,7 @@ module Js_ = {
 
   // constructor({ graphQLErrors, networkError, errorMessage, extraInfo, }: {
   //     graphQLErrors?: ReadonlyArray<GraphQLError>;
-  //     networkError?: Error | null;
+  //     networkError?: Error | ServerParseError | ServerError | null;
   //     errorMessage?: string;
   //     extraInfo?: any;
   // });

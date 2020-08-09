@@ -30,7 +30,7 @@ module WebSocketLink = {
     //     constructor(paramsOrClient: WebSocketLink.Configuration | SubscriptionClient);
     //     request(operation: Operation): Observable<FetchResult> | null;
     // }
-    [@bs.module "@apollo/link-ws"] [@bs.new]
+    [@bs.module "@apollo/client/link/ws"] [@bs.new]
     external make:
       (
       [@bs.unwrap]

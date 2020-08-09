@@ -39,7 +39,7 @@ module ApolloCache = {
     external readQuery:
       (
         t('tSerialized),
-        ~options: DataProxy.Query.Js_.t('variables),
+        ~options: DataProxy.Query.Js_.t('jsVariables),
         ~optimistic: option(bool)
       ) =>
       Js.nullable('jsData) =
@@ -50,7 +50,7 @@ module ApolloCache = {
     external writeFragment:
       (
         t('tSerialized),
-        ~options: DataProxy.WriteFragmentOptions.Js_.t('jsData, 'variables)
+        ~options: DataProxy.WriteFragmentOptions.Js_.t('jsData, 'jsVariables)
       ) =>
       option(reference) =
       "writeFragment";
@@ -60,7 +60,7 @@ module ApolloCache = {
     external writeQuery:
       (
         t('tSerialized),
-        ~options: DataProxy.WriteQueryOptions.Js_.t('jsData, 'variables)
+        ~options: DataProxy.WriteQueryOptions.Js_.t('jsData, 'jsVariables)
       ) =>
       option(reference) =
       "writeQuery";

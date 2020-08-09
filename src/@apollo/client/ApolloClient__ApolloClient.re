@@ -32,7 +32,7 @@ module DefaultWatchQueryOptions = {
     type t = {
       fetchPolicy: option(WatchQueryFetchPolicy.Js_.t),
       // query: GraphQL.Language.documentNode,
-      // variables: option('variables),
+      // variables: option('jsVariables),
       errorPolicy: option(ErrorPolicy.Js_.t),
       context: option(Js.Json.t),
     };
@@ -64,7 +64,7 @@ module DefaultQueryOptions = {
     type t = {
       fetchPolicy: option(FetchPolicy.Js_.t),
       // query: GraphQL.Language.documentNode,
-      // variables: option('variables),
+      // variables: option('jsVariables),
       errorPolicy: option(ErrorPolicy.Js_.t),
       context: option(Js.Json.t),
     };
@@ -98,11 +98,11 @@ module DefaultMutateOptions = {
       fetchPolicy: option(FetchPolicy__noCacheExtracted.Js_.t),
       awaitRefetchQueries: option(bool),
       errorPolicy: option(ErrorPolicy.Js_.t),
-      // optimisticResponse: option('variables => 'jsData),
+      // optimisticResponse: option('jsVariables => 'jsData),
       // update: option(MutationUpdaterFn.Js_.t('jsData)),
       // updateQueries: option(MutationQueryReducersMap.Js_.t('jsData)),
       refetchQueries: option(RefetchQueryDescription.Js_.t),
-      // variables: option('variables),
+      // variables: option('jsVariables),
     };
   };
 
@@ -306,14 +306,14 @@ module Js_ = {
   // mutate<T = any, TVariables = OperationVariables>(options: MutationOptions<T, TVariables>): Promise<FetchResult<T>>;
   [@bs.send]
   external mutate:
-    (t, ~options: MutationOptions.Js_.t('jsData, 'variables)) =>
+    (t, ~options: MutationOptions.Js_.t('jsData, 'jsVariables)) =>
     Js.Promise.t(FetchResult.Js_.t('jsData)) =
     "mutate";
 
   // query<T = any, TVariables = OperationVariables>(options: QueryOptions<TVariables>): Promise<ApolloQueryResult<T>>;
   [@bs.send]
   external query:
-    (t, ~options: QueryOptions.Js_.t('variables)) =>
+    (t, ~options: QueryOptions.Js_.t('jsVariables)) =>
     Js.Promise.t(ApolloQueryResult.Js_.t('jsData)) =
     "query";
 
@@ -322,7 +322,7 @@ module Js_ = {
   external readQuery:
     (
       t,
-      ~options: DataProxy.Query.Js_.t('variables),
+      ~options: DataProxy.Query.Js_.t('jsVariables),
       ~optimistic: option(bool)
     ) =>
     Js.nullable('jsData) =
@@ -334,7 +334,7 @@ module Js_ = {
   // <T = any, TVariables = OperationVariables>(options: WatchQueryOptions<TVariables>): ObservableQuery<T, TVariables>;
   [@bs.send]
   external watchQuery:
-    (t, ~options: WatchQueryOptions.Js_.t('variables)) =>
+    (t, ~options: WatchQueryOptions.Js_.t('jsVariables)) =>
     ObservableQuery.Js_.t('jsData) =
     "watchQuery";
 
@@ -343,7 +343,7 @@ module Js_ = {
   external writeFragment:
     (
       t,
-      ~options: DataProxy.WriteFragmentOptions.Js_.t('jsData, 'variables)
+      ~options: DataProxy.WriteFragmentOptions.Js_.t('jsData, 'jsVariables)
     ) =>
     unit =
     "writeFragment";
@@ -351,7 +351,7 @@ module Js_ = {
   // writeQuery<TData = any, TVariables = OperationVariables>(options: DataProxy.WriteQueryOptions<TData, TVariables>): void;
   [@bs.send]
   external writeQuery:
-    (t, ~options: DataProxy.WriteQueryOptions.Js_.t('jsData, 'variables)) =>
+    (t, ~options: DataProxy.WriteQueryOptions.Js_.t('jsData, 'jsVariables)) =>
     unit =
     "writeQuery";
 
@@ -428,20 +428,23 @@ module type Config = {
 };
 
 let mutate:
-  type data jsVariables.
+  type data variables jsVariables.
     (
       t,
       ~mutation: (module Operation with
-                    type t = data and type Raw.t_variables = jsVariables),
+                    type t = data and
+                    type t_variables = variables and
+                    type Raw.t_variables = jsVariables),
       ~awaitRefetchQueries: bool=?,
       ~context: Js.Json.t=?,
       ~errorPolicy: ErrorPolicy.t=?,
       ~fetchPolicy: FetchPolicy__noCacheExtracted.t=?,
+      ~mapJsVariables: jsVariables => jsVariables=?,
       ~optimisticResponse: jsVariables => data=?,
       ~refetchQueries: RefetchQueryDescription.t=?,
       ~updateQueries: MutationQueryReducersMap.t(data)=?,
       ~update: MutationUpdaterFn.t(data)=?,
-      jsVariables
+      variables
     ) =>
     Js.Promise.t(FetchResult.t(data)) =
   (
@@ -451,12 +454,16 @@ let mutate:
     ~context=?,
     ~errorPolicy=?,
     ~fetchPolicy=?,
+    ~mapJsVariables=Utils.identity,
     ~optimisticResponse=?,
     ~refetchQueries=?,
     ~updateQueries=?,
     ~update=?,
     variables,
   ) => {
+    let jsVariables =
+      variables->Operation.serializeVariables->mapJsVariables;
+
     Js_.mutate(
       client,
       ~options=
@@ -471,7 +478,7 @@ let mutate:
             updateQueries,
             refetchQueries,
             update,
-            variables,
+            variables: jsVariables,
           },
           ~parse=Operation.parse,
           ~serialize=Operation.serialize,
@@ -487,15 +494,18 @@ let mutate:
   };
 
 let query:
-  type data jsVariables.
+  type data variables jsVariables.
     (
       t,
       ~query: (module Operation with
-                 type t = data and type Raw.t_variables = jsVariables),
+                 type t = data and
+                 type t_variables = variables and
+                 type Raw.t_variables = jsVariables),
       ~context: Js.Json.t=?,
       ~errorPolicy: ErrorPolicy.t=?,
       ~fetchPolicy: FetchPolicy.t=?,
-      jsVariables
+      ~mapJsVariables: jsVariables => jsVariables=?,
+      variables
     ) =>
     Js.Promise.t(ApolloQueryResult.t(data)) =
   (
@@ -504,15 +514,19 @@ let query:
     ~context=?,
     ~errorPolicy=?,
     ~fetchPolicy=?,
+    ~mapJsVariables=Utils.identity,
     variables,
   ) => {
+    let jsVariables =
+      variables->Operation.serializeVariables->mapJsVariables;
+
     Js_.query(
       client,
       ~options=
         QueryOptions.toJs({
           fetchPolicy,
           query: Operation.query,
-          variables,
+          variables: jsVariables,
           errorPolicy,
           context,
         }),
@@ -527,20 +541,33 @@ let query:
   };
 
 let readQuery:
-  type data jsVariables.
+  type data variables jsVariables.
     (
       t,
       ~query: (module Operation with
-                 type t = data and type Raw.t_variables = jsVariables),
+                 type t = data and
+                 type t_variables = variables and
+                 type Raw.t_variables = jsVariables),
       ~id: string=?,
+      ~mapJsVariables: jsVariables => jsVariables=?,
       ~optimistic: bool=?,
-      jsVariables
+      variables
     ) =>
     option(data) =
-  (client, ~query as (module Operation), ~id=?, ~optimistic=?, variables) => {
+  (
+    client,
+    ~query as (module Operation),
+    ~id=?,
+    ~mapJsVariables=Utils.identity,
+    ~optimistic=?,
+    variables,
+  ) => {
+    let jsVariables =
+      variables->Operation.serializeVariables->mapJsVariables;
+
     Js_.readQuery(
       client,
-      ~options={id, query: Operation.query, variables},
+      ~options={id, query: Operation.query, variables: jsVariables},
       ~optimistic,
     )
     ->Js.toOption
@@ -550,15 +577,18 @@ let readQuery:
 let setLink: (t, ApolloLink.t) => unit = Js_.setLink;
 
 let watchQuery:
-  type data jsVariables.
+  type data variables jsVariables.
     (
       t,
       ~query: (module Operation with
-                 type t = data and type Raw.t_variables = jsVariables),
+                 type t = data and
+                 type t_variables = variables and
+                 type Raw.t_variables = jsVariables),
       ~context: Js.Json.t=?,
       ~errorPolicy: ErrorPolicy.t=?,
       ~fetchPolicy: WatchQueryFetchPolicy.t=?,
-      jsVariables
+      ~mapJsVariables: jsVariables => jsVariables=?,
+      variables
     ) =>
     ObservableQuery.t(data) =
   (
@@ -567,15 +597,19 @@ let watchQuery:
     ~context=?,
     ~errorPolicy=?,
     ~fetchPolicy=?,
+    ~mapJsVariables=Utils.identity,
     variables,
   ) => {
+    let jsVariables =
+      variables->Operation.serializeVariables->mapJsVariables;
+
     Js_.watchQuery(
       client,
       ~options=
         WatchQueryOptions.toJs({
           fetchPolicy,
           query: Operation.query,
-          variables: Some(variables),
+          variables: Some(jsVariables),
           errorPolicy,
           context,
         }),
@@ -617,15 +651,18 @@ let writeFragment:
   };
 
 let writeQuery:
-  type data jsVariables.
+  type data variables jsVariables.
     (
       t,
       ~query: (module Operation with
-                 type t = data and type Raw.t_variables = jsVariables),
+                 type t = data and
+                 type t_variables = variables and
+                 type Raw.t_variables = jsVariables),
       ~broadcast: bool=?,
       ~data: data,
       ~id: string=?,
-      jsVariables
+      ~mapJsVariables: jsVariables => jsVariables=?,
+      variables
     ) =>
     unit =
   (
@@ -634,8 +671,12 @@ let writeQuery:
     ~broadcast=?,
     ~data,
     ~id=?,
+    ~mapJsVariables=Utils.identity,
     variables,
   ) => {
+    let jsVariables =
+      variables->Operation.serializeVariables->mapJsVariables;
+
     Js_.writeQuery(
       client,
       ~options={
@@ -643,7 +684,7 @@ let writeQuery:
         data: data->Operation.serialize,
         id,
         query: Operation.query,
-        variables,
+        variables: jsVariables,
       },
     );
   };

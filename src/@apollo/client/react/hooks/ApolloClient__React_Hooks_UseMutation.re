@@ -21,17 +21,19 @@ module Js_ = {
   external useMutation:
     (
       . Graphql.documentNode,
-      MutationHookOptions.Js_.t('jsData, 'variables)
+      MutationHookOptions.Js_.t('jsData, 'jsVariables)
     ) =>
-    MutationTuple.Js_.t('jsData, 'variables) =
+    MutationTuple.Js_.t('jsData, 'jsVariables) =
     "useMutation";
 };
 
 let useMutation:
-  type data jsVariables.
+  type data variables jsVariables.
     (
       ~mutation: (module Operation with
-                    type t = data and type Raw.t_variables = jsVariables),
+                    type t = data and
+                    type t_variables = variables and
+                    type Raw.t_variables = jsVariables),
       ~awaitRefetchQueries: bool=?,
       ~context: Js.Json.t=?,
       ~client: ApolloClient.t=?,
@@ -46,7 +48,7 @@ let useMutation:
       ~update: MutationUpdaterFn.t(data)=?,
       unit
     ) =>
-    MutationTuple.t(data, jsVariables) =
+    MutationTuple.t(data, variables, jsVariables) =
   (
     ~mutation as (module Operation),
     ~awaitRefetchQueries=?,
@@ -93,6 +95,7 @@ let useMutation:
         jsMutationTuple->MutationTuple.fromJs(
           ~parse=Operation.parse,
           ~serialize=Operation.serialize,
+          ~serializeVariables=Operation.serializeVariables,
         )
       },
       jsMutationTuple,
@@ -100,23 +103,26 @@ let useMutation:
   };
 
 let useMutationWithVariables:
-  type data jsVariables.
+  type data variables jsVariables.
     (
       ~mutation: (module Operation with
-                    type t = data and type Raw.t_variables = jsVariables),
+                    type t = data and
+                    type t_variables = variables and
+                    type Raw.t_variables = jsVariables),
       ~awaitRefetchQueries: bool=?,
       ~context: Js.Json.t=?,
       ~client: ApolloClient.t=?,
       ~errorPolicy: ErrorPolicy.t=?,
       ~fetchPolicy: FetchPolicy__noCacheExtracted.t=?,
       ~ignoreResults: bool=?,
+      ~mapJsVariables: jsVariables => jsVariables=?,
       ~notifyOnNetworkStatusChange: bool=?,
       ~onError: ApolloError.t => unit=?,
       ~onCompleted: data => unit=?,
       ~optimisticResponse: jsVariables => data=?,
       ~refetchQueries: RefetchQueryDescription.t=?,
       ~update: MutationUpdaterFn.t(data)=?,
-      jsVariables
+      variables
     ) =>
     MutationTuple__noVariables.t(data, jsVariables) =
   (
@@ -127,6 +133,7 @@ let useMutationWithVariables:
     ~errorPolicy=?,
     ~fetchPolicy=?,
     ~ignoreResults=?,
+    ~mapJsVariables=Utils.identity,
     ~notifyOnNetworkStatusChange=?,
     ~onError=?,
     ~onCompleted=?,
@@ -135,6 +142,9 @@ let useMutationWithVariables:
     ~update=?,
     variables,
   ) => {
+    let jsVariables =
+      variables->Operation.serializeVariables->mapJsVariables;
+
     let jsMutationTuple =
       Js_.useMutation(.
         Operation.query,
@@ -153,7 +163,7 @@ let useMutationWithVariables:
             optimisticResponse,
             refetchQueries,
             update,
-            variables: Some(variables),
+            variables: Some(jsVariables),
           },
           ~parse=Operation.parse,
           ~serialize=Operation.serialize,
@@ -167,7 +177,7 @@ let useMutationWithVariables:
             ~parse=Operation.parse,
             ~serialize=Operation.serialize,
             // Passing in the same variables from above allows us to reuse some types
-            ~variables,
+            ~variables=jsVariables,
           );
         (mutate, mutationResult);
       },
@@ -218,6 +228,7 @@ module Extend = (M: Types.Operation) => {
         ~errorPolicy=?,
         ~fetchPolicy=?,
         ~ignoreResults=?,
+        ~mapJsVariables=?,
         ~notifyOnNetworkStatusChange=?,
         ~onError=?,
         ~onCompleted=?,
@@ -234,6 +245,7 @@ module Extend = (M: Types.Operation) => {
       ~errorPolicy?,
       ~fetchPolicy?,
       ~ignoreResults?,
+      ~mapJsVariables?,
       ~notifyOnNetworkStatusChange?,
       ~onError?,
       ~onCompleted?,

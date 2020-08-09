@@ -10,7 +10,7 @@
     "start": "bsb -make-world -w"
   },
   "devDependencies": {
-    "@reasonml-community/graphql-ppx": "^1.0.0-beta.18",
+    "@reasonml-community/graphql-ppx": "^1.0.0-beta.22",
     "bs-platform": "^7.3.2",
     "graphql-client-example-server": "1.2.0",
     "html-webpack-plugin": "^4.3.0",

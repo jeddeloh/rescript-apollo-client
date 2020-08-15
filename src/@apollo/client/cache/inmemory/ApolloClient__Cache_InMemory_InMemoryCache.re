@@ -1,6 +1,7 @@
 module ApolloCache = ApolloClient__Cache_Core_Cache.ApolloCache;
 module KeyFieldsFunction = ApolloClient__Cache_InMemory_Policies.KeyFieldsFunction;
 module PossibleTypesMap = ApolloClient__Cache_InMemory_Policies.PossibleTypesMap;
+module TypePolicy = ApolloClient__Cache_InMemory_Policies.TypePolicy;
 module TypePolicies = ApolloClient__Cache_InMemory_Policies.TypePolicies;
 
 module InMemoryCacheConfig = {
@@ -74,29 +75,29 @@ type t = Js_.t;
 
 let make:
   (
-    ~resultCaching: bool=?,
-    ~possibleTypes: PossibleTypesMap.t=?,
-    ~typePolicies: TypePolicies.t=?,
-    ~dataIdFromObject: KeyFieldsFunction.t=?,
     ~addTypename: bool=?,
+    ~dataIdFromObject: KeyFieldsFunction.t=?,
+    ~possibleTypes: PossibleTypesMap.t=?,
+    ~resultCaching: bool=?,
+    ~typePolicies: TypePolicies.t=?,
     unit
   ) =>
   t =
   (
-    ~resultCaching=?,
-    ~possibleTypes=?,
-    ~typePolicies=?,
-    ~dataIdFromObject=?,
     ~addTypename=?,
+    ~dataIdFromObject=?,
+    ~possibleTypes=?,
+    ~resultCaching=?,
+    ~typePolicies=?,
     (),
   ) => {
     Js_.make(
       InMemoryCacheConfig.make(
-        ~resultCaching?,
-        ~possibleTypes?,
-        ~typePolicies?,
-        ~dataIdFromObject?,
         ~addTypename?,
+        ~dataIdFromObject?,
+        ~possibleTypes?,
+        ~resultCaching?,
+        ~typePolicies=?typePolicies->Belt.Option.map(TypePolicies.toJs),
         (),
       ),
     );

@@ -367,7 +367,7 @@ let make:
     ~credentials: string=?,
     ~headers: Js.Dict.t(string)=?,
     ~link: ApolloLink.t=?,
-    ~cache: ApolloCache.Js_.t(Js.Json.t),
+    ~cache: ApolloCache.t(Js.Json.t),
     ~ssrForceFetchDelay: int=?,
     ~ssrMode: bool=?,
     ~connectToDevTools: bool=?,
@@ -461,8 +461,7 @@ let mutate:
     ~update=?,
     variables,
   ) => {
-    let jsVariables =
-      variables->Operation.serializeVariables->mapJsVariables;
+    let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
 
     Js_.mutate(
       client,
@@ -517,8 +516,7 @@ let query:
     ~mapJsVariables=Utils.identity,
     variables,
   ) => {
-    let jsVariables =
-      variables->Operation.serializeVariables->mapJsVariables;
+    let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
 
     Js_.query(
       client,
@@ -562,8 +560,7 @@ let readQuery:
     ~optimistic=?,
     variables,
   ) => {
-    let jsVariables =
-      variables->Operation.serializeVariables->mapJsVariables;
+    let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
 
     Js_.readQuery(
       client,
@@ -600,8 +597,7 @@ let watchQuery:
     ~mapJsVariables=Utils.identity,
     variables,
   ) => {
-    let jsVariables =
-      variables->Operation.serializeVariables->mapJsVariables;
+    let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
 
     Js_.watchQuery(
       client,
@@ -674,8 +670,7 @@ let writeQuery:
     ~mapJsVariables=Utils.identity,
     variables,
   ) => {
-    let jsVariables =
-      variables->Operation.serializeVariables->mapJsVariables;
+    let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
 
     Js_.writeQuery(
       client,

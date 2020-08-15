@@ -37,6 +37,8 @@ module Cache = {
   let readQuery = ApolloClient__Cache_Core_Cache.ApolloCache.readQuery;
   let writeFragment = ApolloClient__Cache_Core_Cache.ApolloCache.writeFragment;
   let writeQuery = ApolloClient__Cache_Core_Cache.ApolloCache.writeQuery;
+  // Local state management
+  let makeVar = ApolloClient__Cache_InMemory_ReactiveVars.makeVar;
 };
 
 [@text {|{1 Customize Apollo Client's data flow }|}];
@@ -86,10 +88,16 @@ module Types = {
   module ErrorPolicy = ApolloClient__Core_WatchQueryOptions.ErrorPolicy;
   module FetchPolicy = ApolloClient__Core_WatchQueryOptions.FetchPolicy;
   module FetchPolicy__noCacheExtracted = ApolloClient__Core_WatchQueryOptions.FetchPolicy__noCacheExtracted;
+  module FetchResult = ApolloClient__Link_Core_Types.FetchResult;
+  module FieldPolicy = ApolloClient__Cache_InMemory_Policies_FieldPolicy.FieldPolicy;
+  module FieldReadFunction = ApolloClient__Cache_InMemory_Policies_FieldPolicy.FieldReadFunction;
+  module FieldMergeFunction = ApolloClient__Cache_InMemory_Policies_FieldPolicy.FieldMergeFunction;
   module FragmentMatcher = ApolloClient__Core_LocalState.FragmentMatcher;
   module GraphqlError = ApolloClient__Graphql_Error_GraphQLError;
   module GraphQLRequest = ApolloClient__Link_Core_Types.GraphQLRequest;
-  module FetchResult = ApolloClient__Link_Core_Types.FetchResult;
+  module KeyArgs = ApolloClient__Cache_InMemory_Policies_FieldPolicy.FieldPolicy_KeyArgs;
+  module KeySpecifier = ApolloClient__Cache_InMemory_Policies_FieldPolicy.KeySpecifier;
+  module KeyFieldsFunction = ApolloClient__Cache_InMemory_Policies.KeyFieldsFunction;
   module LazyQueryHookOptions = ApolloClient__React_Types.LazyQueryHookOptions;
   module MutationHookOptions = ApolloClient__React_Types.MutationHookOptions;
   module MutationOptions = ApolloClient__Core_WatchQueryOptions.MutationOptions;
@@ -107,10 +115,14 @@ module Types = {
   module QueryTuple = ApolloClient__React_Types.QueryTuple;
   module QueryTuple__noVariables = ApolloClient__React_Types.QueryTuple__noVariables;
   module QueryResult = ApolloClient__React_Types.QueryResult;
+  module PossibleTypesMap = ApolloClient__Cache_InMemory_Policies.PossibleTypesMap;
   module PureQueryOptions = ApolloClient__Core_Types.PureQueryOptions;
+  module ReactiveVar = ApolloClient__Cache_InMemory_ReactiveVars.ReactiveVar;
   module RefetchQueryDescription = ApolloClient__Core_WatchQueryOptions.RefetchQueryDescription;
   module Resolvers = ApolloClient__Core_Types.Resolvers;
   module SubscriptionHookOptions = ApolloClient__React_Types.SubscriptionHookOptions;
+  module TypePolicies = ApolloClient__Cache_InMemory_Policies.TypePolicies;
+  module TypePolicy = ApolloClient__Cache_InMemory_Policies.TypePolicy;
   module UriFunction = ApolloClient__Link_Http_SelectHttpOptionsAndBody.UriFunction;
   module WatchQueryFetchPolicy = ApolloClient__Core_WatchQueryOptions.WatchQueryFetchPolicy;
   module WatchQueryOptions = ApolloClient__Core_WatchQueryOptions.WatchQueryOptions;

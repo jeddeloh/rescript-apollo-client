@@ -8,6 +8,7 @@ let execute = ApolloClient__Link_Core_ApolloLink.Static.execute;
 // export { ApolloError, isApolloError } from './errors/ApolloError.js';
 module ApolloError = ApolloClient__Errors_ApolloError;
 // export { NetworkStatus } from './core/networkStatus.js';
+module NetworkStatus = ApolloClient__Core_NetworkStatus.NetworkStatus;
 // export { ObservableQuery } from './core/ObservableQuery.js';
 // export { serializeFetchParameter } from './link/http/serializeFetchParameter.js';
 // export { selectURI } from './link/http/selectURI.js';
@@ -61,6 +62,7 @@ let useSubscription = ApolloClient__React_Hooks_UseSubscription.useSubscription;
 
 module Core = ApolloClient__Core;
 module Cache = ApolloClient__Cache;
+module Errors = ApolloClient__Errors;
 module Link = ApolloClient__Link;
 module React = ApolloClient__React;
 module Utilities = ApolloClient__Utilities;

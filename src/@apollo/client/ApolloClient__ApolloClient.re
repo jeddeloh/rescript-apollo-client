@@ -261,6 +261,8 @@ module ApolloClientOptions = {
     };
 };
 
+type t;
+
 module Js_ = {
   // export declare class ApolloClient<TCacheShape> implements DataProxy {
   //     link: ApolloLink;
@@ -301,7 +303,11 @@ module Js_ = {
   //     setLink(newLink: ApolloLink): void;
   // }
 
-  type t;
+  type nonrec t = t;
+
+  // clearStore(): Promise<any[]>;
+  [@bs.send]
+  external clearStore: t => Js.Promise.t(array(Js.Json.t)) = "clearStore";
 
   // mutate<T = any, TVariables = OperationVariables>(options: MutationOptions<T, TVariables>): Promise<FetchResult<T>>;
   [@bs.send]
@@ -309,6 +315,16 @@ module Js_ = {
     (t, ~options: MutationOptions.Js_.t('jsData, 'jsVariables)) =>
     Js.Promise.t(FetchResult.Js_.t('jsData)) =
     "mutate";
+
+  // onClearStore(cb: () => Promise<any>): () => void;
+  [@bs.send]
+  external onClearStore: (t, ~cb: unit => Js.Promise.t(unit), unit) => unit =
+    "onClearStore";
+
+  // onResetStore(cb: () => Promise<any>): () => void;
+  [@bs.send]
+  external onResetStore: (t, ~cb: unit => Js.Promise.t(unit), unit) => unit =
+    "onResetStore";
 
   // query<T = any, TVariables = OperationVariables>(options: QueryOptions<TVariables>): Promise<ApolloQueryResult<T>>;
   [@bs.send]
@@ -327,6 +343,16 @@ module Js_ = {
     ) =>
     Js.nullable('jsData) =
     "readQuery";
+
+  // resetStore(): Promise<ApolloQueryResult<any>[] | null>;
+  [@bs.send]
+  external resetStore:
+    t => Js.Promise.t(Js.nullable(array(ApolloQueryResult.t(Js.Json.t)))) =
+    "resetStore";
+
+  // restore(serializedState: TCacheShape): ApolloCache<TCacheShape>;
+  [@bs.send]
+  external restore: (t, Js.Json.t) => ApolloCache.t(Js.Json.t) = "restore";
 
   // setLink(newLink: ApolloLink): void;
   [@bs.send] external setLink: (t, ApolloLink.Js_.t) => unit = "setLink";
@@ -358,8 +384,6 @@ module Js_ = {
   [@bs.module "@apollo/client"] [@bs.new]
   external make: ApolloClientOptions.Js_.t => t = "ApolloClient";
 };
-
-type t = Js_.t;
 
 let make:
   (
@@ -422,10 +446,7 @@ let make:
       }),
     );
 
-module type Config = {
-  type output('a);
-  let promiseTransform: Js.Promise.t('a) => output('a);
-};
+let clearStore = Js_.clearStore;
 
 let mutate:
   type data variables jsVariables.
@@ -461,8 +482,7 @@ let mutate:
     ~update=?,
     variables,
   ) => {
-    let jsVariables =
-      variables->Operation.serializeVariables->mapJsVariables;
+    let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
 
     Js_.mutate(
       client,
@@ -493,6 +513,10 @@ let mutate:
       );
   };
 
+let onClearStore = Js_.onClearStore;
+
+let onResetStore = Js_.onResetStore;
+
 let query:
   type data variables jsVariables.
     (
@@ -517,8 +541,7 @@ let query:
     ~mapJsVariables=Utils.identity,
     variables,
   ) => {
-    let jsVariables =
-      variables->Operation.serializeVariables->mapJsVariables;
+    let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
 
     Js_.query(
       client,
@@ -539,6 +562,8 @@ let query:
         _,
       );
   };
+
+let resetStore = Js_.resetStore;
 
 let readQuery:
   type data variables jsVariables.
@@ -562,8 +587,7 @@ let readQuery:
     ~optimistic=?,
     variables,
   ) => {
-    let jsVariables =
-      variables->Operation.serializeVariables->mapJsVariables;
+    let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
 
     Js_.readQuery(
       client,
@@ -573,6 +597,8 @@ let readQuery:
     ->Js.toOption
     ->Belt.Option.map(Operation.parse);
   };
+
+let restore = Js_.restore;
 
 let setLink: (t, ApolloLink.t) => unit = Js_.setLink;
 
@@ -600,8 +626,7 @@ let watchQuery:
     ~mapJsVariables=Utils.identity,
     variables,
   ) => {
-    let jsVariables =
-      variables->Operation.serializeVariables->mapJsVariables;
+    let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
 
     Js_.watchQuery(
       client,
@@ -674,8 +699,7 @@ let writeQuery:
     ~mapJsVariables=Utils.identity,
     variables,
   ) => {
-    let jsVariables =
-      variables->Operation.serializeVariables->mapJsVariables;
+    let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
 
     Js_.writeQuery(
       client,

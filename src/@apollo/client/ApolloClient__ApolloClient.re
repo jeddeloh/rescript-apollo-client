@@ -391,7 +391,7 @@ let make:
     ~credentials: string=?,
     ~headers: Js.Dict.t(string)=?,
     ~link: ApolloLink.t=?,
-    ~cache: ApolloCache.Js_.t(Js.Json.t),
+    ~cache: ApolloCache.t(Js.Json.t),
     ~ssrForceFetchDelay: int=?,
     ~ssrMode: bool=?,
     ~connectToDevTools: bool=?,

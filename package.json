@@ -1,7 +1,7 @@
 {
   "name": "reason-apollo-client",
   "description": "ReasonML / BuckleScript bindings for the Apollo Client ecosystem",
-  "version": "0.0.1-beta.6",
+  "version": "0.0.1-beta.7",
   "keywords": [
     "Apollo",
     "BuckleScript",

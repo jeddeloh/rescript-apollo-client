@@ -73,7 +73,7 @@ module FetchResult = {
       extensions: option(Js.Json.t), // ACTUAL: Record<string, any>
       context: option(Js.Json.t), // ACTUAL: Record<string, any>
       // ...extends ExecutionResult
-      errors: option(GraphQLError.t),
+      errors: option(array(GraphQLError.t)),
     };
   };
 
@@ -82,7 +82,7 @@ module FetchResult = {
     extensions: option(Js.Json.t), // ACTUAL: Record<string, any>
     context: option(Js.Json.t), // ACTUAL: Record<string, any>
     // ...extends ExecutionResult
-    errors: option(GraphQLError.t),
+    errors: option(array(GraphQLError.t)),
   };
 
   let fromJs: (Js_.t('jsData), ~parse: 'jsData => 'data) => t('data) =

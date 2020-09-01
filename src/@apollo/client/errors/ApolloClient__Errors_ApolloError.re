@@ -76,9 +76,14 @@ module Js_ = {
 };
 
 type t_networkError =
+  /* Fetch threw an error for some reason and we caught it */
   | FetchFailure(Js.Exn.t)
+  /* Fetch got a response, but the status code was >=300 */
   | BadStatus(int, ServerError.t)
-  | BadBody(ServerParseError.t);
+  /* Fetch got a response, but it wasn't JSON */
+  | BadBody(ServerParseError.t)
+  /* We got a JSON response, but it wasn't in a shape we could parse */
+  | ParseError({data: Js.Json.t}); // ParseError is reason-apollo-client only
 
 type t = {
   extraInfo: Js.Json.t,
@@ -108,23 +113,30 @@ let fromJs: Js_.t => t =
     stack: js.stack,
   };
 
+type makeReason_args = {
+  graphQLErrors: option(array(GraphQLError.t)),
+  networkError: option(t_networkError),
+  errorMessage: option(string),
+  extraInfo: option(Js.Json.t),
+};
+
+// constructor({ graphQLErrors, networkError, errorMessage, extraInfo, }: {
+//     graphQLErrors?: ReadonlyArray<GraphQLError>;
+//     networkError?: Error | ServerParseError | ServerError | null;
+//     errorMessage?: string;
+//     extraInfo?: any;
+// });
+[@bs.module "@apollo/client"] [@bs.new]
+external makeReason: makeReason_args => t = "ApolloError";
+
 let make:
   (
     ~graphQLErrors: array(GraphQLError.t)=?,
-    ~networkError: Js.Exn.t=?,
+    ~networkError: t_networkError=?,
     ~errorMessage: string=?,
     ~extraInfo: Js.Json.t=?,
     unit
   ) =>
   t =
   (~graphQLErrors=?, ~networkError=?, ~errorMessage=?, ~extraInfo=?, ()) =>
-    Js_.make({
-      graphQLErrors,
-      networkError:
-        Js.Nullable.fromOption(
-          networkError->Belt.Option.map(Js_.NetworkErrorUnion.error),
-        ),
-      errorMessage,
-      extraInfo,
-    })
-    ->fromJs;
+    makeReason({graphQLErrors, networkError, errorMessage, extraInfo});

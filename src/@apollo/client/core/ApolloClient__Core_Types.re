@@ -1,3 +1,4 @@
+module ApolloError = ApolloClient__Errors_ApolloError;
 module Graphql = ApolloClient__Graphql;
 module FetchResult = ApolloClient__Link_Core_Types.FetchResult;
 module Resolver = ApolloClient__Core_LocalState.Resolver;
@@ -57,18 +58,48 @@ module ApolloQueryResult = {
 
   type t('data) = {
     data: option('data),
-    errors: option(array(Graphql.Error.GraphQLError.t)),
+    /**
+     * Intentionally elevated from array(Graphql.Error.GraphQLError.t) to ApolloError.
+     * This allows us to incorporate network and parse failures into a single result.
+     */
+    error: option(ApolloError.t),
     loading: bool,
     networkStatus: int,
   };
 
-  let fromJs:
-    (Js_.t('jsData), ~parse: 'jsData => 'parsedData) => t('parsedData) =
+  let fromJs: (Js_.t('jsData), ~parse: 'jsData => 'data) => t('data) =
     (js, ~parse) => {
-      data: js.data->Belt.Option.map(parse),
-      errors: js.errors,
-      loading: js.loading,
-      networkStatus: js.networkStatus,
+      let (data, error) =
+        switch (
+          js.data->Belt.Option.map(jsData => Utils.safeParse(parse, jsData))
+        ) {
+        | Some(Data(data)) => (
+            Some(data),
+            js.errors
+            ->Belt.Option.map(errors =>
+                ApolloError.make(~graphQLErrors=errors, ())
+              ),
+          )
+        | Some(ParseError({data})) => (
+            None,
+            Some(
+              ApolloError.make(
+                ~networkError=ParseError({data: data}),
+                ~graphQLErrors=?js.errors,
+                (),
+              ),
+            ),
+          )
+        | None => (
+            None,
+            js.errors
+            ->Belt.Option.map(errors =>
+                ApolloError.make(~graphQLErrors=errors, ())
+              ),
+          )
+        };
+
+      {data, error, loading: js.loading, networkStatus: js.networkStatus};
     };
 };
 

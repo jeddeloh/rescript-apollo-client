@@ -62,8 +62,7 @@ let useQuery:
     ~ssr=?,
     variables,
   ) => {
-    let jsVariables =
-      variables->Operation.serializeVariables->mapJsVariables;
+    let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
 
     let jsQueryResult =
       Js_.useQuery(.

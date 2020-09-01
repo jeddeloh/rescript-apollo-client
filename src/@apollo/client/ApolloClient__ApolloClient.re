@@ -518,12 +518,13 @@ let onClearStore = Js_.onClearStore;
 let onResetStore = Js_.onResetStore;
 
 let query:
-  type data variables jsVariables.
+  type data jsData variables jsVariables.
     (
       t,
       ~query: (module Operation with
                  type t = data and
                  type t_variables = variables and
+                 type Raw.t = jsData and
                  type Raw.t_variables = jsVariables),
       ~context: Js.Json.t=?,
       ~errorPolicy: ErrorPolicy.t=?,

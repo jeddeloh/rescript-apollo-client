@@ -303,12 +303,12 @@ module QueryResult = {
   type t_updateQueryOptions('jsVariables) =
     Js_.t_updateQueryOptions('jsVariables);
 
-  type t_fetchMoreOptions_updateQueryOptions('data, 'jsVariables) = {
+  type t_fetchMoreOptions_updateQueryOptions('jsData, 'data, 'jsVariables) = {
     fetchMoreResult: option('data),
     variables: option('jsVariables),
   };
 
-  type t_fetchMoreOptions('data, 'jsVariables) = {
+  type t_fetchMoreOptions('jsData, 'data, 'jsVariables) = {
     query: option(Graphql.Language.documentNode),
     // ...extends FetchMoreQueryOptions
     variables: option('jsVariables),
@@ -316,7 +316,10 @@ module QueryResult = {
     // ...extends FetchMoreOptions
     updateQuery:
       option(
-        ('data, t_fetchMoreOptions_updateQueryOptions('data, 'jsVariables)) =>
+        (
+          'data,
+          t_fetchMoreOptions_updateQueryOptions('jsData, 'data, 'jsVariables)
+        ) =>
         'data,
       ),
   };
@@ -324,7 +327,7 @@ module QueryResult = {
   type t('data, 'jsData, 'jsVariables) = {
     called: bool,
     client: ApolloClient.t,
-    data: option('data),
+    data: option(Types.parseResult('data)),
     error: option(ApolloError.t),
     loading: bool,
     networkStatus: NetworkStatus.t,
@@ -352,7 +355,7 @@ module QueryResult = {
     (js, ~parse, ~serialize) => {
       called: js.called,
       client: js.client,
-      data: js.data->Belt.Option.map(parse),
+      data: js.data->Belt.Option.map(Utils.safeParse(parse)),
       error: js.error->Belt.Option.map(ApolloError.fromJs),
       loading: js.loading,
       networkStatus: js.networkStatus,
@@ -368,12 +371,13 @@ module QueryResult = {
 
   let fetchMore:
     (
-      t('queryData, 'jsQueryData, 'jsVariables),
+      t('data, 'jsData, 'jsVariables),
       ~context: Js.Json.t=?,
       ~variables: 'jsVariables=?,
       ~updateQuery: (
                       'data,
                       t_fetchMoreOptions_updateQueryOptions(
+                        'jsData,
                         'data,
                         'jsVariables,
                       )
@@ -382,10 +386,13 @@ module QueryResult = {
                       =?,
       unit
     ) =>
-    Js.Promise.t(ApolloQueryResult.t('data)) =
+    Js.Promise.t(ApolloQueryResult.t(Types.parseResult('data))) =
     (queryResult, ~context=?, ~variables=?, ~updateQuery=?, ()) => {
       let serialize = queryResult.__serialize;
-      let parse = queryResult.__parse;
+      let parse = Utils.safeParse(queryResult.__parse);
+
+      let parseErrorDuringCall: ref(option(Types.parseResult(_))) =
+        ref(None);
 
       queryResult
       ->unsafeCastForMethod
@@ -401,25 +408,63 @@ module QueryResult = {
                       'jsData,
                       'jsVariables,
                     ),
-                ) =>
-                  updateQuery(
+                ) => {
+                  switch (
                     parse(previousResult),
-                    {
-                      fetchMoreResult:
-                        jsFetchMoreOptions.fetchMoreResult
-                        ->Belt.Option.map(parse),
-                      variables: jsFetchMoreOptions.variables,
-                    },
-                  )
-                  ->serialize
+                    jsFetchMoreOptions.fetchMoreResult
+                    ->Belt.Option.map(parse),
+                  ) {
+                  | (Data(previousResult), Some(Data(fetchMoreResult))) =>
+                    updateQuery(
+                      previousResult,
+                      {
+                        fetchMoreResult: Some(fetchMoreResult),
+                        variables: jsFetchMoreOptions.variables,
+                      },
+                    )
+                    ->serialize
+                  | (Data(previousResult), None) =>
+                    updateQuery(
+                      previousResult,
+                      {
+                        fetchMoreResult: None,
+                        variables: jsFetchMoreOptions.variables,
+                      },
+                    )
+                    ->serialize
+                  | (ParseError(parseError), _)
+                  | (Data(_), Some(ParseError(parseError))) =>
+                    parseErrorDuringCall.contents =
+                      Some(ParseError(parseError));
+                    previousResult;
+                  };
+                }
               ),
             ~variables?,
             (),
           ),
         )
       ->Js.Promise.then_(
-          jsResult =>
-            Js.Promise.resolve(ApolloQueryResult.fromJs(jsResult, ~parse)),
+          jsResult => {
+            let apolloQueryResult =
+              ApolloQueryResult.fromJs(jsResult, ~parse);
+            Js.Promise.resolve(
+              switch (parseErrorDuringCall.contents) {
+              | Some(ParseError({data})) => {
+                  ...apolloQueryResult,
+                  data: None,
+                  error:
+                    Some(
+                      ApolloError.make(
+                        ~networkError=ParseError({data: data}),
+                        (),
+                      ),
+                    ),
+                }
+              | _ => ApolloQueryResult.fromJs(jsResult, ~parse)
+              },
+            );
+          },
           _,
         );
     };

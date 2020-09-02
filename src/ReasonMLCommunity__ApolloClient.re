@@ -78,14 +78,15 @@ module GraphQL_PPX = {
 
 /** Convenient access to all types and the methods for working with those types */
 module Types = {
-  module RequestHandler = ApolloClient__Link_Core_Types.RequestHandler;
   module ApolloError = ApolloClient__Errors_ApolloError;
   module ApolloQueryResult = ApolloClient__Core_Types.ApolloQueryResult;
   module ApolloLink = ApolloClient__Link_Core_ApolloLink;
   module ApolloCache = ApolloClient__Cache_Core_Cache.ApolloCache;
   module BaseSubscriptionOptions = ApolloClient__React_Types.BaseSubscriptionOptions;
+  module ConnectionParamsOptions = ApolloClient__SubscriptionsTransportWs.ConnectionParamsOptions;
   module DataProxy = ApolloClient__Cache_Core_Types.DataProxy;
   module ErrorPolicy = ApolloClient__Core_WatchQueryOptions.ErrorPolicy;
+  module ErrorResponse = ApolloClient__Link_Error.ErrorResponse;
   module FetchPolicy = ApolloClient__Core_WatchQueryOptions.FetchPolicy;
   module FetchPolicy__noCacheExtracted = ApolloClient__Core_WatchQueryOptions.FetchPolicy__noCacheExtracted;
   module FetchResult = ApolloClient__Link_Core_Types.FetchResult;
@@ -119,6 +120,7 @@ module Types = {
   module PureQueryOptions = ApolloClient__Core_Types.PureQueryOptions;
   module ReactiveVar = ApolloClient__Cache_InMemory_ReactiveVars.ReactiveVar;
   module RefetchQueryDescription = ApolloClient__Core_WatchQueryOptions.RefetchQueryDescription;
+  module RequestHandler = ApolloClient__Link_Core_Types.RequestHandler;
   module Resolvers = ApolloClient__Core_Types.Resolvers;
   module SubscriptionHookOptions = ApolloClient__React_Types.SubscriptionHookOptions;
   module TypePolicies = ApolloClient__Cache_InMemory_Policies.TypePolicies;

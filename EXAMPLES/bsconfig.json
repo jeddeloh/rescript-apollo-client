@@ -1,0 +1,37 @@
+{
+  "name": "examples",
+  "graphql": {
+    "apollo-mode": true,
+    "extend-mutation": "ApolloClient.GraphQL_PPX.ExtendMutation",
+    "extend-query": "ApolloClient.GraphQL_PPX.ExtendQuery",
+    "extend-subscription": "ApolloClient.GraphQL_PPX.ExtendSubscription",
+    "template-tag-return-type": "ApolloClient.GraphQL_PPX.templateTagReturnType",
+    "template-tag-import": "gql",
+    "template-tag-location": "@apollo/client"
+  },
+  "package-specs": [
+    {
+      "module": "commonjs",
+      "in-source": true
+    }
+  ],
+  "ppx-flags": ["@reasonml-community/graphql-ppx/ppx"],
+  "reason": {
+    "react-jsx": 3
+  },
+  "refmt": 3,
+  "sources": [
+    {
+      "dir": "src",
+      "subdirs": true
+    }
+  ],
+  "suffix": ".bs.js",
+  "bs-dependencies": [
+    "reason-apollo-client",
+    "@reasonml-community/graphql-ppx",
+    "@yawaramin/prometo",
+    "reason-promise",
+    "reason-react"
+  ]
+}

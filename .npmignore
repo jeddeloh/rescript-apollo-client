@@ -1,0 +1,16 @@
+.bsb.lock
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+.gitattributes
+.merlin
+package-lock.json
+yarn.lock
+yarn-error.log
+*.bs.js
+.github/
+.graphql_ppx_cache/
+.vscode/
+assets/
+EXAMPLES/
+lib/
+node_modules/

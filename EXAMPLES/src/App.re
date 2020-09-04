@@ -11,6 +11,8 @@ let make = () => {
     <h4> "Mutation"->React.string </h4>
     <Mutation />
     <h4> "Subcription"->React.string </h4>
+    <Mutation_InputVariables />
+    <h4> "Query with Subscription for More"->React.string </h4>
     <Subscription />
     <h4> "Query with Subscription for More"->React.string </h4>
     <Query_SubscribeToMore />

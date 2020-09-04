@@ -106,7 +106,7 @@ let useSubscription:
   };
 
 module Extend = (M: Operation) => {
-  let use =
+  let useSubscription =
       (
         ~client=?,
         ~fetchPolicy=?,

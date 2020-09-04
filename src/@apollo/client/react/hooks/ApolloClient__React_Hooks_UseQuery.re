@@ -118,7 +118,7 @@ module Extend = (M: Operation) => {
       });
     };
 
-  let use =
+  let useQuery =
       (
         ~client=?,
         ~context=?,
@@ -154,7 +154,7 @@ module Extend = (M: Operation) => {
     );
   };
 
-  let useLazy =
+  let useLazyQuery =
       (
         ~client=?,
         ~context=?,
@@ -186,7 +186,7 @@ module Extend = (M: Operation) => {
     );
   };
 
-  let useLazyWithVariables =
+  let useLazyQueryWithVariables =
       (
         ~client=?,
         ~context=?,

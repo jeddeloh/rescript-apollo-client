@@ -186,7 +186,7 @@ let useMutationWithVariables:
   };
 
 module Extend = (M: Types.Operation) => {
-  let use =
+  let useMutation =
       (
         ~awaitRefetchQueries=?,
         ~context=?,
@@ -220,7 +220,7 @@ module Extend = (M: Types.Operation) => {
     );
   };
 
-  let useWithVariables =
+  let useMutationWithVariables =
       (
         ~awaitRefetchQueries=?,
         ~context=?,

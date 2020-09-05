@@ -1,13 +1,13 @@
 {
   "name": "examples",
   "graphql": {
-    "apollo-mode": true,
-    "extend-mutation": "ApolloClient.GraphQL_PPX.ExtendMutation",
-    "extend-query": "ApolloClient.GraphQL_PPX.ExtendQuery",
-    "extend-subscription": "ApolloClient.GraphQL_PPX.ExtendSubscription",
-    "template-tag-return-type": "ApolloClient.GraphQL_PPX.templateTagReturnType",
-    "template-tag-import": "gql",
-    "template-tag-location": "@apollo/client"
+    "apolloMode": true,
+    "extendMutation": "ApolloClient.GraphQL_PPX.ExtendMutation",
+    "extendQuery": "ApolloClient.GraphQL_PPX.ExtendQuery",
+    "extendSubscription": "ApolloClient.GraphQL_PPX.ExtendSubscription",
+    "templateTagReturnType": "ApolloClient.GraphQL_PPX.templateTagReturnType",
+    "templateTagImport": "gql",
+    "templateTagLocation": "@apollo/client"
   },
   "package-specs": [
     {

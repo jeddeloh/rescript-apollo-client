@@ -77,11 +77,11 @@ module FieldFunctionOptions = {
 };
 
 module FieldReadFunction = {
-  type t = (Js.Json.t, FieldFunctionOptions.t) => Js.Json.t;
+  type t = (option(Js.Json.t), FieldFunctionOptions.t) => Js.Json.t;
 
   module Js_ = {
     // export declare type FieldReadFunction<TExisting = any, TReadResult = TExisting> = (existing: SafeReadonly<TExisting> | undefined, options: FieldFunctionOptions) => TReadResult | undefined;
-    type t = (Js.Json.t, FieldFunctionOptions.Js_.t) => Js.Json.t;
+    type t = (option(Js.Json.t), FieldFunctionOptions.Js_.t) => Js.Json.t;
   };
 };
 

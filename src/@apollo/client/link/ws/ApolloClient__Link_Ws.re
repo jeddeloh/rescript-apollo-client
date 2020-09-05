@@ -1,9 +1,10 @@
 module ApolloLink = ApolloClient__Link_Core_ApolloLink;
 module Graphql = ApolloClient__Graphql;
-module SubscriptionClient = ApolloClient__SubscriptionsTransportWs.SubscriptionClient;
 
 module WebSocketLink = {
   module ClientOptions = ApolloClient__SubscriptionsTransportWs.ClientOptions;
+  module SubscriptionClient = ApolloClient__SubscriptionsTransportWs.SubscriptionClient;
+
   module Configuration = {
     module Js_ = {
       // export declare namespace WebSocketLink {

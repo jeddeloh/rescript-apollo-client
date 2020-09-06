@@ -48,14 +48,15 @@ module TypePolicy = {
   module Js_ = {
     module FieldsUnion: {
       type t;
-      let fieldPolicy: FieldPolicy.Js_.t => t;
-      let fieldReadFunction: FieldReadFunction.Js_.t => t;
+      let fieldPolicy: FieldPolicy.Js_.t('existing) => t;
+      let fieldReadFunction: FieldReadFunction.Js_.t('existing) => t;
     } = {
       [@unboxed]
       type t =
         | Any('a): t;
-      let fieldPolicy = (v: FieldPolicy.Js_.t) => Any(v);
-      let fieldReadFunction = (v: FieldReadFunction.Js_.t) => Any(v);
+      let fieldPolicy = (v: FieldPolicy.Js_.t('existing)) => Any(v);
+      let fieldReadFunction = (v: FieldReadFunction.Js_.t('existing)) =>
+        Any(v);
     };
 
     // export declare type TypePolicy = {
@@ -80,8 +81,8 @@ module TypePolicy = {
     | ConcatPagination(KeyArgs.t)
     | OffsetLimitPagination(KeyArgs.t)
     | RelayStylePagination(KeyArgs.t)
-    | FieldPolicy(FieldPolicy.t)
-    | FieldReadFunction(FieldReadFunction.t);
+    | FieldPolicy(FieldPolicy.t('existing)): t_field
+    | FieldReadFunction(FieldReadFunction.t('existing)): t_field;
 
   type fieldKey = string;
 

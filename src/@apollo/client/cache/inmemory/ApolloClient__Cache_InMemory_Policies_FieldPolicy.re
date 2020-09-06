@@ -77,11 +77,13 @@ module FieldFunctionOptions = {
 };
 
 module FieldReadFunction = {
-  type t = (option(Js.Json.t), FieldFunctionOptions.t) => Js.Json.t;
+  type t('existing) =
+    (option('existing), FieldFunctionOptions.t) => 'existing;
 
   module Js_ = {
     // export declare type FieldReadFunction<TExisting = any, TReadResult = TExisting> = (existing: SafeReadonly<TExisting> | undefined, options: FieldFunctionOptions) => TReadResult | undefined;
-    type t = (option(Js.Json.t), FieldFunctionOptions.Js_.t) => Js.Json.t;
+    type t('existing) =
+      (option('existing), FieldFunctionOptions.Js_.t) => 'existing;
   };
 };
 
@@ -148,9 +150,9 @@ module FieldPolicy_KeyArgs = {
 };
 
 module FieldPolicy = {
-  type t = {
+  type t('existing) = {
     keyArgs: option(FieldPolicy_KeyArgs.t),
-    read: option(FieldReadFunction.t),
+    read: option(FieldReadFunction.t('existing)),
     merge: option(FieldMergeFunction.t),
   };
 
@@ -160,14 +162,14 @@ module FieldPolicy = {
     //     read?: FieldReadFunction<TExisting, TReadResult>;
     //     merge?: FieldMergeFunction<TExisting, TIncoming> | boolean;
     // };
-    type nonrec t = {
+    type nonrec t('existing) = {
       keyArgs: option(FieldPolicy_KeyArgs.Js_.t),
-      read: option(FieldReadFunction.t),
-      merge: option(FieldMergeFunction.t),
+      read: option(FieldReadFunction.Js_.t('existing)),
+      merge: option(FieldMergeFunction.Js_.t),
     };
   };
 
-  let toJs: t => Js_.t =
+  let toJs: t('existing) => Js_.t('existing) =
     t => {
       keyArgs: t.keyArgs->Belt.Option.map(FieldPolicy_KeyArgs.toJs),
       read: t.read,

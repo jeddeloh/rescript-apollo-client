@@ -1,7 +1,7 @@
 {
   "name": "reason-apollo-client",
   "description": "ReasonML / BuckleScript bindings for the Apollo Client ecosystem",
-  "version": "0.0.1-beta.7",
+  "version": "0.0.1-beta.8",
   "keywords": [
     "Apollo",
     "BuckleScript",
@@ -21,8 +21,8 @@
   },
   "devDependencies": {
     "@apollo/client": "^3.1.3",
-    "@reasonml-community/graphql-ppx": "^1.0.0-beta.22",
-    "bs-platform": "^7.3.2",
+    "@reasonml-community/graphql-ppx": "^1.0.0",
+    "bs-platform": "^8.2.0",
     "graphql": "^14.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -31,7 +31,7 @@
   },
   "peerDependencies": {
     "@apollo/client": "^3.0.0",
-    "@reasonml-community/graphql-ppx": "^1.0.0-beta.22",
+    "@reasonml-community/graphql-ppx": "^1.0.0",
     "bs-platform": "^7.3.0 || ^8.0.0",
     "reason-react": "^0.8.0 || ^0.9.0"
   }

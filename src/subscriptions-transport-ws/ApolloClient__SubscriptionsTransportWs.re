@@ -145,6 +145,10 @@ module ClientOptions = {
 };
 
 module SubscriptionClient = {
+  type t;
+
+  type webSocketImpl;
+
   module Js_ = {
     // export declare class SubscriptionClient {
     //     client: any;
@@ -164,7 +168,43 @@ module SubscriptionClient = {
     //     applyMiddlewares(options: OperationOptions): Promise<OperationOptions>;
     //     use(middlewares: Middleware[]): SubscriptionClient;
     // }
-    type t;
+    type nonrec t = t;
+
+    [@bs.new] [@bs.module "subscriptions-transport-ws"]
+    external make:
+      (
+        ~url: string,
+        ~options: ClientOptions.Js_.t=?,
+        ~webSocketImpl: webSocketImpl=?,
+        ~webSocketProtocols: array(string)=?,
+        unit
+      ) =>
+      t =
+      "SubscriptionClient";
+
+    [@bs.send]
+    external close: (t, ~isForced: bool=?, ~closedByUser: bool=?, unit) => unit =
+      "close";
   };
-  type t = Js_.t;
+
+  let make:
+    (
+      ~url: string,
+      ~options: ClientOptions.t=?,
+      ~webSocketImpl: webSocketImpl=?,
+      ~webSocketProtocols: array(string)=?,
+      unit
+    ) =>
+    t =
+    (~url, ~options=?, ~webSocketImpl=?, ~webSocketProtocols=?, ()) => {
+      Js_.make(
+        ~url,
+        ~options=?options->Belt.Option.map(ClientOptions.toJs),
+        ~webSocketImpl?,
+        ~webSocketProtocols?,
+        (),
+      );
+    };
+
+  let close = Js_.close;
 };

@@ -10,8 +10,8 @@
     "start": "bsb -make-world -w"
   },
   "devDependencies": {
-    "@reasonml-community/graphql-ppx": "^1.0.0-beta.22",
-    "bs-platform": "^7.3.2",
+    "@reasonml-community/graphql-ppx": "^1.0.0",
+    "bs-platform": "^8.2.0",
     "graphql-client-example-server": "1.2.0",
     "html-webpack-plugin": "^4.3.0",
     "webpack": "^4.43.0",
@@ -19,12 +19,12 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
-    "@apollo/client": "3.0.1",
+    "@apollo/client": "3.1.4",
     "@yawaramin/prometo": "0.11.0",
     "graphql": "^14.0.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
-    "reason-apollo-client": "^0.0.1-beta.7",
+    "reason-apollo-client": "0.0.1-beta.7",
     "reason-promise": "1.1.1",
     "reason-react": "0.9.1",
     "subscriptions-transport-ws": "0.9.16"

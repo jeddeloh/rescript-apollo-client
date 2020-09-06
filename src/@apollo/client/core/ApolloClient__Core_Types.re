@@ -70,34 +70,11 @@ module ApolloQueryResult = {
   let fromJs: (Js_.t('jsData), ~parse: 'jsData => 'data) => t('data) =
     (js, ~parse) => {
       let (data, error) =
-        switch (
-          js.data->Belt.Option.map(jsData => Utils.safeParse(parse, jsData))
-        ) {
-        | Some(Data(data)) => (
-            Some(data),
-            js.errors
-            ->Belt.Option.map(errors =>
-                ApolloError.make(~graphQLErrors=errors, ())
-              ),
-          )
-        | Some(ParseError({data})) => (
-            None,
-            Some(
-              ApolloError.make(
-                ~networkError=ParseError({data: data}),
-                ~graphQLErrors=?js.errors,
-                (),
-              ),
-            ),
-          )
-        | None => (
-            None,
-            js.errors
-            ->Belt.Option.map(errors =>
-                ApolloError.make(~graphQLErrors=errors, ())
-              ),
-          )
-        };
+        Utils.safeParseWithCommonProps(
+          ~jsData=js.data,
+          ~graphQLErrors=?js.errors,
+          parse,
+        );
 
       {data, error, loading: js.loading, networkStatus: js.networkStatus};
     };

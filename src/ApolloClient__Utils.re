@@ -1,3 +1,4 @@
+module ApolloError = ApolloClient__Errors_ApolloError;
 module Graphql = ApolloClient__Graphql;
 module Types = ApolloClient__Types;
 
@@ -11,6 +12,38 @@ let safeParse: ('jsData => 'data) => Types.safeParse('jsData, 'data) =
     | data => Data(data)
     | exception _ => ParseError({data: jsData->asJson})
     };
+
+let safeParseWithCommonProps:
+  (
+    ~jsData: option('jsData),
+    ~graphQLErrors: array(Graphql.Error.GraphQLError.t)=?,
+    ~apolloError: ApolloError.t=?,
+    'jsData => 'data
+  ) =>
+  (option('data), option(ApolloError.t)) =
+  (~jsData, ~graphQLErrors=?, ~apolloError=?, parse) => {
+    let existingError =
+      switch (apolloError, graphQLErrors) {
+      | (Some(_), _) => apolloError
+      | (_, Some(graphQLErrors)) =>
+        Some(ApolloError.make(~graphQLErrors, ()))
+      | (None, None) => None
+      };
+    switch (jsData->Belt.Option.map(jsData => safeParse(parse, jsData))) {
+    | Some(ParseError({data})) => (
+        None,
+        Some(
+          ApolloError.make(
+            ~networkError=ParseError({data: data}),
+            ~graphQLErrors?,
+            (),
+          ),
+        ),
+      )
+    | Some(Data(data)) => (Some(data), existingError)
+    | None => (None, existingError)
+    };
+  };
 
 let useGuaranteedMemo1 = (f, dependency) => {
   let value = React.useRef(f());

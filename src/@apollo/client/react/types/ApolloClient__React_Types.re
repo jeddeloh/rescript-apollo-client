@@ -327,7 +327,7 @@ module QueryResult = {
   type t('data, 'jsData, 'jsVariables) = {
     called: bool,
     client: ApolloClient.t,
-    data: option(Types.parseResult('data)),
+    data: option('data),
     error: option(ApolloError.t),
     loading: bool,
     networkStatus: NetworkStatus.t,
@@ -353,20 +353,28 @@ module QueryResult = {
     ) =>
     t('data, 'jsData, 'jsVariables) =
     (js, ~parse, ~serialize) => {
-      called: js.called,
-      client: js.client,
-      data: js.data->Belt.Option.map(Utils.safeParse(parse)),
-      error: js.error->Belt.Option.map(ApolloError.fromJs),
-      loading: js.loading,
-      networkStatus: js.networkStatus,
-      fetchMore: js.fetchMore,
-      refetch: js.refetch,
-      startPolling: js.startPolling,
-      stopPolling: js.stopPolling,
-      subscribeToMore: js.subscribeToMore,
-      updateQuery: js.updateQuery,
-      __parse: parse,
-      __serialize: serialize,
+      let (data, error) =
+        Utils.safeParseWithCommonProps(
+          ~jsData=js.data,
+          ~apolloError=?js.error->Belt.Option.map(ApolloError.fromJs),
+          parse,
+        );
+      {
+        called: js.called,
+        client: js.client,
+        data,
+        error,
+        loading: js.loading,
+        networkStatus: js.networkStatus,
+        fetchMore: js.fetchMore,
+        refetch: js.refetch,
+        startPolling: js.startPolling,
+        stopPolling: js.stopPolling,
+        subscribeToMore: js.subscribeToMore,
+        updateQuery: js.updateQuery,
+        __parse: parse,
+        __serialize: serialize,
+      };
     };
 
   let fetchMore:

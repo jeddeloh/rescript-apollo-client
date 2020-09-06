@@ -1,6 +1,7 @@
-module ApolloQueryResult = ApolloClient__Core_Types.ApolloQueryResult;
-module ApolloLink = ApolloClient__Link_Core_ApolloLink;
 module ApolloCache = ApolloClient__Cache_Core_Cache.ApolloCache;
+module ApolloError = ApolloClient__Errors_ApolloError;
+module ApolloLink = ApolloClient__Link_Core_ApolloLink;
+module ApolloQueryResult = ApolloClient__Core_Types.ApolloQueryResult;
 module DataProxy = ApolloClient__Cache_Core_Types.DataProxy;
 module ErrorPolicy = ApolloClient__Core_WatchQueryOptions.ErrorPolicy;
 module FetchPolicy = ApolloClient__Core_WatchQueryOptions.FetchPolicy;
@@ -532,7 +533,7 @@ let query:
       ~mapJsVariables: jsVariables => jsVariables=?,
       variables
     ) =>
-    Js.Promise.t(ApolloQueryResult.t(data)) =
+    Promise.t(ApolloQueryResult.t(data)) =
   (
     client,
     ~query as (module Operation),
@@ -555,13 +556,23 @@ let query:
           context,
         }),
     )
-    ->Js.Promise.then_(
-        jsResult =>
-          jsResult
-          ->ApolloQueryResult.fromJs(_, ~parse=Operation.parse)
-          ->Js.Promise.resolve,
-        _,
-      );
+    ->Promise.Js.fromBsPromise
+    ->Promise.Js.toResult
+    ->Promise.map(result => {
+        switch (result) {
+        | Ok(jsApolloQueryResult) =>
+          jsApolloQueryResult->ApolloQueryResult.fromJs(
+            ~parse=Operation.parse,
+          )
+        | Error(error) =>
+          ApolloQueryResult.fromError(
+            ApolloError.make(
+              ~networkError=FetchFailure(Utils.(ensureError(Any(error)))),
+              (),
+            ),
+          )
+        }
+      });
   };
 
 let resetStore = Js_.resetStore;

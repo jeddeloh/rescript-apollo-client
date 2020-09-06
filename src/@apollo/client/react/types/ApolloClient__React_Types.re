@@ -394,7 +394,7 @@ module QueryResult = {
                       =?,
       unit
     ) =>
-    Js.Promise.t(ApolloQueryResult.t(Types.parseResult('data))) =
+    Promise.t(ApolloQueryResult.t(Types.parseResult('data))) =
     (queryResult, ~context=?, ~variables=?, ~updateQuery=?, ()) => {
       let serialize = queryResult.__serialize;
       let parse = Utils.safeParse(queryResult.__parse);
@@ -452,29 +452,27 @@ module QueryResult = {
             (),
           ),
         )
-      ->Js.Promise.then_(
-          jsResult => {
-            let apolloQueryResult =
-              ApolloQueryResult.fromJs(jsResult, ~parse);
-            Js.Promise.resolve(
-              switch (parseErrorDuringCall.contents) {
-              | Some(ParseError({data})) => {
-                  ...apolloQueryResult,
-                  data: None,
-                  error:
-                    Some(
-                      ApolloError.make(
-                        ~networkError=ParseError({data: data}),
-                        (),
-                      ),
-                    ),
-                }
-              | _ => ApolloQueryResult.fromJs(jsResult, ~parse)
-              },
-            );
-          },
-          _,
-        );
+      ->Promise.Js.fromBsPromise
+      ->Promise.Js.toResult
+      ->Promise.map(result => {
+          switch (result) {
+          | Ok(jsApolloQueryResult) =>
+            switch (parseErrorDuringCall.contents) {
+            | Some(ParseError({data})) =>
+              ApolloQueryResult.fromError(
+                ApolloError.make(~networkError=ParseError({data: data}), ()),
+              )
+            | _ => ApolloQueryResult.fromJs(jsApolloQueryResult, ~parse)
+            }
+          | Error(error) =>
+            ApolloQueryResult.fromError(
+              ApolloError.make(
+                ~networkError=FetchFailure(Utils.(ensureError(Any(error)))),
+                (),
+              ),
+            )
+          }
+        });
     };
 
   let refetch:

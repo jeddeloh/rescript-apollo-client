@@ -1,6 +1,7 @@
 module ApolloError = ApolloClient__Errors_ApolloError;
 module Graphql = ApolloClient__Graphql;
 module FetchResult = ApolloClient__Link_Core_Types.FetchResult;
+module NetworkStatus = ApolloClient__Core_NetworkStatus.NetworkStatus;
 module Resolver = ApolloClient__Core_LocalState.Resolver;
 module Types = ApolloClient__Types;
 module Utils = ApolloClient__Utils;
@@ -64,7 +65,7 @@ module ApolloQueryResult = {
      */
     error: option(ApolloError.t),
     loading: bool,
-    networkStatus: int,
+    networkStatus: NetworkStatus.t,
   };
 
   let fromJs: (Js_.t('jsData), ~parse: 'jsData => 'data) => t('data) =
@@ -76,7 +77,20 @@ module ApolloQueryResult = {
           parse,
         );
 
-      {data, error, loading: js.loading, networkStatus: js.networkStatus};
+      {
+        data,
+        error,
+        loading: js.loading,
+        networkStatus: js.networkStatus->NetworkStatus.fromJs,
+      };
+    };
+
+  let fromError: ApolloError.t => t('data) =
+    error => {
+      data: None,
+      error: Some(error),
+      loading: false,
+      networkStatus: Error,
     };
 };
 

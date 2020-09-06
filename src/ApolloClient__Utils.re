@@ -4,6 +4,31 @@ module Types = ApolloClient__Types;
 
 [@bs.new] external makeError: string => Js.Exn.t = "Error";
 
+[@unboxed]
+type any =
+  | Any('a): any;
+
+let ensureError: any => Js.Exn.t = [%bs.raw
+  {|
+  function (unknown) {
+    if (unknown instanceof Error) {
+      return unknown;
+    } else {
+      unknown = unknown || {};
+      const message = unknown.message;
+      const errorMessage = unknown.errorMessage;
+      const error = new Error(message || errorMessage || "[no message]");
+
+      Object.keys(unknown).forEach(function(key) {
+        error[key] = JSON.stringify(unknown[key]);
+      });
+
+      return error
+    }
+  }
+  |}
+];
+
 external asJson: 'any => Js.Json.t = "%identity";
 
 let safeParse: ('jsData => 'data) => Types.safeParse('jsData, 'data) =

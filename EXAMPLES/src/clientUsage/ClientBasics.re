@@ -1,6 +1,5 @@
 module ApolloQueryResult = ApolloClient.Types.ApolloQueryResult;
 module ObservableQuery = ApolloClient.Types.ObservableQuery;
-module Prometo = Yawaramin__Prometo;
 
 module AddTodoMutation = [%graphql
   {|

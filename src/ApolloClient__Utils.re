@@ -31,11 +31,12 @@ let ensureError: any => Js.Exn.t = [%bs.raw
 
 external asJson: 'any => Js.Json.t = "%identity";
 
-let safeParse: ('jsData => 'data) => Types.safeParse('jsData, 'data) =
+let safeParse: ('jsData => 'data) => Types.safeParse('data, 'jsData) =
   (parse, jsData) =>
     switch (parse(jsData)) {
     | data => Data(data)
-    | exception _ => ParseError({data: jsData->asJson})
+    | exception (Js.Exn.Error(error)) =>
+      ParseError({jsData: jsData->asJson, error})
     };
 
 let safeParseWithCommonProps:
@@ -43,10 +44,10 @@ let safeParseWithCommonProps:
     ~jsData: option('jsData),
     ~graphQLErrors: array(Graphql.Error.GraphQLError.t)=?,
     ~apolloError: ApolloError.t=?,
-    'jsData => 'data
+    Types.safeParse('data, 'jsData)
   ) =>
   (option('data), option(ApolloError.t)) =
-  (~jsData, ~graphQLErrors=?, ~apolloError=?, parse) => {
+  (~jsData, ~graphQLErrors=?, ~apolloError=?, safeParse) => {
     let existingError =
       switch (apolloError, graphQLErrors) {
       | (Some(_), _) => apolloError
@@ -54,17 +55,21 @@ let safeParseWithCommonProps:
         Some(ApolloError.make(~graphQLErrors, ()))
       | (None, None) => None
       };
-    switch (jsData->Belt.Option.map(jsData => safeParse(parse, jsData))) {
-    | Some(ParseError({data})) => (
-        None,
-        Some(
-          ApolloError.make(
-            ~networkError=ParseError({data: data}),
-            ~graphQLErrors?,
-            (),
+    switch (jsData->Belt.Option.map(jsData => safeParse(jsData))) {
+    | Some(ParseError(parseError)) =>
+      // Be careful we do not overwrite an existing error with a ParseError
+      existingError->Belt.Option.isSome
+        ? (None, existingError)
+        : (
+          None,
+          Some(
+            ApolloError.make(
+              ~networkError=ParseError(parseError),
+              ~graphQLErrors?,
+              (),
+            ),
           ),
-        ),
-      )
+        )
     | Some(Data(data)) => (Some(data), existingError)
     | None => (None, existingError)
     };

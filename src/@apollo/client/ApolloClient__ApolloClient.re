@@ -484,6 +484,7 @@ let mutate:
     variables,
   ) => {
     let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
+    let safeParse = Utils.safeParse(Operation.parse);
 
     Js_.mutate(
       client,
@@ -501,15 +502,13 @@ let mutate:
             update,
             variables: jsVariables,
           },
-          ~parse=Operation.parse,
+          ~safeParse,
           ~serialize=Operation.serialize,
         ),
     )
     ->Js.Promise.then_(
         jsResult =>
-          jsResult
-          ->FetchResult.fromJs(_, ~parse=Operation.parse)
-          ->Js.Promise.resolve,
+          jsResult->FetchResult.fromJs(_, ~safeParse)->Js.Promise.resolve,
         _,
       );
   };
@@ -544,6 +543,7 @@ let query:
     variables,
   ) => {
     let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
+    let safeParse = Utils.safeParse(Operation.parse);
 
     Js_.query(
       client,
@@ -561,9 +561,7 @@ let query:
     ->Promise.map(result => {
         switch (result) {
         | Ok(jsApolloQueryResult) =>
-          jsApolloQueryResult->ApolloQueryResult.fromJs(
-            ~parse=Operation.parse,
-          )
+          jsApolloQueryResult->ApolloQueryResult.fromJs(~safeParse)
         | Error(error) =>
           ApolloQueryResult.fromError(
             ApolloError.make(

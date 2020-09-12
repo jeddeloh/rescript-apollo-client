@@ -63,6 +63,7 @@ let useQuery:
     variables,
   ) => {
     let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
+    let safeParse = Utils.safeParse(Operation.parse);
 
     let jsQueryResult =
       Js_.useQuery(.
@@ -91,7 +92,7 @@ let useQuery:
     Utils.useGuaranteedMemo1(
       () => {
         jsQueryResult->QueryResult.fromJs(
-          ~parse=Operation.parse,
+          ~safeParse,
           ~serialize=Operation.serialize,
         )
       },

@@ -38,7 +38,7 @@ let useLazyQuery:
       ~errorPolicy: ErrorPolicy.t=?,
       ~fetchPolicy: WatchQueryFetchPolicy.t=?,
       ~notifyOnNetworkStatusChange: bool=?,
-      ~onCompleted: data => unit=?,
+      ~onCompleted: Types.parseResult(data) => unit=?,
       ~onError: ApolloError.t => unit=?,
       ~partialRefetch: bool=?,
       ~pollInterval: int=?,
@@ -61,6 +61,7 @@ let useLazyQuery:
     ~ssr=?,
     (),
   ) => {
+    let safeParse = Utils.safeParse(Operation.parse);
     let jsQueryTuple =
       Js_.useLazyQuery(.
         Operation.query,
@@ -80,14 +81,14 @@ let useLazyQuery:
             ssr,
             variables: None,
           },
-          ~parse=Operation.parse,
+          ~safeParse,
         ),
       );
 
     Utils.useGuaranteedMemo1(
       () => {
         jsQueryTuple->QueryTuple.fromJs(
-          ~parse=Operation.parse,
+          ~safeParse,
           ~serialize=Operation.serialize,
           ~serializeVariables=Operation.serializeVariables,
         )
@@ -111,7 +112,7 @@ let useLazyQueryWithVariables:
       ~fetchPolicy: WatchQueryFetchPolicy.t=?,
       ~mapJsVariables: jsVariables => jsVariables=?,
       ~notifyOnNetworkStatusChange: bool=?,
-      ~onCompleted: data => unit=?,
+      ~onCompleted: Types.parseResult(data) => unit=?,
       ~onError: ApolloError.t => unit=?,
       ~partialRefetch: bool=?,
       ~pollInterval: int=?,
@@ -135,8 +136,8 @@ let useLazyQueryWithVariables:
     ~ssr=?,
     variables,
   ) => {
-    let jsVariables =
-      variables->Operation.serializeVariables->mapJsVariables;
+    let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
+    let safeParse = Utils.safeParse(Operation.parse);
 
     let jsQueryTuple =
       Js_.useLazyQuery(.
@@ -157,14 +158,14 @@ let useLazyQueryWithVariables:
             ssr,
             variables: Some(jsVariables),
           },
-          ~parse=Operation.parse,
+          ~safeParse,
         ),
       );
 
     Utils.useGuaranteedMemo1(
       () => {
         jsQueryTuple->QueryTuple__noVariables.fromJs(
-          ~parse=Operation.parse,
+          ~safeParse,
           ~serialize=Operation.serialize,
           // Passing in the same variables from above allows us to reuse some types
           ~variables=jsVariables,

@@ -68,13 +68,15 @@ module ApolloQueryResult = {
     networkStatus: NetworkStatus.t,
   };
 
-  let fromJs: (Js_.t('jsData), ~parse: 'jsData => 'data) => t('data) =
-    (js, ~parse) => {
+  let fromJs:
+    (Js_.t('jsData), ~safeParse: Types.safeParse('data, 'jsData)) =>
+    t('data) =
+    (js, ~safeParse) => {
       let (data, error) =
         Utils.safeParseWithCommonProps(
           ~jsData=js.data,
           ~graphQLErrors=?js.errors,
-          parse,
+          safeParse,
         );
 
       {
@@ -119,15 +121,15 @@ module MutationQueryReducer = {
   type t('data) = (Js.Json.t, options('data)) => Js.Json.t;
 
   let toJs:
-    (t('data), ~parse: 'jsData => 'data) =>
+    (t('data), ~safeParse: Types.safeParse('data, 'jsData)) =>
     (. Js.Json.t, Js_.options('jsData)) => Js.Json.t =
-    (t, ~parse) =>
+    (t, ~safeParse) =>
       (. previousResult, jsOptions) =>
         t(
           previousResult,
           {
             mutationResult:
-              jsOptions.mutationResult->FetchResult.fromJs(~parse),
+              jsOptions.mutationResult->FetchResult.fromJs(~safeParse),
             queryName: jsOptions.queryName,
             queryVariables: jsOptions.queryVariables,
           },
@@ -146,11 +148,13 @@ module MutationQueryReducersMap = {
 
   type t('data) = Js.Dict.t(MutationQueryReducer.t('data));
 
-  let toJs: (t('data), ~parse: 'jsData => 'data) => Js_.t('jsData) =
-    (t, ~parse) => {
+  let toJs:
+    (t('data), ~safeParse: Types.safeParse('data, 'jsData)) =>
+    Js_.t('jsData) =
+    (t, ~safeParse) => {
       Js.Dict.map(
         (. mutationQueryReducer) =>
-          mutationQueryReducer->MutationQueryReducer.toJs(~parse),
+          mutationQueryReducer->MutationQueryReducer.toJs(~safeParse),
         t,
       );
     };

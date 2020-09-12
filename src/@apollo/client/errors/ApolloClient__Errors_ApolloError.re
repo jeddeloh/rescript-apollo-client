@@ -2,6 +2,7 @@ module Graphql = ApolloClient__Graphql;
 module GraphQLError = ApolloClient__Graphql.Error.GraphQLError;
 module ServerError = ApolloClient__Link_Utils_ThrowServerError.ServerError;
 module ServerParseError = ApolloClient__Link_Http_ParseAndCheckHttpResponse.ServerParseError;
+module Types = ApolloClient__Types;
 
 module Js_ = {
   module NetworkErrorUnion: {
@@ -83,7 +84,7 @@ type t_networkError =
   /* Fetch got a response, but it wasn't JSON */
   | BadBody(ServerParseError.t)
   /* We got a JSON response, but it wasn't in a shape we could parse */
-  | ParseError({data: Js.Json.t}); // ParseError is reason-apollo-client only
+  | ParseError(Types.parseError); // ParseError is reason-apollo-client only
 
 type t = {
   extraInfo: Js.Json.t,

@@ -32,8 +32,13 @@ module type OperationNoRequiredVars = {
   let makeDefaultVariables: unit => t_variables;
 };
 
+type parseError = {
+  jsData: Js.Json.t,
+  error: Js.Exn.t,
+};
+
 type parseResult('data) =
   | Data('data)
-  | ParseError({data: Js.Json.t});
+  | ParseError(parseError);
 
-type safeParse('jsData, 'data) = 'jsData => parseResult('data);
+type safeParse('data, 'jsData) = 'jsData => parseResult('data);

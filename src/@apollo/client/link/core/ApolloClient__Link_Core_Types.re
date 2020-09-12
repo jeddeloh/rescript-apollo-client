@@ -1,6 +1,9 @@
+module ApolloError = ApolloClient__Errors_ApolloError;
 module Graphql = ApolloClient__Graphql;
 module GraphQLError = ApolloClient__Graphql.Error.GraphQLError;
 module Observable = ApolloClient__ZenObservable.Observable;
+module Types = ApolloClient__Types;
+module Utils = ApolloClient__Utils;
 
 module GraphQLRequest = {
   module Js_ = {
@@ -82,17 +85,20 @@ module FetchResult = {
     extensions: option(Js.Json.t), // ACTUAL: Record<string, any>
     context: option(Js.Json.t), // ACTUAL: Record<string, any>
     // ...extends ExecutionResult
-    errors: option(array(GraphQLError.t)),
+    error: option(ApolloError.t),
   };
 
-  let fromJs: (Js_.t('jsData), ~parse: 'jsData => 'data) => t('data) =
-    (js, ~parse) => {
-      {
-        data: js.data->Js.toOption->Belt.Option.map(parse),
-        extensions: js.extensions,
-        context: js.context,
-        errors: js.errors,
-      };
+  let fromJs:
+    (Js_.t('jsData), ~safeParse: Types.safeParse('data, 'jsData)) =>
+    t('data) =
+    (js, ~safeParse) => {
+      let (data, error) =
+        Utils.safeParseWithCommonProps(
+          ~jsData=js.data->Js.toOption,
+          ~graphQLErrors=?js.errors,
+          safeParse,
+        );
+      {data, error, extensions: js.extensions, context: js.context};
     };
 };
 

@@ -115,11 +115,14 @@ module ObservableQuery = {
        * Ugh, this diverges from normal patterns because data in these callbacks has to be parsed before this point.
        * I wonder if there is a way we could pass parse along and then use it here or maybe there is a better pattern for this.
        */
-      Js_.subscribe(
-        t->castToJs,
-        ~onNext=Obj.magic(onNext),
-        ~onError?,
-        ~onComplete?,
-        (),
+      (
+        Js_.subscribe(
+          t->castToJs,
+          ~onNext=Obj.magic(onNext),
+          ~onError?,
+          ~onComplete?,
+          (),
+        )
+        ->Subscription.fromJs
       );
 };

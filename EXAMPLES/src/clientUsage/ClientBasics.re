@@ -101,7 +101,7 @@ let watchQuerySubscription =
       (),
     );
 // Unsubscribe like so:
-// watchQuerySubscription->ApolloClient.ObservableQuery.Subscription.unsubscribe;
+watchQuerySubscription.unsubscribe();
 
 [@react.component]
 let make = () => {

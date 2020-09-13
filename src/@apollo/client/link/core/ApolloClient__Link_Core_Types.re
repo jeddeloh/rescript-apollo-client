@@ -100,6 +100,14 @@ module FetchResult = {
         );
       {data, error, extensions: js.extensions, context: js.context};
     };
+
+  let fromError: ApolloError.t => t('data) =
+    error => {
+      data: None,
+      extensions: None,
+      context: None,
+      error: Some(error),
+    };
 };
 
 module NextLink = {

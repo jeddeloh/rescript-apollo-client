@@ -480,19 +480,27 @@ module QueryResult = {
 
   let refetch:
     (t('data, 'jsData, 'jsVariables), 'jsVariables) =>
-    Js.Promise.t(ApolloQueryResult.t('data)) =
+    Promise.t(ApolloQueryResult.t('data)) =
     (queryResult, variables) =>
       queryResult
       ->unsafeCastForMethod
       ->Js_.refetch(variables)
-      ->Js.Promise.then_(
-          jsApolloQueryResult =>
-            Js.Promise.resolve(
-              jsApolloQueryResult->ApolloQueryResult.fromJs(
-                ~safeParse=queryResult.__safeParse,
+      ->Promise.Js.fromBsPromise
+      ->Promise.Js.toResult
+      ->Promise.map(result =>
+          switch (result) {
+          | Ok(jsApolloQueryResult) =>
+            jsApolloQueryResult->ApolloQueryResult.fromJs(
+              ~safeParse=queryResult.__safeParse,
+            )
+          | Error(error) =>
+            ApolloQueryResult.fromError(
+              ApolloError.make(
+                ~networkError=FetchFailure(Utils.ensureError(Any(error))),
+                (),
               ),
-            ),
-          _,
+            )
+          }
         );
 
   [@bs.send]
@@ -1003,7 +1011,7 @@ module MutationTuple = {
       ~update: MutationUpdaterFn.t('data)=?,
       'variables
     ) =>
-    Js.Promise.t(FetchResult.t('data));
+    Promise.t(FetchResult.t('data));
 
   type t('data, 'variables, 'jsVariables) = (
     t_mutationFn('data, 'variables, 'jsVariables),
@@ -1052,10 +1060,20 @@ module MutationTuple = {
             ),
           ),
         )
-        ->Js.Promise.then_(
-            jsResult =>
-              FetchResult.fromJs(jsResult, ~safeParse)->Js.Promise.resolve,
-            _,
+        ->Promise.Js.fromBsPromise
+        ->Promise.Js.toResult
+        ->Promise.map(result =>
+            switch (result) {
+            | Ok(jsFetchResult) =>
+              FetchResult.fromJs(jsFetchResult, ~safeParse)
+            | Error(error) =>
+              FetchResult.fromError(
+                ApolloError.make(
+                  ~networkError=FetchFailure(Utils.ensureError(Any(error))),
+                  (),
+                ),
+              )
+            }
           );
       };
 
@@ -1079,7 +1097,7 @@ module MutationTuple__noVariables = {
       ~fetchPolicy: WatchQueryFetchPolicy.t=?,
       unit
     ) =>
-    Js.Promise.t(FetchResult.t('data));
+    Promise.t(FetchResult.t('data));
 
   type t('data, 'jsVariables) = (
     t_mutationFn('data, 'jsVariables),
@@ -1122,10 +1140,20 @@ module MutationTuple__noVariables = {
             ),
           ),
         )
-        ->Js.Promise.then_(
-            jsResult =>
-              FetchResult.fromJs(jsResult, ~safeParse)->Js.Promise.resolve,
-            _,
+        ->Promise.Js.fromBsPromise
+        ->Promise.Js.toResult
+        ->Promise.map(result =>
+            switch (result) {
+            | Ok(jsFetchResult) =>
+              FetchResult.fromJs(jsFetchResult, ~safeParse)
+            | Error(error) =>
+              FetchResult.fromError(
+                ApolloError.make(
+                  ~networkError=FetchFailure(Utils.ensureError(Any(error))),
+                  (),
+                ),
+              )
+            }
           );
       };
 

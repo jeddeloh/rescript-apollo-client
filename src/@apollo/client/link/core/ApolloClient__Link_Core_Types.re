@@ -93,7 +93,7 @@ module FetchResult = {
     t('data) =
     (js, ~safeParse) => {
       let (data, error) =
-        Utils.safeParseWithCommonProps(
+        Utils.safeParseAndLiftToCommonResultProps(
           ~jsData=js.data->Js.toOption,
           ~graphQLErrors=?js.errors,
           safeParse,

@@ -73,7 +73,7 @@ module ApolloQueryResult = {
     t('data) =
     (js, ~safeParse) => {
       let (data, error) =
-        Utils.safeParseWithCommonProps(
+        Utils.safeParseAndLiftToCommonResultProps(
           ~jsData=js.data,
           ~graphQLErrors=?js.errors,
           safeParse,

@@ -37,7 +37,7 @@ module QueryHookOptions = {
       notifyOnNetworkStatusChange: option(bool),
       partialRefetch: option(bool),
       pollInterval: option(int),
-      // INTENTIONALLY IGNORED
+      // INTENTIONALLY IGNORED (but now with safeParse and result unwrapping, maybe it shouldn't be?)
       // returnPartialData: option(bool),
       ssr: option(bool),
       // We don't allow optional variables because it's not typesafe
@@ -50,7 +50,7 @@ module QueryHookOptions = {
     // ...extends QueryFunctionOptions
     displayName: option(string),
     skip: option(bool),
-    onCompleted: option('data => unit),
+    onCompleted: option(Types.parseResult('data) => unit),
     onError: option(ApolloError.t => unit),
     // ...extends BaseQueryOptions
     client: option(ApolloClient.t),
@@ -60,14 +60,17 @@ module QueryHookOptions = {
     notifyOnNetworkStatusChange: option(bool),
     partialRefetch: option(bool),
     pollInterval: option(int),
-    // INTENTIONALLY IGNORED
+    // INTENTIONALLY IGNORED (but now with safeParse and result unwrapping, maybe it shouldn't be?)
     // returnPartialData: option(bool),
     ssr: option(bool),
     variables: 'jsVariables,
   };
 
   let toJs =
-      (t: t('data, 'jsVariables), ~parse: 'jsData => 'data)
+      (
+        t: t('data, 'jsVariables),
+        ~safeParse: Types.safeParse('data, 'jsData),
+      )
       : Js_.t('jsData, 'jsVariables) => {
     client: t.client,
     context: t.context,
@@ -75,7 +78,9 @@ module QueryHookOptions = {
     errorPolicy: t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
     onCompleted:
       t.onCompleted
-      ->Belt.Option.map((onCompleted, jsData) => onCompleted(jsData->parse)),
+      ->Belt.Option.map((onCompleted, jsData) =>
+          onCompleted(jsData->safeParse)
+        ),
     onError:
       t.onError
       ->Belt.Option.map(onError =>
@@ -123,7 +128,7 @@ module LazyQueryHookOptions = {
       partialRefetch: bool,
       [@bs.optional]
       pollInterval: int,
-      // INTENTIONALLY IGNORED
+      // INTENTIONALLY IGNORED (but now with safeParse and result unwrapping, maybe it shouldn't be?)
       // returnPartialData: option(bool),
       [@bs.optional]
       ssr: bool,
@@ -147,7 +152,7 @@ module LazyQueryHookOptions = {
     notifyOnNetworkStatusChange: option(bool),
     partialRefetch: option(bool),
     pollInterval: option(int),
-    // INTENTIONALLY IGNORED
+    // INTENTIONALLY IGNORED (but now with safeParse and result unwrapping, maybe it shouldn't be?)
     // returnPartialData: option(bool),
     ssr: option(bool),
     variables: option('jsVariables),
@@ -357,7 +362,7 @@ module QueryResult = {
     t('data, 'jsData, 'jsVariables) =
     (js, ~safeParse, ~serialize) => {
       let (data, error) =
-        Utils.safeParseWithCommonProps(
+        Utils.safeParseAndLiftToCommonResultProps(
           ~jsData=js.data,
           ~apolloError=?js.error->Belt.Option.map(ApolloError.fromJs),
           safeParse,
@@ -916,7 +921,7 @@ module MutationResult = {
     t('data) =
     (js, ~safeParse) => {
       let (data, error) =
-        Utils.safeParseWithCommonProps(
+        Utils.safeParseAndLiftToCommonResultProps(
           ~jsData=js.data->Js.toOption,
           ~apolloError=?js.error->Belt.Option.map(ApolloError.fromJs),
           safeParse,
@@ -1181,11 +1186,18 @@ module SubscriptionResult = {
     error: option(ApolloError.t),
   };
 
-  let fromJs: (Js_.t('jsData), ~parse: 'jsData => 'data) => t('data) =
-    (js, ~parse) => {
-      loading: js.loading,
-      data: js.data->Belt.Option.map(parse),
-      error: js.error->Belt.Option.map(ApolloError.fromJs),
+  let fromJs:
+    (Js_.t('jsData), ~safeParse: Types.safeParse('data, 'jsData)) =>
+    t('data) =
+    (js, ~safeParse) => {
+      let (data, error) =
+        Utils.safeParseAndLiftToCommonResultProps(
+          ~jsData=js.data,
+          ~apolloError=?js.error->Belt.Option.map(ApolloError.fromJs),
+          safeParse,
+        );
+
+      {loading: js.loading, data, error};
     };
 };
 
@@ -1206,11 +1218,13 @@ module OnSubscriptionDataOptions = {
     subscriptionData: SubscriptionResult.t('data),
   };
 
-  let fromJs: (Js_.t('jsData), ~parse: 'jsData => 'data) => t('data) =
-    (js, ~parse) => {
+  let fromJs:
+    (Js_.t('jsData), ~safeParse: Types.safeParse('data, 'jsData)) =>
+    t('data) =
+    (js, ~safeParse) => {
       client: js.client,
       subscriptionData:
-        js.subscriptionData->SubscriptionResult.fromJs(~parse),
+        js.subscriptionData->SubscriptionResult.fromJs(~safeParse),
     };
 };
 
@@ -1297,9 +1311,9 @@ module SubscriptionHookOptions = {
   };
 
   let toJs:
-    (t('data, 'jsVariables), ~parse: 'jsData => 'data) =>
+    (t('data, 'jsVariables), ~safeParse: Types.safeParse('data, 'jsData)) =>
     Js_.t('jsData, 'jsVariables) =
-    (t, ~parse) => {
+    (t, ~safeParse) => {
       subscription: t.subscription,
       variables: t.variables,
       fetchPolicy: t.fetchPolicy,
@@ -1319,7 +1333,7 @@ module SubscriptionHookOptions = {
             (. jsOnSubscriptionDataOptions) =>
               onSubscriptionData(
                 jsOnSubscriptionDataOptions->OnSubscriptionDataOptions.fromJs(
-                  ~parse,
+                  ~safeParse,
                 ),
               )
           ),

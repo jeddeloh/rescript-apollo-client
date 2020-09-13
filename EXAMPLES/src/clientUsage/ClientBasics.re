@@ -40,26 +40,25 @@ let addTodo = _ =>
       ~mutation=(module AddTodoMutation),
       {text: "Another To-Do"},
     )
-  ->Promise.Js.fromBsPromise
-  ->Promise.Js.toResult
   ->Promise.get(
       fun
-      | Ok(result) => Js.log2("mutate result: ", result.data)
-      | Error(error) => Js.log2("Error: ", error),
+      | {data: Some(data), error: None} => Js.log2("mutate result: ", data)
+      | {error} => Js.log2("Error: ", error),
     );
 
+let observableQuery =
+  Client.instance->ApolloClient.watchQuery(~query=(module TodosQuery), ());
+
 let watchQuerySubscription =
-  Client.instance
-  ->ApolloClient.watchQuery(~query=(module TodosQuery), ())
-  ->ObservableQuery.subscribe(
-      ~onNext=
-        result =>
-          switch (result) {
-          | {data: Some({todos})} => Js.log2("watchQuery To-Dos: ", todos)
-          | _ => ()
-          },
-      (),
-    );
+  observableQuery.subscribe(
+    ~onNext=
+      result =>
+        switch (result) {
+        | {data: Some({todos})} => Js.log2("watchQuery To-Dos: ", todos)
+        | _ => ()
+        },
+    (),
+  );
 // Unsubscribe like so:
 // watchQuerySubscription->ApolloClient.ObservableQuery.Subscription.unsubscribe;
 

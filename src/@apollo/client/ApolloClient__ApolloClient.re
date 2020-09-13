@@ -634,11 +634,14 @@ let readQuery:
     ~optimistic=?,
     variables,
   ) => {
-    let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
-
     Js_.readQuery(
       client,
-      ~options={id, query: Operation.query, variables: jsVariables},
+      ~options=
+        DataProxy.Query.toJs(
+          {id, query: Operation.query, variables},
+          ~mapJsVariables,
+          ~serializeVariables=Operation.serializeVariables,
+        ),
       ~optimistic,
     )
     ->Js.toOption
@@ -674,6 +677,7 @@ let watchQuery:
     variables,
   ) => {
     let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
+    let safeParse = Utils.safeParse(Operation.parse);
 
     Js_.watchQuery(
       client,
@@ -686,7 +690,7 @@ let watchQuery:
           context,
         }),
     )
-    ->ObservableQuery.fromJs(~parse=Operation.parse);
+    ->ObservableQuery.fromJs(~safeParse);
   };
 
 let writeFragment:
@@ -712,13 +716,11 @@ let writeFragment:
   ) => {
     Js_.writeFragment(
       client,
-      ~options={
-        broadcast,
-        data: data->Fragment.serialize,
-        id,
-        fragment: Fragment.query,
-        fragmentName,
-      },
+      ~options=
+        DataProxy.WriteFragmentOptions.toJs(
+          {broadcast, data, id, fragment: Fragment.query, fragmentName},
+          ~serialize=Fragment.serialize,
+        ),
     );
   };
 
@@ -746,16 +748,14 @@ let writeQuery:
     ~mapJsVariables=Utils.identity,
     variables,
   ) => {
-    let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
-
     Js_.writeQuery(
       client,
-      ~options={
-        broadcast,
-        data: data->Operation.serialize,
-        id,
-        query: Operation.query,
-        variables: jsVariables,
-      },
+      ~options=
+        DataProxy.WriteQueryOptions.toJs(
+          {broadcast, data, id, query: Operation.query, variables},
+          ~mapJsVariables,
+          ~serialize=Operation.serialize,
+          ~serializeVariables=Operation.serializeVariables,
+        ),
     );
   };

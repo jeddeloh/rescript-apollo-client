@@ -17,13 +17,14 @@ let ensureError: any => Js.Exn.t = [%bs.raw
       unknown = unknown || {};
       const message = unknown.message;
       const errorMessage = unknown.errorMessage;
-      const error = new Error(message || errorMessage || "[no message]");
+      const keys = Object.keys(unknown);
+      const error = new Error(message || errorMessage || "[Non-error exception with keys: " + keys.join(", ") + "]");
 
-      Object.keys(unknown).forEach(function(key) {
-        error[key] = JSON.stringify(unknown[key]);
+      keys.forEach(function(key) {
+        error[key] = unknown[key];
       });
 
-      return error
+      return error;
     }
   }
   |}
@@ -39,7 +40,7 @@ let safeParse: ('jsData => 'data) => Types.safeParse('data, 'jsData) =
       ParseError({jsData: jsData->asJson, error})
     };
 
-let safeParseWithCommonProps:
+let safeParseAndLiftToCommonResultProps:
   (
     ~jsData: option('jsData),
     ~graphQLErrors: array(Graphql.Error.GraphQLError.t)=?,
@@ -55,6 +56,7 @@ let safeParseWithCommonProps:
         Some(ApolloError.make(~graphQLErrors, ()))
       | (None, None) => None
       };
+
     switch (jsData->Belt.Option.map(jsData => safeParse(jsData))) {
     | Some(ParseError(parseError)) =>
       // Be careful we do not overwrite an existing error with a ParseError

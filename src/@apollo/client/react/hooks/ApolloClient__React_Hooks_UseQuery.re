@@ -36,7 +36,7 @@ let useQuery:
       ~fetchPolicy: WatchQueryFetchPolicy.t=?,
       ~mapJsVariables: jsVariables => jsVariables=?,
       ~notifyOnNetworkStatusChange: bool=?,
-      ~onCompleted: data => unit=?,
+      ~onCompleted: Types.parseResult(data) => unit=?,
       ~onError: ApolloError.t => unit=?,
       ~partialRefetch: bool=?,
       ~pollInterval: int=?,
@@ -85,7 +85,7 @@ let useQuery:
             ssr,
             variables: jsVariables,
           },
-          ~parse=Operation.parse,
+          ~safeParse,
         ),
       );
 

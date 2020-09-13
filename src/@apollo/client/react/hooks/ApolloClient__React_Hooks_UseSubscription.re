@@ -71,8 +71,8 @@ let useSubscription:
     ~skip=?,
     variables,
   ) => {
-    let jsVariables =
-      variables->Operation.serializeVariables->mapJsVariables;
+    let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
+    let safeParse = Utils.safeParse(Operation.parse);
 
     let jsSubscriptionResult =
       Js_.useSubscription(.
@@ -88,7 +88,7 @@ let useSubscription:
             skip,
             variables: jsVariables,
           },
-          ~parse=Operation.parse,
+          ~safeParse,
         ),
       );
 

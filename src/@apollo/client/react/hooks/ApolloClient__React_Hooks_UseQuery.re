@@ -44,7 +44,7 @@ let useQuery:
       ~ssr: bool=?,
       variables
     ) =>
-    QueryResult.t(data, jsData, jsVariables) =
+    QueryResult.t(data, jsData, variables, jsVariables) =
   (
     ~query as (module Operation),
     ~client=?,
@@ -62,7 +62,6 @@ let useQuery:
     ~ssr=?,
     variables,
   ) => {
-    let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
     let safeParse = Utils.safeParse(Operation.parse);
 
     let jsQueryResult =
@@ -83,9 +82,11 @@ let useQuery:
             query: None,
             skip,
             ssr,
-            variables: jsVariables,
+            variables,
           },
+          ~mapJsVariables,
           ~safeParse,
+          ~serializeVariables=Operation.serializeVariables,
         ),
       );
 
@@ -94,6 +95,7 @@ let useQuery:
         jsQueryResult->QueryResult.fromJs(
           ~safeParse,
           ~serialize=Operation.serialize,
+          ~serializeVariables=Operation.serializeVariables,
         )
       },
       jsQueryResult,

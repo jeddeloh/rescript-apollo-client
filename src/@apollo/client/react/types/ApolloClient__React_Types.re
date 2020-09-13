@@ -45,7 +45,7 @@ module QueryHookOptions = {
     };
   };
 
-  type t('data, 'jsVariables) = {
+  type t('data, 'variables) = {
     query: option(Graphql.documentNode),
     // ...extends QueryFunctionOptions
     displayName: option(string),
@@ -63,13 +63,15 @@ module QueryHookOptions = {
     // INTENTIONALLY IGNORED (but now with safeParse and result unwrapping, maybe it shouldn't be?)
     // returnPartialData: option(bool),
     ssr: option(bool),
-    variables: 'jsVariables,
+    variables: 'variables,
   };
 
   let toJs =
       (
-        t: t('data, 'jsVariables),
+        t: t('data, 'variables),
+        ~mapJsVariables: 'jsVariables => 'jsVariables,
         ~safeParse: Types.safeParse('data, 'jsData),
+        ~serializeVariables: 'variables => 'jsVariables,
       )
       : Js_.t('jsData, 'jsVariables) => {
     client: t.client,
@@ -93,7 +95,7 @@ module QueryHookOptions = {
     partialRefetch: t.partialRefetch,
     skip: t.skip,
     ssr: t.ssr,
-    variables: t.variables,
+    variables: t.variables->serializeVariables->mapJsVariables,
   };
 };
 
@@ -138,7 +140,7 @@ module LazyQueryHookOptions = {
     let make = t;
   };
 
-  type t('data, 'jsVariables) = {
+  type t('data, 'variables) = {
     query: option(Graphql.documentNode),
     // ...extends QueryFunctionOptions
     displayName: option(string),
@@ -155,13 +157,14 @@ module LazyQueryHookOptions = {
     // INTENTIONALLY IGNORED (but now with safeParse and result unwrapping, maybe it shouldn't be?)
     // returnPartialData: option(bool),
     ssr: option(bool),
-    variables: option('jsVariables),
+    variables: option('variables),
   };
 
   let toJs =
       (
-        t: t('data, 'jsVariables),
+        t: t('data, 'variables),
         ~safeParse: Types.safeParse('data, 'jsData),
+        ~serializeVariables: 'variables => 'jsVariables,
       )
       : Js_.t('jsData, 'jsVariables) =>
     Js_.make(
@@ -186,7 +189,7 @@ module LazyQueryHookOptions = {
       ~pollInterval=?t.pollInterval,
       ~partialRefetch=?t.partialRefetch,
       ~ssr=?t.ssr,
-      ~variables=?t.variables,
+      ~variables=?t.variables->Belt.Option.map(serializeVariables),
       (),
     );
 };
@@ -332,7 +335,7 @@ module QueryResult = {
       ),
   };
 
-  type t('data, 'jsData, 'jsVariables) = {
+  type t('data, 'jsData, 'variables, 'jsVariables) = {
     called: bool,
     client: ApolloClient.t,
     data: option('data),
@@ -347,20 +350,23 @@ module QueryResult = {
     updateQuery: useMethodFunctionsInThisModuleInstead,
     __safeParse: Types.safeParse('data, 'jsData),
     __serialize: 'data => 'jsData,
+    __serializeVariables: 'variables => 'jsVariables,
   };
 
   external unsafeCastForMethod:
-    t('data, 'jsData, 'jsVariables) => Js_.t('jsData, 'jsVariables) =
+    t('data, 'jsData, 'variables, 'jsVariables) =>
+    Js_.t('jsData, 'jsVariables) =
     "%identity";
 
   let fromJs:
     (
       Js_.t('jsData, 'jsVariables),
       ~safeParse: Types.safeParse('data, 'jsData),
-      ~serialize: 'data => 'jsData
+      ~serialize: 'data => 'jsData,
+      ~serializeVariables: 'variables => 'jsVariables
     ) =>
-    t('data, 'jsData, 'jsVariables) =
-    (js, ~safeParse, ~serialize) => {
+    t('data, 'jsData, 'variables, 'jsVariables) =
+    (js, ~safeParse, ~serialize, ~serializeVariables) => {
       let (data, error) =
         Utils.safeParseAndLiftToCommonResultProps(
           ~jsData=js.data,
@@ -382,14 +388,16 @@ module QueryResult = {
         updateQuery: js.updateQuery,
         __safeParse: safeParse,
         __serialize: serialize,
+        __serializeVariables: serializeVariables,
       };
     };
 
   let fetchMore:
     (
-      t('data, 'jsData, 'jsVariables),
+      t('data, 'jsData, 'variables, 'jsVariables),
       ~context: Js.Json.t=?,
-      ~variables: 'jsVariables=?,
+      ~mapJsVariables: 'jsVariables => 'jsVariables=?,
+      ~variables: 'variables=?,
       ~updateQuery: (
                       'data,
                       t_fetchMoreOptions_updateQueryOptions(
@@ -403,9 +411,17 @@ module QueryResult = {
       unit
     ) =>
     Promise.t(ApolloQueryResult.t('data)) =
-    (queryResult, ~context=?, ~variables=?, ~updateQuery=?, ()) => {
-      let serialize = queryResult.__serialize;
+    (
+      queryResult,
+      ~context=?,
+      ~mapJsVariables=Utils.identity,
+      ~variables=?,
+      ~updateQuery=?,
+      (),
+    ) => {
       let safeParse = queryResult.__safeParse;
+      let serialize = queryResult.__serialize;
+      let serializeVariables = queryResult.__serializeVariables;
 
       let parseErrorDuringCall: ref(option(Types.parseResult(_))) =
         ref(None);
@@ -456,7 +472,10 @@ module QueryResult = {
                   };
                 }
               ),
-            ~variables?,
+            ~variables=?
+              variables->Belt.Option.map(v =>
+                v->serializeVariables->mapJsVariables
+              ),
             (),
           ),
         )
@@ -484,12 +503,18 @@ module QueryResult = {
     };
 
   let refetch:
-    (t('data, 'jsData, 'jsVariables), 'jsVariables) =>
+    (
+      t('data, 'jsData, 'variables, 'jsVariables),
+      ~mapJsVariables: 'jsVariables => 'jsVariables=?,
+      'variables
+    ) =>
     Promise.t(ApolloQueryResult.t('data)) =
-    (queryResult, variables) =>
+    (queryResult, ~mapJsVariables=Utils.identity, variables) => {
+      let serializeVariables = queryResult.__serializeVariables;
+
       queryResult
       ->unsafeCastForMethod
-      ->Js_.refetch(variables)
+      ->Js_.refetch(variables->serializeVariables->mapJsVariables)
       ->Promise.Js.fromBsPromise
       ->Promise.Js.toResult
       ->Promise.map(result =>
@@ -507,13 +532,16 @@ module QueryResult = {
             )
           }
         );
+    };
 
   [@bs.send]
-  external startPolling: (t('data, 'jsData, 'jsVariables), int) => unit =
+  external startPolling:
+    (t('data, 'jsData, 'variables, 'jsVariables), int) => unit =
     "startPolling";
 
   [@bs.send]
-  external stopPolling: (t('data, 'jsData, 'jsVariables), unit) => unit =
+  external stopPolling:
+    (t('data, 'jsData, 'variables, 'jsVariables), unit) => unit =
     "stopPolling";
 
   type subscribeToMore_error =
@@ -523,7 +551,7 @@ module QueryResult = {
   let subscribeToMore:
     type subscriptionData subscriptionVariables.
       (
-        t('queryData, 'jsQueryData, 'jsVariables),
+        t('queryData, 'jsQueryData, 'variables, 'jsVariables),
         ~subscription: (module Operation with
                           type t = subscriptionData and
                           type Raw.t_variables = subscriptionVariables),
@@ -577,7 +605,7 @@ module QueryResult = {
 
   let updateQuery:
     (
-      t('data, 'jsData, 'jsVariables),
+      t('data, 'jsData, 'variables, 'jsVariables),
       (Types.parseResult('data), t_updateQueryOptions('jsVariables)) => 'data
     ) =>
     unit =
@@ -654,22 +682,25 @@ module LazyQueryResult = {
     type t('jsData, 'jsVariables) = Union.t;
   };
 
-  type t('data, 'jsData, 'jsVariables) =
-    | Executed(QueryResult.t('data, 'jsData, 'jsVariables))
+  type t('data, 'jsData, 'variables, 'jsVariables) =
+    | Executed(QueryResult.t('data, 'jsData, 'variables, 'jsVariables))
     | Unexecuted(UnexecutedLazyResult.t);
 
   let fromJs:
     (
       Js_.t('jsData, 'jsVariables),
       ~safeParse: Types.safeParse('data, 'jsData),
-      ~serialize: 'data => 'jsData
+      ~serialize: 'data => 'jsData,
+      ~serializeVariables: 'variables => 'jsVariables
     ) =>
-    t('data, 'jsData, 'jsVariables) =
-    (js, ~safeParse, ~serialize) => {
+    t('data, 'jsData, 'variables, 'jsVariables) =
+    (js, ~safeParse, ~serialize, ~serializeVariables) => {
       switch (js->Js_.Union.classify) {
       | UnexecutedLazyResult(v) => Unexecuted(v->UnexecutedLazyResult.fromJs)
       | QueryResult(v) =>
-        Executed(v->QueryResult.fromJs(~safeParse, ~serialize))
+        Executed(
+          v->QueryResult.fromJs(~safeParse, ~serialize, ~serializeVariables),
+        )
       };
     };
 };
@@ -677,7 +708,7 @@ module LazyQueryResult = {
 module QueryTuple = {
   module Js_ = {
     // export declare type QueryTuple<TData, TVariables> = [(options?: QueryLazyOptions<TVariables>) => void, LazyQueryResult<TData, TVariables>];
-    type t('jsData, 'variables, 'jsVariables) = (
+    type t('jsData, 'jsVariables) = (
       QueryLazyOptions.Js_.t('jsVariables) => unit,
       LazyQueryResult.Js_.t('jsData, 'jsVariables),
     );
@@ -690,12 +721,12 @@ module QueryTuple = {
       'variables
     ) =>
     unit,
-    LazyQueryResult.t('data, 'jsData, 'jsVariables),
+    LazyQueryResult.t('data, 'jsData, 'variables, 'jsVariables),
   );
 
   let fromJs:
     (
-      Js_.t('jsData, 'variables, 'jsVariables),
+      Js_.t('jsData, 'jsVariables),
       ~safeParse: Types.safeParse('data, 'jsData),
       ~serialize: 'data => 'jsData,
       ~serializeVariables: 'variables => 'jsVariables
@@ -712,32 +743,52 @@ module QueryTuple = {
           context,
           variables: variables->serializeVariables->mapJsVariables,
         }),
-      jsLazyQueryResult->LazyQueryResult.fromJs(~safeParse, ~serialize),
+      jsLazyQueryResult->LazyQueryResult.fromJs(
+        ~safeParse,
+        ~serialize,
+        ~serializeVariables,
+      ),
     );
 };
 
 module QueryTuple__noVariables = {
   module Js_ = {
-    type t('jsData, 'variables, 'jsVariables) =
-      QueryTuple.Js_.t('jsData, 'variables, 'jsVariables);
+    type t('jsData, 'jsVariables) = QueryTuple.Js_.t('jsData, 'jsVariables);
   };
 
-  type t('data, 'jsData, 'jsVariables) = (
+  type t('data, 'jsData, 'variables, 'jsVariables) = (
     (~context: Js.Json.t=?, unit) => unit,
-    LazyQueryResult.t('data, 'jsData, 'jsVariables),
+    LazyQueryResult.t('data, 'jsData, 'variables, 'jsVariables),
   );
 
   let fromJs:
     (
-      Js_.t('jsData, 'variables, 'jsVariables),
+      Js_.t('jsData, 'jsVariables),
+      ~mapJsVariables: 'jsVariables => 'jsVariables,
       ~safeParse: Types.safeParse('data, 'jsData),
       ~serialize: 'data => 'jsData,
-      ~variables: 'jsVariables
+      ~serializeVariables: 'variables => 'jsVariables,
+      ~variables: 'variables
     ) =>
-    t('data, 'jsData, 'jsVariables) =
-    ((jsExecuteQuery, jsLazyQueryResult), ~safeParse, ~serialize, ~variables) => (
-      (~context=?, ()) => jsExecuteQuery({context, variables}),
-      jsLazyQueryResult->LazyQueryResult.fromJs(~safeParse, ~serialize),
+    t('data, 'jsData, 'variables, 'jsVariables) =
+    (
+      (jsExecuteQuery, jsLazyQueryResult),
+      ~mapJsVariables,
+      ~safeParse,
+      ~serialize,
+      ~serializeVariables,
+      ~variables,
+    ) => (
+      (~context=?, ()) =>
+        jsExecuteQuery({
+          context,
+          variables: variables->serializeVariables->mapJsVariables,
+        }),
+      jsLazyQueryResult->LazyQueryResult.fromJs(
+        ~safeParse,
+        ~serialize,
+        ~serializeVariables,
+      ),
     );
 };
 
@@ -834,7 +885,7 @@ module MutationHookOptions = {
     let make = t;
   };
 
-  type t('data, 'jsVariables) = {
+  type t('data, 'variables, 'jsVariables) = {
     mutation: option(Graphql.documentNode),
     awaitRefetchQueries: option(bool),
     context: option(Js.Json.t),
@@ -848,17 +899,19 @@ module MutationHookOptions = {
     optimisticResponse: option('jsVariables => 'data),
     refetchQueries: option(RefetchQueryDescription.t),
     update: option(MutationUpdaterFn.t('data)),
-    variables: option('jsVariables),
+    variables: option('variables),
   };
 
   let toJs:
     (
-      t('data, 'jsVariables),
+      t('data, 'variables, 'jsVariables),
+      ~mapJsVariables: 'jsVariables => 'jsVariables,
       ~safeParse: Types.safeParse('data, 'jsData),
-      ~serialize: 'data => 'jsData
+      ~serialize: 'data => 'jsData,
+      ~serializeVariables: 'variables => 'jsVariables
     ) =>
     Js_.t('jsData, 'jsVariables) =
-    (t, ~safeParse, ~serialize) => {
+    (t, ~mapJsVariables, ~safeParse, ~serialize, ~serializeVariables) => {
       Js_.make(
         ~awaitRefetchQueries=?t.awaitRefetchQueries,
         ~context=?t.context,
@@ -884,7 +937,9 @@ module MutationHookOptions = {
           t.refetchQueries->Belt.Option.map(RefetchQueryDescription.toJs),
         ~update=?
           t.update->Belt.Option.map(MutationUpdaterFn.toJs(~safeParse)),
-        ~variables=?t.variables,
+        ~variables=?
+          t.variables
+          ->Belt.Option.map(v => v->serializeVariables->mapJsVariables),
         (),
       );
     };
@@ -963,8 +1018,8 @@ module MutationFunctionOptions = {
     };
   };
 
-  type t('data, 'jsVariables) = {
-    variables: 'jsVariables,
+  type t('data, 'variables, 'jsVariables) = {
+    variables: 'variables,
     optimisticResponse: option('jsVariables => 'data),
     refetchQueries: option(RefetchQueryDescription.t),
     awaitRefetchQueries: option(bool),
@@ -975,13 +1030,15 @@ module MutationFunctionOptions = {
 
   let toJs:
     (
-      t('data, 'jsVariables),
+      t('data, 'variables, 'jsVariables),
+      ~mapJsVariables: 'jsVariables => 'jsVariables,
       ~safeParse: Types.safeParse('data, 'jsData),
-      ~serialize: 'data => 'jsData
+      ~serialize: 'data => 'jsData,
+      ~serializeVariables: 'variables => 'jsVariables
     ) =>
     Js_.t('jsData, 'jsVariables) =
-    (t, ~safeParse, ~serialize) => {
-      variables: t.variables,
+    (t, ~mapJsVariables, ~safeParse, ~serialize, ~serializeVariables) => {
+      variables: t.variables->serializeVariables->mapJsVariables,
       optimisticResponse:
         t.optimisticResponse
         ->Belt.Option.map(optimisticResponse =>
@@ -1005,6 +1062,7 @@ module MutationTuple = {
       MutationResult.Js_.t('jsData),
     );
   };
+
   type t_mutationFn('data, 'variables, 'jsVariables) =
     (
       ~awaitRefetchQueries: bool=?,
@@ -1052,7 +1110,7 @@ module MutationTuple = {
           Some(
             MutationFunctionOptions.toJs(
               {
-                variables: variables->serializeVariables->mapJsVariables,
+                variables,
                 optimisticResponse,
                 refetchQueries,
                 awaitRefetchQueries,
@@ -1060,8 +1118,10 @@ module MutationTuple = {
                 context,
                 fetchPolicy,
               },
+              ~mapJsVariables,
               ~safeParse,
               ~serialize,
+              ~serializeVariables,
             ),
           ),
         )
@@ -1112,12 +1172,21 @@ module MutationTuple__noVariables = {
   let fromJs:
     (
       Js_.t('jsData, 'jsVariables),
+      ~mapJsVariables: 'jsVariables => 'jsVariables,
       ~safeParse: Types.safeParse('data, 'jsData),
       ~serialize: 'data => 'jsData,
-      ~variables: 'jsVariables
+      ~serializeVariables: 'variables => 'jsVariables,
+      ~variables: 'variables
     ) =>
     t('data, 'jsVariables) =
-    ((jsMutationFn, jsMutationResult), ~safeParse, ~serialize, ~variables) => {
+    (
+      (jsMutationFn, jsMutationResult),
+      ~mapJsVariables,
+      ~safeParse,
+      ~serialize,
+      ~serializeVariables,
+      ~variables,
+    ) => {
       let mutationFn =
           (
             ~optimisticResponse=?,
@@ -1140,8 +1209,10 @@ module MutationTuple__noVariables = {
                 context,
                 fetchPolicy,
               },
+              ~mapJsVariables,
               ~safeParse,
               ~serialize,
+              ~serializeVariables,
             ),
           ),
         )
@@ -1298,9 +1369,9 @@ module SubscriptionHookOptions = {
     };
   };
 
-  type t('data, 'jsVariables) = {
+  type t('data, 'variables, 'jsVariables) = {
     subscription: option(Graphql.documentNode),
-    variables: 'jsVariables,
+    variables: 'variables,
     fetchPolicy: option(FetchPolicy.t),
     shouldResubscribe:
       option(BaseSubscriptionOptions.t('data, 'jsVariables) => bool),
@@ -1311,11 +1382,16 @@ module SubscriptionHookOptions = {
   };
 
   let toJs:
-    (t('data, 'jsVariables), ~safeParse: Types.safeParse('data, 'jsData)) =>
+    (
+      t('data, 'variables, 'jsVariables),
+      ~mapJsVariables: 'jsVariables => 'jsVariables,
+      ~safeParse: Types.safeParse('data, 'jsData),
+      ~serializeVariables: 'variables => 'jsVariables
+    ) =>
     Js_.t('jsData, 'jsVariables) =
-    (t, ~safeParse) => {
+    (t, ~mapJsVariables, ~safeParse, ~serializeVariables) => {
       subscription: t.subscription,
-      variables: t.variables,
+      variables: t.variables->serializeVariables->mapJsVariables,
       fetchPolicy: t.fetchPolicy,
       shouldResubscribe:
         t.shouldResubscribe

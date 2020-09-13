@@ -20,7 +20,7 @@ module Js_ = {
       . Graphql.documentNode,
       LazyQueryHookOptions.Js_.t('jsData, 'jsVariables)
     ) =>
-    QueryTuple.Js_.t('jsData, 'variables, 'jsVariables) =
+    QueryTuple.Js_.t('jsData, 'jsVariables) =
     "useLazyQuery";
 };
 
@@ -82,6 +82,7 @@ let useLazyQuery:
             variables: None,
           },
           ~safeParse,
+          ~serializeVariables=Operation.serializeVariables,
         ),
       );
 
@@ -119,7 +120,7 @@ let useLazyQueryWithVariables:
       ~ssr: bool=?,
       variables
     ) =>
-    QueryTuple__noVariables.t(data, jsData, jsVariables) =
+    QueryTuple__noVariables.t(data, jsData, variables, jsVariables) =
   (
     ~query as (module Operation),
     ~client=?,
@@ -136,7 +137,6 @@ let useLazyQueryWithVariables:
     ~ssr=?,
     variables,
   ) => {
-    let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
     let safeParse = Utils.safeParse(Operation.parse);
 
     let jsQueryTuple =
@@ -156,19 +156,22 @@ let useLazyQueryWithVariables:
             pollInterval,
             query: None,
             ssr,
-            variables: Some(jsVariables),
+            variables: Some(variables),
           },
           ~safeParse,
+          ~serializeVariables=Operation.serializeVariables,
         ),
       );
 
     Utils.useGuaranteedMemo1(
       () => {
         jsQueryTuple->QueryTuple__noVariables.fromJs(
+          ~mapJsVariables,
           ~safeParse,
           ~serialize=Operation.serialize,
+          ~serializeVariables=Operation.serializeVariables,
           // Passing in the same variables from above allows us to reuse some types
-          ~variables=jsVariables,
+          ~variables,
         )
       },
       jsQueryTuple,

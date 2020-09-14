@@ -73,10 +73,9 @@ module ErrorResponse = {
   };
 
   type t_networkError =
-    ApolloError.t_networkError =
-      | FetchFailure(Js.Exn.t)
-      | BadStatus(int, ServerError.t)
-      | BadBody(ServerParseError.t);
+    | FetchFailure(Js.Exn.t)
+    | BadStatus(int, ServerError.t)
+    | BadBody(ServerParseError.t);
 
   type t = {
     graphQLErrors: option(array(GraphQLError.t)),

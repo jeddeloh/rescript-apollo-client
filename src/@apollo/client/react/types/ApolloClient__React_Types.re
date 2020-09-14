@@ -253,7 +253,7 @@ module QueryResult = {
       data: option('jsData),
       error: option(ApolloError.Js_.t),
       loading: bool,
-      networkStatus: NetworkStatus.t,
+      networkStatus: NetworkStatus.Js_.t,
       // ...extends ObservableQueryFields<TData, TVariables> = Pick<ObservableQuery<TData, TVariables>, 'startPolling' | 'stopPolling' | 'subscribeToMore' | 'updateQuery' | 'refetch' | 'jsVariables'>
       fetchMore: useMethodFunctionsInThisModuleInstead,
       refetch: useMethodFunctionsInThisModuleInstead,
@@ -442,7 +442,7 @@ module QueryResult = {
         data,
         error,
         loading: js.loading,
-        networkStatus: js.networkStatus,
+        networkStatus: js.networkStatus->NetworkStatus.fromJs,
         fetchMore: js.fetchMore,
         refetch: js.refetch,
         startPolling: js.startPolling,

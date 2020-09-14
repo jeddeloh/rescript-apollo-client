@@ -392,9 +392,6 @@ module QueryResult = {
         'data
       ) =>
       unit,
-    __safeParse: Types.safeParse('data, 'jsData),
-    __serialize: 'data => 'jsData,
-    __serializeVariables: 'variables => 'jsVariables,
   };
 
   external unsafeCastForMethod:
@@ -588,12 +585,8 @@ module QueryResult = {
         stopPolling,
         subscribeToMore,
         updateQuery,
-        __safeParse: safeParse,
-        __serialize: serialize,
-        __serializeVariables: serializeVariables,
       };
     };
-
 };
 
 module UnexecutedLazyResult = {

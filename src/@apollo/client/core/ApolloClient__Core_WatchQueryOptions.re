@@ -291,7 +291,7 @@ module SubscribeToMoreOptions = {
 module MutationUpdaterFn = {
   module Js_ = {
     type t('jsData) =
-      (. ApolloCache.Js_.t(Js.Json.t), FetchResult.Js_.t('jsData)) => unit;
+      (. ApolloCache.t(Js.Json.t), FetchResult.Js_.t('jsData)) => unit; // Non-Js_ cache is correct here
   };
 
   type t('data) = (ApolloCache.t(Js.Json.t), FetchResult.t('data)) => unit;
@@ -309,7 +309,6 @@ module MutationUpdaterFn = {
 
 module RefetchQueryDescription = {
   module Js_ = {
-    // CAVEAT: I did not try very hard to find a simpler alternative
     module Union: {
       type t;
       let string: string => t;

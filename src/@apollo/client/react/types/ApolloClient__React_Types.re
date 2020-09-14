@@ -334,7 +334,7 @@ module QueryResult = {
       ),
   };
 
-  type subscribeToMore_error =
+  type t_subscribeToMoreError =
     | ParseError(Types.parseError)
     | SubscriptionError(Js.Exn.t);
 
@@ -380,7 +380,7 @@ module QueryResult = {
                         'subscriptionData,
                       )
                         =?,
-        ~onError: subscribeToMore_error => unit=?,
+        ~onError: t_subscribeToMoreError => unit=?,
         ~context: Js.Json.t=?,
         'subscriptionVariables
       ) =>
@@ -829,7 +829,7 @@ module MutationHookOptions = {
       [@bs.optional]
       awaitRefetchQueries: bool,
       [@bs.optional]
-      client: ApolloClient.Js_.t,
+      client: ApolloClient.t, // Non-Js_ client is appropriate here
       [@bs.optional]
       context: Js.Json.t, // actual: option(Context)
       [@bs.optional]
@@ -928,7 +928,7 @@ module MutationResult = {
       error: option(ApolloError.Js_.t),
       loading: bool,
       called: bool,
-      client: option(ApolloClient.Js_.t),
+      client: option(ApolloClient.t) // Non-Js_ client is appropriate here
     };
   };
 

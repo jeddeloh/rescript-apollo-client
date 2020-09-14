@@ -98,7 +98,7 @@ module ErrorResponse = {
             }
           ),
       response: js.response,
-      operation: js.operation,
+      operation: js.operation->Operation.fromJs,
       forward: js.forward,
     };
 };

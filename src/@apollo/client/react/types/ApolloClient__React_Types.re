@@ -284,8 +284,7 @@ module QueryResult = {
       "startPolling";
 
     [@bs.send]
-    external stopPolling: (t('jsData, 'jsVariables), unit) => unit =
-      "stopPolling";
+    external stopPolling: t('jsData, 'jsVariables) => unit = "stopPolling";
 
     [@bs.send]
     external updateQuery:
@@ -346,10 +345,29 @@ module QueryResult = {
     error: option(ApolloError.t),
     loading: bool,
     networkStatus: NetworkStatus.t,
-    fetchMore: useMethodFunctionsInThisModuleInstead,
-    refetch: useMethodFunctionsInThisModuleInstead,
-    startPolling: useMethodFunctionsInThisModuleInstead,
-    stopPolling: useMethodFunctionsInThisModuleInstead,
+    fetchMore:
+      (
+        ~context: Js.Json.t=?,
+        ~mapJsVariables: 'jsVariables => 'jsVariables=?,
+        ~variables: 'variables=?,
+        ~updateQuery: (
+                        'data,
+                        t_fetchMoreOptions_updateQueryOptions(
+                          'jsData,
+                          'data,
+                          'jsVariables,
+                        )
+                      ) =>
+                      'data
+                        =?,
+        unit
+      ) =>
+      Promise.t(ApolloQueryResult.t('data)),
+    refetch:
+      (~mapJsVariables: 'jsVariables => 'jsVariables=?, 'variables) =>
+      Promise.t(ApolloQueryResult.t('data)),
+    startPolling: int => unit,
+    stopPolling: unit => unit,
     subscribeToMore:
       'subscriptionData 'subscriptionVariables.
       (
@@ -368,7 +386,12 @@ module QueryResult = {
       ) =>
       unit,
 
-    updateQuery: useMethodFunctionsInThisModuleInstead,
+    updateQuery:
+      (
+        (Types.parseResult('data), t_updateQueryOptions('jsVariables)) =>
+        'data
+      ) =>
+      unit,
     __safeParse: Types.safeParse('data, 'jsData),
     __serialize: 'data => 'jsData,
     __serializeVariables: 'variables => 'jsVariables,
@@ -394,6 +417,116 @@ module QueryResult = {
           ~apolloError=?js.error->Belt.Option.map(ApolloError.fromJs),
           safeParse,
         );
+      let fetchMore =
+          (
+            ~context=?,
+            ~mapJsVariables=Utils.identity,
+            ~variables=?,
+            ~updateQuery=?,
+            (),
+          ) => {
+        let parseErrorDuringCall: ref(option(Types.parseResult(_))) =
+          ref(None);
+
+        js
+        ->Js_.fetchMore(
+            Js_.t_fetchMoreOptions(
+              ~context?,
+              ~updateQuery=?
+                updateQuery->Belt.Option.map(updateQuery =>
+                  (.
+                    previousResult,
+                    jsFetchMoreOptions:
+                      Js_.t_fetchMoreOptions_updateQueryOptions(
+                        'jsData,
+                        'jsVariables,
+                      ),
+                  ) => {
+                    switch (
+                      safeParse(previousResult),
+                      jsFetchMoreOptions.fetchMoreResult
+                      ->Belt.Option.map(safeParse),
+                    ) {
+                    | (Data(previousResult), Some(Data(fetchMoreResult))) =>
+                      updateQuery(
+                        previousResult,
+                        {
+                          fetchMoreResult: Some(fetchMoreResult),
+                          variables: jsFetchMoreOptions.variables,
+                        },
+                      )
+                      ->serialize
+                    | (Data(previousResult), None) =>
+                      updateQuery(
+                        previousResult,
+                        {
+                          fetchMoreResult: None,
+                          variables: jsFetchMoreOptions.variables,
+                        },
+                      )
+                      ->serialize
+                    | (ParseError(parseError), _)
+                    | (Data(_), Some(ParseError(parseError))) =>
+                      parseErrorDuringCall.contents =
+                        Some(ParseError(parseError));
+                      previousResult;
+                    };
+                  }
+                ),
+              ~variables=?
+                variables->Belt.Option.map(v =>
+                  v->serializeVariables->mapJsVariables
+                ),
+              (),
+            ),
+          )
+        ->Promise.Js.fromBsPromise
+        ->Promise.Js.toResult
+        ->Promise.map(result => {
+            switch (result) {
+            | Ok(jsApolloQueryResult) =>
+              switch (parseErrorDuringCall.contents) {
+              | Some(ParseError(parseError)) =>
+                ApolloQueryResult.fromError(
+                  ApolloError.make(~networkError=ParseError(parseError), ()),
+                )
+              | _ => ApolloQueryResult.fromJs(jsApolloQueryResult, ~safeParse)
+              }
+            | Error(error) =>
+              ApolloQueryResult.fromError(
+                ApolloError.make(
+                  ~networkError=
+                    FetchFailure(Utils.(ensureError(Any(error)))),
+                  (),
+                ),
+              )
+            }
+          });
+      };
+
+      let refetch = (~mapJsVariables=Utils.identity, variables) => {
+        js
+        ->Js_.refetch(variables->serializeVariables->mapJsVariables)
+        ->Promise.Js.fromBsPromise
+        ->Promise.Js.toResult
+        ->Promise.map(result =>
+            switch (result) {
+            | Ok(jsApolloQueryResult) =>
+              jsApolloQueryResult->ApolloQueryResult.fromJs(~safeParse)
+            | Error(error) =>
+              ApolloQueryResult.fromError(
+                ApolloError.make(
+                  ~networkError=FetchFailure(Utils.ensureError(Any(error))),
+                  (),
+                ),
+              )
+            }
+          );
+      };
+
+      let startPolling = pollInterval => js->Js_.startPolling(pollInterval);
+
+      let stopPolling = () => js->Js_.stopPolling;
 
       let subscribeToMore =
           (
@@ -436,6 +569,12 @@ module QueryResult = {
         );
       };
 
+      let updateQuery = updateQueryFn => {
+        js->Js_.updateQuery((jsPreviousData, options) => {
+          updateQueryFn(jsPreviousData->safeParse, options)->serialize
+        });
+      };
+
       {
         called: js.called,
         client: js.client,
@@ -443,240 +582,18 @@ module QueryResult = {
         error,
         loading: js.loading,
         networkStatus: js.networkStatus->NetworkStatus.fromJs,
-        fetchMore: js.fetchMore,
-        refetch: js.refetch,
-        startPolling: js.startPolling,
-        stopPolling: js.stopPolling,
+        fetchMore,
+        refetch,
+        startPolling,
+        stopPolling,
         subscribeToMore,
-        updateQuery: js.updateQuery,
+        updateQuery,
         __safeParse: safeParse,
         __serialize: serialize,
         __serializeVariables: serializeVariables,
       };
     };
 
-  let fetchMore:
-    (
-      t('data, 'jsData, 'variables, 'jsVariables),
-      ~context: Js.Json.t=?,
-      ~mapJsVariables: 'jsVariables => 'jsVariables=?,
-      ~variables: 'variables=?,
-      ~updateQuery: (
-                      'data,
-                      t_fetchMoreOptions_updateQueryOptions(
-                        'jsData,
-                        'data,
-                        'jsVariables,
-                      )
-                    ) =>
-                    'data
-                      =?,
-      unit
-    ) =>
-    Promise.t(ApolloQueryResult.t('data)) =
-    (
-      queryResult,
-      ~context=?,
-      ~mapJsVariables=Utils.identity,
-      ~variables=?,
-      ~updateQuery=?,
-      (),
-    ) => {
-      let safeParse = queryResult.__safeParse;
-      let serialize = queryResult.__serialize;
-      let serializeVariables = queryResult.__serializeVariables;
-
-      let parseErrorDuringCall: ref(option(Types.parseResult(_))) =
-        ref(None);
-
-      queryResult
-      ->unsafeCastForMethod
-      ->Js_.fetchMore(
-          Js_.t_fetchMoreOptions(
-            ~context?,
-            ~updateQuery=?
-              updateQuery->Belt.Option.map(updateQuery =>
-                (.
-                  previousResult,
-                  jsFetchMoreOptions:
-                    Js_.t_fetchMoreOptions_updateQueryOptions(
-                      'jsData,
-                      'jsVariables,
-                    ),
-                ) => {
-                  switch (
-                    safeParse(previousResult),
-                    jsFetchMoreOptions.fetchMoreResult
-                    ->Belt.Option.map(safeParse),
-                  ) {
-                  | (Data(previousResult), Some(Data(fetchMoreResult))) =>
-                    updateQuery(
-                      previousResult,
-                      {
-                        fetchMoreResult: Some(fetchMoreResult),
-                        variables: jsFetchMoreOptions.variables,
-                      },
-                    )
-                    ->serialize
-                  | (Data(previousResult), None) =>
-                    updateQuery(
-                      previousResult,
-                      {
-                        fetchMoreResult: None,
-                        variables: jsFetchMoreOptions.variables,
-                      },
-                    )
-                    ->serialize
-                  | (ParseError(parseError), _)
-                  | (Data(_), Some(ParseError(parseError))) =>
-                    parseErrorDuringCall.contents =
-                      Some(ParseError(parseError));
-                    previousResult;
-                  };
-                }
-              ),
-            ~variables=?
-              variables->Belt.Option.map(v =>
-                v->serializeVariables->mapJsVariables
-              ),
-            (),
-          ),
-        )
-      ->Promise.Js.fromBsPromise
-      ->Promise.Js.toResult
-      ->Promise.map(result => {
-          switch (result) {
-          | Ok(jsApolloQueryResult) =>
-            switch (parseErrorDuringCall.contents) {
-            | Some(ParseError(parseError)) =>
-              ApolloQueryResult.fromError(
-                ApolloError.make(~networkError=ParseError(parseError), ()),
-              )
-            | _ => ApolloQueryResult.fromJs(jsApolloQueryResult, ~safeParse)
-            }
-          | Error(error) =>
-            ApolloQueryResult.fromError(
-              ApolloError.make(
-                ~networkError=FetchFailure(Utils.(ensureError(Any(error)))),
-                (),
-              ),
-            )
-          }
-        });
-    };
-
-  let refetch:
-    (
-      t('data, 'jsData, 'variables, 'jsVariables),
-      ~mapJsVariables: 'jsVariables => 'jsVariables=?,
-      'variables
-    ) =>
-    Promise.t(ApolloQueryResult.t('data)) =
-    (queryResult, ~mapJsVariables=Utils.identity, variables) => {
-      let serializeVariables = queryResult.__serializeVariables;
-
-      queryResult
-      ->unsafeCastForMethod
-      ->Js_.refetch(variables->serializeVariables->mapJsVariables)
-      ->Promise.Js.fromBsPromise
-      ->Promise.Js.toResult
-      ->Promise.map(result =>
-          switch (result) {
-          | Ok(jsApolloQueryResult) =>
-            jsApolloQueryResult->ApolloQueryResult.fromJs(
-              ~safeParse=queryResult.__safeParse,
-            )
-          | Error(error) =>
-            ApolloQueryResult.fromError(
-              ApolloError.make(
-                ~networkError=FetchFailure(Utils.ensureError(Any(error))),
-                (),
-              ),
-            )
-          }
-        );
-    };
-
-  [@bs.send]
-  external startPolling:
-    (t('data, 'jsData, 'variables, 'jsVariables), int) => unit =
-    "startPolling";
-
-  [@bs.send]
-  external stopPolling:
-    (t('data, 'jsData, 'variables, 'jsVariables), unit) => unit =
-    "stopPolling";
-
-  let subscribeToMore:
-    type subscriptionData subscriptionVariables.
-      (
-        t('queryData, 'jsQueryData, 'variables, 'jsVariables),
-        ~subscription: (module Operation with
-                          type t = subscriptionData and
-                          type Raw.t_variables = subscriptionVariables),
-        ~updateQuery: UpdateQueryFn.t(
-                        'queryData,
-                        subscriptionVariables,
-                        subscriptionData,
-                      )
-                        =?,
-        ~onError: subscribeToMore_error => unit=?,
-        ~context: Js.Json.t=?,
-        subscriptionVariables
-      ) =>
-      unit =
-    (
-      queryResult,
-      ~subscription as (module Operation),
-      ~updateQuery=?,
-      ~onError=?,
-      ~context=?,
-      variables,
-    ) => {
-      let subscriptionSafeParse = Utils.safeParse(Operation.parse);
-
-      queryResult
-      ->unsafeCastForMethod
-      ->Js_.subscribeToMore(
-          SubscribeToMoreOptions.toJs(
-            {
-              document: Operation.query,
-              variables,
-              updateQuery,
-              onError:
-                onError->Belt.Option.map((onError, error) =>
-                  onError(SubscriptionError(error))
-                ),
-              context,
-            },
-            ~onUpdateQueryParseError=
-              parseError =>
-                switch (onError) {
-                | Some(onError) => onError(ParseError(parseError))
-                | None => ()
-                },
-            ~querySafeParse=queryResult.__safeParse,
-            ~querySerialize=queryResult.__serialize,
-            ~subscriptionSafeParse,
-          ),
-        );
-    };
-
-  let updateQuery:
-    (
-      t('data, 'jsData, 'variables, 'jsVariables),
-      (Types.parseResult('data), t_updateQueryOptions('jsVariables)) => 'data
-    ) =>
-    unit =
-    (queryResult, updateQueryFn) => {
-      let safeParse = queryResult.__safeParse;
-      let serialize = queryResult.__serialize;
-      queryResult
-      ->unsafeCastForMethod
-      ->Js_.updateQuery((jsPreviousData, options) => {
-          updateQueryFn(jsPreviousData->safeParse, options)->serialize
-        });
-    };
 };
 
 module UnexecutedLazyResult = {

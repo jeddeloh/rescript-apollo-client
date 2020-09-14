@@ -335,6 +335,10 @@ module QueryResult = {
       ),
   };
 
+  type subscribeToMore_error =
+    | ParseError(Types.parseError)
+    | SubscriptionError(Js.Exn.t);
+
   type t('data, 'jsData, 'variables, 'jsVariables) = {
     called: bool,
     client: ApolloClient.t,
@@ -346,7 +350,24 @@ module QueryResult = {
     refetch: useMethodFunctionsInThisModuleInstead,
     startPolling: useMethodFunctionsInThisModuleInstead,
     stopPolling: useMethodFunctionsInThisModuleInstead,
-    subscribeToMore: useMethodFunctionsInThisModuleInstead,
+    subscribeToMore:
+      'subscriptionData 'subscriptionVariables.
+      (
+        ~subscription: (module Operation with
+                          type t = 'subscriptionData and
+                          type Raw.t_variables = 'subscriptionVariables),
+        ~updateQuery: UpdateQueryFn.t(
+                        'data,
+                        'subscriptionVariables,
+                        'subscriptionData,
+                      )
+                        =?,
+        ~onError: subscribeToMore_error => unit=?,
+        ~context: Js.Json.t=?,
+        'subscriptionVariables
+      ) =>
+      unit,
+
     updateQuery: useMethodFunctionsInThisModuleInstead,
     __safeParse: Types.safeParse('data, 'jsData),
     __serialize: 'data => 'jsData,
@@ -373,6 +394,48 @@ module QueryResult = {
           ~apolloError=?js.error->Belt.Option.map(ApolloError.fromJs),
           safeParse,
         );
+
+      let subscribeToMore =
+          (
+            type subscriptionData,
+            type subscriptionVariables,
+            ~subscription as
+              module Operation:
+                Operation with
+                  type t = subscriptionData and
+                  type Raw.t_variables = subscriptionVariables,
+            ~updateQuery=?,
+            ~onError=?,
+            ~context=?,
+            variables,
+          ) => {
+        let subscriptionSafeParse = Utils.safeParse(Operation.parse);
+
+        js->Js_.subscribeToMore(
+          SubscribeToMoreOptions.toJs(
+            {
+              document: Operation.query,
+              variables,
+              updateQuery,
+              onError:
+                onError->Belt.Option.map((onError, error) =>
+                  onError(SubscriptionError(error))
+                ),
+              context,
+            },
+            ~onUpdateQueryParseError=
+              parseError =>
+                switch (onError) {
+                | Some(onError) => onError(ParseError(parseError))
+                | None => ()
+                },
+            ~querySafeParse=safeParse,
+            ~querySerialize=serialize,
+            ~subscriptionSafeParse,
+          ),
+        );
+      };
+
       {
         called: js.called,
         client: js.client,
@@ -384,7 +447,7 @@ module QueryResult = {
         refetch: js.refetch,
         startPolling: js.startPolling,
         stopPolling: js.stopPolling,
-        subscribeToMore: js.subscribeToMore,
+        subscribeToMore,
         updateQuery: js.updateQuery,
         __safeParse: safeParse,
         __serialize: serialize,
@@ -543,10 +606,6 @@ module QueryResult = {
   external stopPolling:
     (t('data, 'jsData, 'variables, 'jsVariables), unit) => unit =
     "stopPolling";
-
-  type subscribeToMore_error =
-    | ParseError(Types.parseError)
-    | SubscriptionError(Js.Exn.t);
 
   let subscribeToMore:
     type subscriptionData subscriptionVariables.

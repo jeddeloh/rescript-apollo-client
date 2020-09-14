@@ -1,3 +1,5 @@
+module Types = ApolloClient__Types;
+
 module ObservableQuery = {
   module ApolloQueryResult = ApolloClient__Core_Types.ApolloQueryResult;
   module Subscription = ApolloClient__ZenObservable.Subscription;
@@ -50,6 +52,36 @@ module ObservableQuery = {
     // ...extends Observable<ApolloQueryResult<TData>>
     // <R>(callback: (value: T) => R): Observable<R>;
     [@bs.send] external map: (t('t), 't => 'r) => t('r) = "map";
+    let fakeMap: (t('t), 't => 'r) => t('r) =
+      (js, fn) =>
+        /**
+          * We should be able to just map, but it's broken:
+          * https://github.com/apollographql/apollo-client/issues/6144
+          * This is not any sort of real map, of course. It just returns an observable
+          * with a subcribe method that builds the transformation into onNext :(
+          */
+        {
+          [%raw
+            {|
+            function (js, fn) {
+              var originalSubscribe = js.subscribe.bind(js);
+              js.subscribe = function (onNext, onError, onComplete) {
+                var newOnNext = function (result) {
+                  var transformedResult = result.data
+                    ? Object.assign({}, result, { data: fn(result.data) })
+                    : result;
+                  return onNext(transformedResult);
+                };
+                return originalSubscribe(newOnNext, onError, onComplete);
+              };
+              return js;
+            }
+          |}
+          ](
+            js,
+            fn,
+          );
+        };
 
     // ...extends Observable<ApolloQueryResult<TData>>
     // (onNext: (value: T) => void, onError?: (error: any) => void, onComplete?: () => void): ZenObservable.Subscription;
@@ -66,63 +98,54 @@ module ObservableQuery = {
       "subscribe";
   };
 
-  type t('data);
+  type t('data) = {
+    map: 'mappedData. ('data => 'mappedData) => t('mappedData),
+    subscribe:
+      (
+        ~onNext: ApolloQueryResult.t('data) => unit,
+        ~onError: Js.Json.t => unit=?,
+        ~onComplete: unit => unit=?,
+        unit
+      ) =>
+      Subscription.t,
+  };
 
   external castFromJs: Js_.t('data) => t('data) = "%identity";
 
   external castToJs: t('data) => Js_.t('data) = "%identity";
 
-  let fromJs: (Js_.t('jsData), ~parse: 'jsData => 'data) => t('data) =
-    (js, ~parse) => {
-      // Lovely. We should be able to just map, but it's broken:
-      // https://github.com/apollographql/apollo-client/issues/6144
-      // js->Js_.map(ApolloQueryResult.fromJs(~parse))->castFromJs;
-      [%raw
-        {|
-          function (js, parse) {
-            var originalSubscribe = js.subscribe.bind(js);
-            js.subscribe = function (onNext, onError, onComplete) {
-              var newOnNext = function (result) {
-                var parsedResult = result.data
-                  ? Object.assign({}, result, { data: parse(result.data) })
-                  : result;
-                return onNext(parsedResult);
-              };
-              return originalSubscribe(newOnNext, onError, onComplete);
-            };
-            return js;
+  let fromJs:
+    (Js_.t('jsData), ~safeParse: Types.safeParse('data, 'jsData)) =>
+    t('data) =
+    (js, ~safeParse) => {
+      let observableWithParsedData =
+        js->Js_.fakeMap(jsData =>
+          switch (safeParse(jsData)) {
+          | Data(data) => data
+          | ParseError(_error) =>
+            Js.Exn.raiseError(
+              "OMG, Becky. There was a parse error in an observable",
+            )
           }
-        |}
-      ](
-        js,
-        parse,
-      );
+        );
+      {
+        map: f => {
+          observableWithParsedData->Js_.fakeMap(f)->castFromJs;
+        },
+
+        subscribe: (~onNext, ~onError=?, ~onComplete=?, ()) =>
+          js
+          ->Js_.subscribe(
+              ~onNext=
+                jsApolloQueryResult =>
+                  onNext(
+                    jsApolloQueryResult->ApolloQueryResult.fromJs(~safeParse),
+                  ),
+              ~onError?,
+              ~onComplete?,
+              (),
+            )
+          ->Subscription.fromJs,
+      };
     };
-
-  [@bs.send] external map: (t('a), 'a => 'b) => t('b) = "map";
-
-  let subscribe:
-    (
-      t('data),
-      ~onNext: ApolloQueryResult.t('data) => unit,
-      ~onError: Js.Json.t => unit=?,
-      ~onComplete: unit => unit=?,
-      unit
-    ) =>
-    Subscription.t =
-    (t, ~onNext, ~onError=?, ~onComplete=?, ()) =>
-      /**
-       * Ugh, this diverges from normal patterns because data in these callbacks has to be parsed before this point.
-       * I wonder if there is a way we could pass parse along and then use it here or maybe there is a better pattern for this.
-       */
-      (
-        Js_.subscribe(
-          t->castToJs,
-          ~onNext=Obj.magic(onNext),
-          ~onError?,
-          ~onComplete?,
-          (),
-        )
-        ->Subscription.fromJs
-      );
 };

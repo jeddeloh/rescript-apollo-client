@@ -65,6 +65,8 @@ let useMutation:
     ~update=?,
     (),
   ) => {
+    let safeParse = Utils.safeParse(Operation.parse);
+
     let jsMutationTuple =
       Js_.useMutation(.
         Operation.query,
@@ -85,15 +87,17 @@ let useMutation:
             update,
             variables: None,
           },
-          ~parse=Operation.parse,
+          ~mapJsVariables=Utils.identity,
+          ~safeParse,
           ~serialize=Operation.serialize,
+          ~serializeVariables=Operation.serializeVariables,
         ),
       );
 
     Utils.useGuaranteedMemo1(
       () => {
         jsMutationTuple->MutationTuple.fromJs(
-          ~parse=Operation.parse,
+          ~safeParse,
           ~serialize=Operation.serialize,
           ~serializeVariables=Operation.serializeVariables,
         )
@@ -142,8 +146,7 @@ let useMutationWithVariables:
     ~update=?,
     variables,
   ) => {
-    let jsVariables =
-      variables->Operation.serializeVariables->mapJsVariables;
+    let safeParse = Utils.safeParse(Operation.parse);
 
     let jsMutationTuple =
       Js_.useMutation(.
@@ -163,10 +166,12 @@ let useMutationWithVariables:
             optimisticResponse,
             refetchQueries,
             update,
-            variables: Some(jsVariables),
+            variables: Some(variables),
           },
-          ~parse=Operation.parse,
+          ~mapJsVariables,
+          ~safeParse,
           ~serialize=Operation.serialize,
+          ~serializeVariables=Operation.serializeVariables,
         ),
       );
 
@@ -174,10 +179,12 @@ let useMutationWithVariables:
       () => {
         let (mutate, mutationResult) =
           jsMutationTuple->MutationTuple__noVariables.fromJs(
-            ~parse=Operation.parse,
+            ~mapJsVariables,
+            ~safeParse,
             ~serialize=Operation.serialize,
+            ~serializeVariables=Operation.serializeVariables,
             // Passing in the same variables from above allows us to reuse some types
-            ~variables=jsVariables,
+            ~variables,
           );
         (mutate, mutationResult);
       },

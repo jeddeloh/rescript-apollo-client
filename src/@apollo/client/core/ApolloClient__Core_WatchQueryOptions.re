@@ -178,22 +178,36 @@ module UpdateQueryFn = {
   let toJs:
     (
       t('queryData, 'subscriptionVariables, 'subscriptionData),
-      ~queryParse: 'jsQueryData => 'queryData,
+      ~onParseError: Types.parseError => unit,
+      ~querySafeParse: Types.safeParse('queryData, 'jsQueryData),
       ~querySerialize: 'queryData => 'jsQueryData,
-      ~subscriptionParse: 'jsSubscriptionData => 'subscriptionData
+      ~subscriptionSafeParse: Types.safeParse(
+                                'subscriptionData,
+                                'jsSubscriptionData,
+                              )
     ) =>
     Js_.t('jsQueryData, 'subscriptionVariables, 'jsSubscriptionData) =
-    (t, ~queryParse, ~querySerialize, ~subscriptionParse) =>
+    (
+      t,
+      ~onParseError,
+      ~querySafeParse,
+      ~querySerialize,
+      ~subscriptionSafeParse,
+    ) =>
       (. jsQueryData, {subscriptionData: {data}}) =>
-        t(
-          jsQueryData->queryParse,
-          {
-            subscriptionData: {
-              data: data->subscriptionParse,
-            },
-          },
-        )
-        ->querySerialize;
+        switch (jsQueryData->querySafeParse, data->subscriptionSafeParse) {
+        | (Data(queryData), Data(subscriptionData)) =>
+          t(queryData, {
+                         subscriptionData: {
+                           data: subscriptionData,
+                         },
+                       })
+          ->querySerialize
+        | (ParseError(parseError), _)
+        | (_, ParseError(parseError)) =>
+          onParseError(parseError);
+          jsQueryData;
+        };
 };
 
 module SubscribeToMoreOptions = {
@@ -241,21 +255,32 @@ module SubscribeToMoreOptions = {
   let toJs:
     (
       t('queryData, 'subscriptionVariables, 'subscriptionData),
-      ~queryParse: 'jsQueryData => 'queryData,
+      ~onUpdateQueryParseError: Types.parseError => unit,
+      ~querySafeParse: Types.safeParse('queryData, 'jsQueryData),
       ~querySerialize: 'queryData => 'jsQueryData,
-      ~subscriptionParse: 'jsSubscriptionData => 'subscriptionData
+      ~subscriptionSafeParse: Types.safeParse(
+                                'subscriptionData,
+                                'jsSubscriptionData,
+                              )
     ) =>
     Js_.t('jsQueryData, 'subscriptionVariables, 'jsSubscriptionData) =
-    (t, ~queryParse, ~querySerialize, ~subscriptionParse) => {
+    (
+      t,
+      ~onUpdateQueryParseError,
+      ~querySafeParse,
+      ~querySerialize,
+      ~subscriptionSafeParse,
+    ) => {
       document: t.document,
       variables: t.variables,
       updateQuery:
         t.updateQuery
         ->Belt.Option.map(
             UpdateQueryFn.toJs(
-              ~queryParse,
+              ~onParseError=onUpdateQueryParseError,
+              ~querySafeParse,
               ~querySerialize,
-              ~subscriptionParse,
+              ~subscriptionSafeParse,
             ),
           ),
       onError: t.onError,
@@ -271,10 +296,15 @@ module MutationUpdaterFn = {
 
   type t('data) = (ApolloCache.t(Js.Json.t), FetchResult.t('data)) => unit;
 
-  let toJs: (t('data), ~parse: 'jsData => 'data) => Js_.t('jsData) =
-    (mutationUpdaterFn, ~parse) =>
+  let toJs:
+    (t('data), ~safeParse: Types.safeParse('data, 'jsData)) =>
+    Js_.t('jsData) =
+    (mutationUpdaterFn, ~safeParse) =>
       (. cache, jsFetchResult) =>
-        mutationUpdaterFn(cache, jsFetchResult->FetchResult.fromJs(~parse));
+        mutationUpdaterFn(
+          cache,
+          jsFetchResult->FetchResult.fromJs(~safeParse),
+        );
 };
 
 module RefetchQueryDescription = {
@@ -353,11 +383,11 @@ module MutationOptions = {
   let toJs:
     (
       t('data, 'jsVariables),
-      ~parse: 'jsData => 'data,
+      ~safeParse: Types.safeParse('data, 'jsData),
       ~serialize: 'data => 'jsData
     ) =>
     Js_.t('jsData, 'jsVariables) =
-    (t, ~parse, ~serialize) => {
+    (t, ~safeParse, ~serialize) => {
       awaitRefetchQueries: t.awaitRefetchQueries,
       context: t.context,
       errorPolicy: t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
@@ -371,10 +401,10 @@ module MutationOptions = {
           ),
       refetchQueries:
         t.refetchQueries->Belt.Option.map(RefetchQueryDescription.toJs),
-      update: t.update->Belt.Option.map(MutationUpdaterFn.toJs(~parse)),
+      update: t.update->Belt.Option.map(MutationUpdaterFn.toJs(~safeParse)),
       updateQueries:
         t.updateQueries
-        ->Belt.Option.map(MutationQueryReducersMap.toJs(~parse)),
+        ->Belt.Option.map(MutationQueryReducersMap.toJs(~safeParse)),
       variables: t.variables,
     };
 };

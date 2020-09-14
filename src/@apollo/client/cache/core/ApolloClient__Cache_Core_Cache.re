@@ -1,5 +1,6 @@
 module DataProxy = ApolloClient__Cache_Core_Types.DataProxy;
 module Types = ApolloClient__Types;
+module Utils = ApolloClient__Utils;
 
 module type Fragment = Types.Fragment;
 module type Operation = Types.Operation;
@@ -71,20 +72,35 @@ module ApolloCache = {
   type t('tSerialized) = Js_.t('tSerialized);
 
   let readQuery:
-    type data jsVariables.
+    type data variables jsVariables.
       (
         t('tSerialized),
         ~query: (module Operation with
-                   type t = data and type Raw.t_variables = jsVariables),
+                   type t = data and
+                   type t_variables = variables and
+                   type Raw.t_variables = jsVariables),
         ~id: string=?,
+        ~mapJsVariables: jsVariables => jsVariables=?,
         ~optimistic: bool=?,
-        jsVariables
+        variables
       ) =>
       option(data) =
-    (client, ~query as (module Operation), ~id=?, ~optimistic=?, variables) => {
+    (
+      client,
+      ~query as (module Operation),
+      ~id=?,
+      ~mapJsVariables=Utils.identity,
+      ~optimistic=?,
+      variables,
+    ) => {
       Js_.readQuery(
         client,
-        ~options={id, query: Operation.query, variables},
+        ~options=
+          DataProxy.Query.toJs(
+            {id, query: Operation.query, variables},
+            ~mapJsVariables,
+            ~serializeVariables=Operation.serializeVariables,
+          ),
         ~optimistic,
       )
       ->Js.toOption
@@ -102,7 +118,6 @@ module ApolloCache = {
         ~fragmentName: string=?,
         unit
       ) =>
-      // jsVariables
       option(reference) =
     (
       client,
@@ -111,31 +126,32 @@ module ApolloCache = {
       ~broadcast=?,
       ~id,
       ~fragmentName=?,
+      // variables,
       (),
     ) => {
-      // variables,
       Js_.writeFragment(
         client,
-        ~options={
-          broadcast,
-          data: data->Fragment.serialize,
-          id,
-          fragment: Fragment.query,
-          fragmentName,
-        },
+        ~options=
+          DataProxy.WriteFragmentOptions.toJs(
+            {broadcast, data, id, fragment: Fragment.query, fragmentName},
+            ~serialize=Fragment.serialize,
+          ),
       );
     };
 
   let writeQuery:
-    type data jsVariables.
+    type data variables jsVariables.
       (
         t('tSerialized),
         ~query: (module Operation with
-                   type t = data and type Raw.t_variables = jsVariables),
+                   type t = data and
+                   type t_variables = variables and
+                   type Raw.t_variables = jsVariables),
         ~broadcast: bool=?,
         ~data: data,
         ~id: string=?,
-        jsVariables
+        ~mapJsVariables: jsVariables => jsVariables=?,
+        variables
       ) =>
       option(reference) =
     (
@@ -144,17 +160,18 @@ module ApolloCache = {
       ~broadcast=?,
       ~data,
       ~id=?,
+      ~mapJsVariables=Utils.identity,
       variables,
     ) => {
       Js_.writeQuery(
         client,
-        ~options={
-          broadcast,
-          data: data->Operation.serialize,
-          id,
-          query: Operation.query,
-          variables,
-        },
+        ~options=
+          DataProxy.WriteQueryOptions.toJs(
+            {broadcast, data, id, query: Operation.query, variables},
+            ~mapJsVariables,
+            ~serialize=Operation.serialize,
+            ~serializeVariables=Operation.serializeVariables,
+          ),
       );
     };
 };

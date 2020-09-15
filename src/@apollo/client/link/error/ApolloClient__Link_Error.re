@@ -68,8 +68,9 @@ module ErrorResponse = {
       networkError: option(NetworkErrorUnion.t),
       response: option(ExecutionResult.Js_.t(Js.Json.t)),
       operation: Operation.Js_.t,
-      forward: NextLink.Js_.t,
     };
+
+    [@bs.send] external forward: t => NextLink.Js_.t = "forward";
   };
 
   type t_networkError =
@@ -99,7 +100,7 @@ module ErrorResponse = {
           ),
       response: js.response,
       operation: js.operation->Operation.fromJs,
-      forward: js.forward,
+      forward: operation => js->Js_.forward(operation->Operation.toJs),
     };
 };
 

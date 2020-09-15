@@ -275,7 +275,7 @@ module QueryResult = {
 
     [@bs.send]
     external refetch:
-      (t('jsData, 'jsVariables), 'jsVariables) =>
+      (t('jsData, 'jsVariables), option('jsVariables)) =>
       Js.Promise.t(ApolloQueryResult.Js_.t('jsData)) =
       "refetch";
 
@@ -364,7 +364,11 @@ module QueryResult = {
       ) =>
       Promise.t(ApolloQueryResult.t('data)),
     refetch:
-      (~mapJsVariables: 'jsVariables => 'jsVariables=?, 'variables) =>
+      (
+        ~mapJsVariables: 'jsVariables => 'jsVariables=?,
+        ~variables: 'variables=?,
+        unit
+      ) =>
       Promise.t(ApolloQueryResult.t('data)),
     startPolling: int => unit,
     stopPolling: unit => unit,
@@ -501,9 +505,13 @@ module QueryResult = {
           });
       };
 
-      let refetch = (~mapJsVariables=Utils.identity, variables) => {
+      let refetch = (~mapJsVariables=Utils.identity, ~variables=?, ()) => {
         js
-        ->Js_.refetch(variables->serializeVariables->mapJsVariables)
+        ->Js_.refetch(
+            variables->Belt.Option.map(v =>
+              v->serializeVariables->mapJsVariables
+            ),
+          )
         ->Promise.Js.fromBsPromise
         ->Promise.Js.toResult
         ->Promise.map(result =>

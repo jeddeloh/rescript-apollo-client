@@ -54,19 +54,35 @@ module Operation = {
     variables: Js.Json.t,
     operationName: string,
     extensions: Js.Json.t,
+    [@bs.as "reason_setContext"]
     setContext: Js.Json.t => Js.Json.t,
+    [@bs.as "reason_getContext"]
     getContext: unit => Js.Json.t,
   };
 
+  let preserveJsPropsAndContext: (Js_.t, t) => t = [%bs.raw
+    {|
+      function (js, t) {
+        return Object.assign(js, t)
+      }
+    |}
+  ];
+
   let fromJs: Js_.t => t =
-    js => {
-      query: js.query,
-      variables: js.variables,
-      operationName: js.operationName,
-      extensions: js.extensions,
-      setContext: context => js->Js_.setContext(context),
-      getContext: () => js->Js_.getContext,
-    };
+    js =>
+      preserveJsPropsAndContext(
+        js,
+        {
+          query: js.query,
+          variables: js.variables,
+          operationName: js.operationName,
+          extensions: js.extensions,
+          setContext: context => js->Js_.setContext(context),
+          getContext: () => js->Js_.getContext,
+        },
+      );
+
+  external toJs: t => Js_.t = "%identity";
 };
 
 module FetchResult = {
@@ -124,7 +140,7 @@ module NextLink = {
   };
 
   // These are intentionally Js_.t because we can't know what to parse
-  type t = Js_.t;
+  type t = Operation.t => Observable.t(FetchResult.Js_.t(Js.Json.t));
 };
 
 module RequestHandler = {

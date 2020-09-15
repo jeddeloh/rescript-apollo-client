@@ -25,8 +25,7 @@ module TodosQuery = [%graphql
 ];
 
 let logTodos = _ =>
-  Client.instance
-  ->ApolloClient.query(~query=(module TodosQuery), ())
+  Client.instance.query(~query=(module TodosQuery), ())
   ->Promise.get(
       fun
       | {data: Some({todos}), error: None} =>
@@ -35,11 +34,10 @@ let logTodos = _ =>
     );
 
 let addTodo = _ =>
-  Client.instance
-  ->ApolloClient.mutate(
-      ~mutation=(module AddTodoMutation),
-      {text: "Another To-Do"},
-    )
+  Client.instance.mutate(
+    ~mutation=(module AddTodoMutation),
+    {text: "Another To-Do"},
+  )
   ->Promise.get(
       fun
       | {data: Some(data), error: None} => Js.log2("mutate result: ", data)
@@ -47,7 +45,7 @@ let addTodo = _ =>
     );
 
 let observableQuery =
-  Client.instance->ApolloClient.watchQuery(~query=(module TodosQuery), ());
+  Client.instance.watchQuery(~query=(module TodosQuery), ());
 
 let watchQuerySubscription =
   observableQuery.subscribe(
@@ -60,7 +58,7 @@ let watchQuerySubscription =
     (),
   );
 // Unsubscribe like so:
-// watchQuerySubscription->ApolloClient.ObservableQuery.Subscription.unsubscribe;
+// watchQuerySubscription.unsubscribe();
 
 [@react.component]
 let make = () => {

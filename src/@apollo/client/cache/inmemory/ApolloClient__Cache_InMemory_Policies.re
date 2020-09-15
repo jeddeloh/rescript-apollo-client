@@ -123,7 +123,9 @@ module TypePolicy = {
                   | FieldPolicy(fieldPolicy) =>
                     fieldPolicy->FieldPolicy.toJs->Js_.FieldsUnion.fieldPolicy
                   | FieldReadFunction(fieldReadFunction) =>
-                    fieldReadFunction->Js_.FieldsUnion.fieldReadFunction
+                    fieldReadFunction
+                    ->FieldReadFunction.toJs
+                    ->Js_.FieldsUnion.fieldReadFunction
                   },
                 )
               })

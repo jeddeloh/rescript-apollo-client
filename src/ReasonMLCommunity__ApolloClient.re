@@ -1,7 +1,6 @@
 [@text {|{1 Creating a client}|}];
 type t = ApolloClient__ApolloClient.t;
 let make = ApolloClient__ApolloClient.make;
-let setLink = ApolloClient__ApolloClient.setLink;
 
 module DefaultWatchQueryOptions = ApolloClient__ApolloClient.DefaultWatchQueryOptions;
 module DefaultQueryOptions = ApolloClient__ApolloClient.DefaultQueryOptions;
@@ -9,13 +8,6 @@ module DefaultMutateOptions = ApolloClient__ApolloClient.DefaultMutateOptions;
 module DefaultOptions = ApolloClient__ApolloClient.DefaultOptions;
 
 [@text {|{1 Fetching data }|}];
-let mutate = ApolloClient__ApolloClient.mutate;
-let query = ApolloClient__ApolloClient.query;
-let readQuery = ApolloClient__ApolloClient.readQuery;
-let watchQuery = ApolloClient__ApolloClient.watchQuery;
-let writeFragment = ApolloClient__ApolloClient.writeFragment;
-let writeQuery = ApolloClient__ApolloClient.writeQuery;
-
 module React = {
   module ApolloProvider = ApolloClient__React_Context_ApolloProvider;
   let useApolloClient = ApolloClient__React_Hooks_UseApolloClient.useApolloClient;
@@ -33,10 +25,6 @@ module Cache = {
     ApolloClient__Cache_Core_Cache.ApolloCache.t('serialized);
   // Creating
   module InMemoryCache = ApolloClient__Cache_InMemory_InMemoryCache;
-  // Reading and writing
-  let readQuery = ApolloClient__Cache_Core_Cache.ApolloCache.readQuery;
-  let writeFragment = ApolloClient__Cache_Core_Cache.ApolloCache.writeFragment;
-  let writeQuery = ApolloClient__Cache_Core_Cache.ApolloCache.writeQuery;
   // Local state management
   let makeVar = ApolloClient__Cache_InMemory_ReactiveVars.makeVar;
 };

@@ -30,7 +30,7 @@ let make = () => {
    * Sorry, this example is nonsensical given the current schema, but I'm gonna proceed anyway
    */
   React.useEffect0(() => {
-    queryResult->QueryResult.subscribeToMore(
+    queryResult.subscribeToMore(
       ~subscription=(module SorryItsNotASubscriptionForTodos),
       ~updateQuery=
         (previous, {subscriptionData: {data: {siteStatisticsUpdated}}}) => {

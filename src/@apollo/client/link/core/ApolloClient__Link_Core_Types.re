@@ -42,24 +42,31 @@ module Operation = {
       variables: Js.Json.t,
       operationName: string,
       extensions: Js.Json.t,
-      setContext: useMethodFunctionInThisModuleInstead,
-      getContext: useMethodFunctionInThisModuleInstead,
     };
+
+    [@bs.send] external getContext: t => Js.Json.t = "getContext";
+
+    [@bs.send] external setContext: (t, Js.Json.t) => Js.Json.t = "setContext";
   };
 
-  type t =
-    Js_.t = {
-      query: Graphql.documentNode,
-      variables: Js.Json.t,
-      operationName: string,
-      extensions: Js.Json.t,
-      setContext: useMethodFunctionInThisModuleInstead,
-      getContext: useMethodFunctionInThisModuleInstead,
+  type t = {
+    query: Graphql.documentNode,
+    variables: Js.Json.t,
+    operationName: string,
+    extensions: Js.Json.t,
+    setContext: Js.Json.t => Js.Json.t,
+    getContext: unit => Js.Json.t,
+  };
+
+  let fromJs: Js_.t => t =
+    js => {
+      query: js.query,
+      variables: js.variables,
+      operationName: js.operationName,
+      extensions: js.extensions,
+      setContext: context => js->Js_.setContext(context),
+      getContext: () => js->Js_.getContext,
     };
-
-  [@bs.send] external getContext: t => Js.Json.t = "getContext";
-
-  [@bs.send] external setContext: (t, Js.Json.t) => Js.Json.t = "setContext";
 };
 
 module FetchResult = {

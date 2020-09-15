@@ -36,8 +36,8 @@ module WebSocketLink = {
       (
       [@bs.unwrap]
       [
-        | `Configuration(Configuration.Js_.t)
-        | `SubscriptionClient(SubscriptionClient.Js_.t)
+        | `Configuration(Configuration.Js_.t) // Non-Js_ SubscriptionClient is correct here
+        | `SubscriptionClient(SubscriptionClient.t) // Non-Js_ SubscriptionClient is correct here
       ]
       ) =>
       ApolloLink.Js_.t =

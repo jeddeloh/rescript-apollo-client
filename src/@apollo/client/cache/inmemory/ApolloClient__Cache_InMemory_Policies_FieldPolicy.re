@@ -19,7 +19,8 @@ module StorageType = {
 };
 
 module FieldFunctionOptions = {
-  type useMethodFunctionInThisModuleInstead;
+  type unimplemented;
+
   module Js_ = {
     // export interface FieldFunctionOptions<TArgs = Record<string, any>, TVars = Record<string, any>> {
     //     args: TArgs | null;
@@ -42,38 +43,56 @@ module FieldFunctionOptions = {
       field: Js.nullable(FieldNode.t),
       variables: option(Js.Dict.t(Js.Json.t)),
       isReference: bool,
-      toReference: useMethodFunctionInThisModuleInstead,
+      toReference: unimplemented,
+      readField: unimplemented,
+      canRead: unimplemented,
       storage: Js.nullable(StorageType.Js_.t),
-      cache: ApolloCache.Js_.t(Js.Json.t),
-      readField: useMethodFunctionInThisModuleInstead,
-      canRead: useMethodFunctionInThisModuleInstead,
-      mergeObjects: useMethodFunctionInThisModuleInstead,
+      cache: ApolloCache.t(Js.Json.t) // Non-Js_ ApolloCache is correct here
     };
+    [@bs.send] external canRead: t => CanReadFunction.Js_.t = "canRead";
+    [@bs.send]
+    external mergeObjects:
+      (t, ~existing: Js.Json.t, ~incoming: Js.Json.t) => option(Js.Json.t) =
+      "canRead";
+    [@bs.send] external readField: t => ReadFieldFunction.Js_.t = "readField";
+    [@bs.send]
+    external toReference: t => ToReferenceFunction.t = "toReference";
   };
 
-  type t =
-    Js_.t = {
-      args: Js.nullable(Js.Dict.t(Js.Json.t)),
-      fieldName: string,
-      storeFieldName: string,
-      field: Js.nullable(FieldNode.t),
-      variables: option(Js.Dict.t(Js.Json.t)),
-      isReference: bool,
-      toReference: useMethodFunctionInThisModuleInstead,
-      storage: Js.nullable(StorageType.t),
-      cache: ApolloCache.Js_.t(Js.Json.t),
-      readField: useMethodFunctionInThisModuleInstead,
-      canRead: useMethodFunctionInThisModuleInstead,
-      mergeObjects: useMethodFunctionInThisModuleInstead,
-    };
+  type t = {
+    args: Js.nullable(Js.Dict.t(Js.Json.t)),
+    fieldName: string,
+    storeFieldName: string,
+    field: Js.nullable(FieldNode.t),
+    variables: option(Js.Dict.t(Js.Json.t)),
+    isReference: bool,
+    toReference: unimplemented,
+    storage: Js.nullable(StorageType.t),
+    cache: ApolloCache.t(Js.Json.t),
+    readField: unimplemented,
+    canRead: unimplemented,
+    mergeObjects:
+      (~existing: Js.Json.t, ~incoming: Js.Json.t) => option(Js.Json.t),
+  };
 
-  [@bs.send] external canRead: t => CanReadFunction.Js_.t = "canRead";
-  [@bs.send]
-  external mergeObjects:
-    (t, ~existing: Js.Json.t, ~incoming: Js.Json.t) => option(Js.Json.t) =
-    "canRead";
-  [@bs.send] external readField: t => ReadFieldFunction.Js_.t = "readField";
-  [@bs.send] external toReference: t => ToReferenceFunction.t = "toReference";
+  let fromJs: Js_.t => t =
+    js => {
+      {
+        args: js.args,
+        fieldName: js.fieldName,
+        storeFieldName: js.storeFieldName,
+        field: js.field,
+        variables: js.variables,
+        isReference: js.isReference,
+        toReference: js.toReference,
+        storage: js.storage,
+        cache: js.cache,
+        readField: js.readField,
+        canRead: js.canRead,
+        mergeObjects: (~existing: Js.Json.t, ~incoming: Js.Json.t) =>
+          js->Js_.mergeObjects(~existing, ~incoming),
+      };
+    };
 };
 
 module FieldReadFunction = {
@@ -85,6 +104,10 @@ module FieldReadFunction = {
     type t('existing) =
       (option('existing), FieldFunctionOptions.Js_.t) => 'existing;
   };
+
+  let toJs: t('existing) => Js_.t('existing) =
+    (t, existing, jsFieldFunctionOptions) =>
+      t(existing, jsFieldFunctionOptions->FieldFunctionOptions.fromJs);
 };
 
 module KeySpecifier = {
@@ -172,7 +195,7 @@ module FieldPolicy = {
   let toJs: t('existing) => Js_.t('existing) =
     t => {
       keyArgs: t.keyArgs->Belt.Option.map(FieldPolicy_KeyArgs.toJs),
-      read: t.read,
+      read: t.read->Belt.Option.map(FieldReadFunction.toJs),
       merge: t.merge,
     };
 };

@@ -394,6 +394,7 @@ module Js_ = {
 };
 
 type t = {
+  [@bs.as "reason_clearStore"]
   clearStore: unit => Promise.t(Belt.Result.t(array(Js.Json.t), Js.Exn.t)),
   [@bs.as "reason_mutate"]
   mutate:

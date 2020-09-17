@@ -54,10 +54,8 @@ let make = () => {
                    },
                  (),
                )
-               ->Promise.get(({error}) =>
-                   if (error->Belt.Option.isSome) {
-                     Js.log2("Failed to fetch more: ", error);
-                   }
+               ->Promise.getError(error =>
+                   Js.log2("Failed to fetch more: ", error)
                  )
              }>
              "Fetch More!"->React.string

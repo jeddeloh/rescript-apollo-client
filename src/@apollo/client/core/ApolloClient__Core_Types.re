@@ -94,6 +94,35 @@ module ApolloQueryResult = {
       loading: false,
       networkStatus: Error,
     };
+
+  type t__ok('data) = {
+    data: 'data,
+    error: option(ApolloError.t),
+    loading: bool,
+    networkStatus: NetworkStatus.t,
+  };
+
+  let toResult: t('data) => Belt.Result.t(t__ok('data), ApolloError.t) =
+    apolloQueryResult => {
+      switch (apolloQueryResult) {
+      | {data: Some(data)} =>
+        Ok({
+          data,
+          error: apolloQueryResult.error,
+          loading: apolloQueryResult.loading,
+          networkStatus: apolloQueryResult.networkStatus,
+        })
+      | {error: Some(error)} => Error(error)
+      | {data: None, error: None} =>
+        Error(
+          ApolloError.make(
+            ~errorMessage=
+              "No data and no error on ApolloQueryResult.t. Shouldn't this be impossible?",
+            (),
+          ),
+        )
+      };
+    };
 };
 
 module MutationQueryReducer = {

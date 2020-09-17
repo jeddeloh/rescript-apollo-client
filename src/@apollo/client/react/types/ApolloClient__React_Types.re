@@ -362,14 +362,18 @@ module QueryResult = {
                         =?,
         unit
       ) =>
-      Promise.t(ApolloQueryResult.t('data)),
+      Promise.t(
+        Belt.Result.t(ApolloQueryResult.t__ok('data), ApolloError.t),
+      ),
     refetch:
       (
         ~mapJsVariables: 'jsVariables => 'jsVariables=?,
         ~variables: 'variables=?,
         unit
       ) =>
-      Promise.t(ApolloQueryResult.t('data)),
+      Promise.t(
+        Belt.Result.t(ApolloQueryResult.t__ok('data), ApolloError.t),
+      ),
     startPolling: int => unit,
     stopPolling: unit => unit,
     subscribeToMore:
@@ -502,7 +506,8 @@ module QueryResult = {
                 ),
               )
             }
-          });
+          })
+        ->Promise.map(ApolloQueryResult.toResult);
       };
 
       let refetch = (~mapJsVariables=Utils.identity, ~variables=?, ()) => {
@@ -526,7 +531,8 @@ module QueryResult = {
                 ),
               )
             }
-          );
+          )
+        ->Promise.map(ApolloQueryResult.toResult);
       };
 
       let startPolling = pollInterval => js->Js_.startPolling(pollInterval);
@@ -1051,7 +1057,7 @@ module MutationTuple = {
       ~update: MutationUpdaterFn.t('data)=?,
       'variables
     ) =>
-    Promise.t(FetchResult.t('data));
+    Promise.t(Belt.Result.t(FetchResult.t__ok('data), ApolloError.t));
 
   type t('data, 'variables, 'jsVariables) = (
     t_mutationFn('data, 'variables, 'jsVariables),
@@ -1116,7 +1122,8 @@ module MutationTuple = {
                 ),
               )
             }
-          );
+          )
+        ->Promise.map(FetchResult.toResult);
       };
 
       (mutationFn, jsMutationResult->MutationResult.fromJs(~safeParse));
@@ -1139,7 +1146,7 @@ module MutationTuple__noVariables = {
       ~fetchPolicy: WatchQueryFetchPolicy.t=?,
       unit
     ) =>
-    Promise.t(FetchResult.t('data));
+    Promise.t(Belt.Result.t(FetchResult.t__ok('data), ApolloError.t));
 
   type t('data, 'jsVariables) = (
     t_mutationFn('data, 'jsVariables),
@@ -1207,7 +1214,8 @@ module MutationTuple__noVariables = {
                 ),
               )
             }
-          );
+          )
+        ->Promise.map(FetchResult.toResult);
       };
 
       (mutationFn, jsMutationResult->MutationResult.fromJs(~safeParse));

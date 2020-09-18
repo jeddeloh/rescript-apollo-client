@@ -23,25 +23,13 @@ module TodosQuery = [%graphql
     }
   |}
 ];
-let fauxTodosQuery = ();
-let fauxAddTodoMutation = ();
-
-type fauxVariables = {text: string};
-type fauxJsClient('query, 'mutation) = {
-  query:
-    (~query: 'query, unit) =>
-    Js.Promise.t(ApolloClient.Types.ApolloQueryResult.t(Js.Json.t)),
-  mutate:
-    (~mutation: 'mutation, fauxVariables) =>
-    Js.Promise.t(ApolloClient.Types.FetchResult.t(Js.Json.t)),
-};
 
 let client = Client.instance;
-[@bs.val] external jsClient: fauxJsClient('query, 'mutation) = "jsClient";
 
+// Chaining using default `reason-promise`
 client.query(~query=(module TodosQuery), ())
-->Promise.flatMapOk(({data}) => {
-    client.mutate(~mutation=(module AddTodoMutation), {text: ""})
+->Promise.flatMapOk(({data: _}) => {
+    client.mutate(~mutation=(module AddTodoMutation), {text: "example"})
   })
 ->Promise.get(result =>
     switch (result) {
@@ -51,29 +39,34 @@ client.query(~query=(module TodosQuery), ())
     }
   );
 
-jsClient.query(~query=fauxTodosQuery, ())
-|> Js.Promise.then_((apolloQueryResult: ApolloQueryResult.t(_)) => {
-     switch (apolloQueryResult) {
-     | {data: Some(data), error: None} =>
-       jsClient.mutate(~mutation=fauxAddTodoMutation, {text: ""})
-       |> Js.Promise.then_((fetchResult: FetchResult.t(_)) => {
-            switch (fetchResult) {
-            | {data: Some(data), error: None} => Js.Promise.resolve(data)
-            | {error: Some(error)} => Js.Promise.reject(Obj.magic(error))
-            | {data: None, error: None} =>
-              Js.Promise.reject(Obj.magic(":_("))
-            }
-          })
-     | {error: Some(error)} => Js.Promise.reject(Obj.magic(error))
-     | {data: None, error: None} =>
-       Js.Promise.reject(
-         Obj.magic(
-           "As a new user how do I create an exn? Should I raise instead?",
-         ),
-       )
-     }
+module Promise = ApolloClient__Promise;
+
+// Chaining with our T-first Js promise helpers if you don't like reason-promise
+client.query(~query=(module TodosQuery), ())
+->Promise.resultToJs
+->Promise.Js.then_(({data: _}) => {
+    Promise.Js.resolve(
+      client.mutate(~mutation=(module AddTodoMutation), {text: "example"})
+      ->Promise.resultToJs,
+    )
+  })
+->Promise.Js.then_(_ => Promise.Js.resolve(Js.log("Success for both!")))
+->Promise.Js.catch(error =>
+    Promise.Js.resolve(Js.log2("Untyped error", error))
+  )
+->Promise.Js.finalize;
+
+// Chaining with regular Js promises
+client.query(~query=(module TodosQuery), ())
+|> ApolloClient__Promise.resultToJs
+|> Js.Promise.then_(({data: _}: ApolloQueryResult.t__ok(_)) => {
+     Js.Promise.resolve(
+       client.mutate(~mutation=(module AddTodoMutation), {text: "example"})
+       |> ApolloClient__Promise.resultToJs,
+     )
    })
-|> Js.Promise.then_(_ => Js.Promise.resolve(Js.log("Success for both!")))
+|> Js.Promise.then_(_ => Promise.Js.resolve(Js.log("Success for both!")))
 |> Js.Promise.catch(error =>
-     Js.Promise.resolve(Js.log2("Untyped error of something!", error))
-   );
+     Js.Promise.resolve(Js.log2("Untyped error", error))
+   )
+|> ignore;

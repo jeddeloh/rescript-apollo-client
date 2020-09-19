@@ -394,6 +394,7 @@ module Js_ = {
 };
 
 type t = {
+  [@bs.as "reason_clearStore"]
   clearStore: unit => Promise.t(Belt.Result.t(array(Js.Json.t), Js.Exn.t)),
   [@bs.as "reason_mutate"]
   mutate:
@@ -414,7 +415,7 @@ type t = {
       ~update: MutationUpdaterFn.t('data)=?,
       'variables
     ) =>
-    Promise.t(FetchResult.t('data)),
+    Promise.t(Belt.Result.t(FetchResult.t__ok('data), ApolloError.t)),
 
   [@bs.as "reason_onClearStore"]
   onClearStore: (~cb: unit => Promise.t(unit), unit) => unit,
@@ -435,7 +436,7 @@ type t = {
       ~mapJsVariables: 'jsVariables => 'jsVariables=?,
       'variables
     ) =>
-    Promise.t(ApolloQueryResult.t('data)),
+    Promise.t(Belt.Result.t(ApolloQueryResult.t__ok('data), ApolloError.t)),
 
   [@bs.as "reason_readQuery"]
   readQuery:
@@ -649,7 +650,8 @@ let make:
               ),
             )
           }
-        });
+        })
+      ->Promise.map(FetchResult.toResult);
     };
 
     let onClearStore = (~cb) =>
@@ -706,7 +708,8 @@ let make:
               ),
             )
           }
-        });
+        })
+      ->Promise.map(ApolloQueryResult.toResult);
     };
 
     let readQuery =

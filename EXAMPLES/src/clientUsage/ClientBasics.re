@@ -28,9 +28,8 @@ let logTodos = _ =>
   Client.instance.query(~query=(module TodosQuery), ())
   ->Promise.get(
       fun
-      | {data: Some({todos}), error: None} =>
-        Js.log2("query To-Dos: ", todos)
-      | {error} => Js.log2("Error: ", error),
+      | Ok({data: {todos}}) => Js.log2("query To-Dos: ", todos)
+      | Error(error) => Js.log2("Error: ", error),
     );
 
 let addTodo = _ =>
@@ -40,8 +39,8 @@ let addTodo = _ =>
   )
   ->Promise.get(
       fun
-      | {data: Some(data), error: None} => Js.log2("mutate result: ", data)
-      | {error} => Js.log2("Error: ", error),
+      | Ok({data}) => Js.log2("mutate result: ", data)
+      | Error(error) => Js.log2("Error: ", error),
     );
 
 let observableQuery =

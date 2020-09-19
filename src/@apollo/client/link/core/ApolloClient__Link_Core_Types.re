@@ -28,6 +28,7 @@ module GraphQLRequest = {
 
 module Operation = {
   type useMethodFunctionInThisModuleInstead;
+
   module Js_ = {
     // export interface Operation {
     //     query: DocumentNode;
@@ -130,6 +131,35 @@ module FetchResult = {
       extensions: None,
       context: None,
       error: Some(error),
+    };
+
+  type t__ok('data) = {
+    data: 'data,
+    error: option(ApolloError.t),
+    extensions: option(Js.Json.t),
+    context: option(Js.Json.t),
+  };
+
+  let toResult: t('data) => Belt.Result.t(t__ok('data), ApolloError.t) =
+    fetchResult => {
+      switch (fetchResult) {
+      | {data: Some(data)} =>
+        Ok({
+          data,
+          error: fetchResult.error,
+          extensions: fetchResult.extensions,
+          context: fetchResult.context,
+        })
+      | {error: Some(error)} => Error(error)
+      | {data: None, error: None} =>
+        Error(
+          ApolloError.make(
+            ~errorMessage=
+              "No data and no error on FetchResult.t. Shouldn't this be impossible?",
+            (),
+          ),
+        )
+      };
     };
 };
 

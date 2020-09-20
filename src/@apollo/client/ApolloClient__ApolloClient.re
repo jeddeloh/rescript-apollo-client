@@ -612,8 +612,6 @@ let make:
           ~update=?,
           variables,
         ) => {
-      let jsVariables =
-        variables->Operation.serializeVariables->mapJsVariables;
       let safeParse = Utils.safeParse(Operation.parse);
 
       Js_.mutate(
@@ -630,10 +628,12 @@ let make:
               updateQueries,
               refetchQueries,
               update,
-              variables: jsVariables,
+              variables,
             },
+            ~mapJsVariables,
             ~safeParse,
             ~serialize=Operation.serialize,
+            ~serializeVariables=Operation.serializeVariables,
           ),
       )
       ->Promise.Js.fromBsPromise
@@ -679,20 +679,22 @@ let make:
           ~mapJsVariables=Utils.identity,
           variables,
         ) => {
-      let jsVariables =
-        variables->Operation.serializeVariables->mapJsVariables;
       let safeParse = Utils.safeParse(Operation.parse);
 
       Js_.query(
         jsClient,
         ~options=
-          QueryOptions.toJs({
-            fetchPolicy,
-            query: Operation.query,
-            variables: jsVariables,
-            errorPolicy,
-            context,
-          }),
+          QueryOptions.toJs(
+            {
+              fetchPolicy,
+              query: Operation.query,
+              variables,
+              errorPolicy,
+              context,
+            },
+            ~mapJsVariables,
+            ~serializeVariables=Operation.serializeVariables,
+          ),
       )
       ->Promise.Js.fromBsPromise
       ->Promise.Js.toResult
@@ -780,20 +782,22 @@ let make:
           ~mapJsVariables=Utils.identity,
           variables,
         ) => {
-      let jsVariables =
-        variables->Operation.serializeVariables->mapJsVariables;
       let safeParse = Utils.safeParse(Operation.parse);
 
       jsClient
       ->Js_.watchQuery(
           ~options=
-            WatchQueryOptions.toJs({
-              fetchPolicy,
-              query: Operation.query,
-              variables: Some(jsVariables),
-              errorPolicy,
-              context,
-            }),
+            WatchQueryOptions.toJs(
+              {
+                fetchPolicy,
+                query: Operation.query,
+                variables,
+                errorPolicy,
+                context,
+              },
+              ~mapJsVariables,
+              ~serializeVariables=Operation.serializeVariables,
+            ),
         )
       ->ObservableQuery.fromJs(~safeParse);
     };

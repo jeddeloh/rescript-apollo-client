@@ -103,11 +103,17 @@ module QueryOptions = {
     context: option(Js.Json.t),
   };
 
-  let toJs: t('jsVariables) => Js_.t('jsVariables) =
-    t => {
+  let toJs:
+    (
+      t('variables),
+      ~mapJsVariables: 'jsVariables => 'jsVariables,
+      ~serializeVariables: 'variables => 'jsVariables
+    ) =>
+    Js_.t('jsVariables) =
+    (t, ~mapJsVariables, ~serializeVariables) => {
       fetchPolicy: t.fetchPolicy->Belt.Option.map(FetchPolicy.toJs),
       query: t.query,
-      variables: t.variables,
+      variables: t.variables->serializeVariables->mapJsVariables,
       errorPolicy: t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
       context: t.context,
     };
@@ -119,7 +125,8 @@ module WatchQueryOptions = {
       fetchPolicy: option(WatchQueryFetchPolicy.Js_.t),
       // ...extends QueryBaseOptions
       query: Graphql.documentNode,
-      variables: option('jsVariables),
+      // We don't allow optional variables because it's not typesafe
+      variables: 'jsVariables,
       errorPolicy: option(ErrorPolicy.Js_.t),
       context: option(Js.Json.t),
     };
@@ -128,16 +135,22 @@ module WatchQueryOptions = {
   type t('jsVariables) = {
     fetchPolicy: option(WatchQueryFetchPolicy.t),
     query: Graphql.documentNode,
-    variables: option('jsVariables),
+    variables: 'jsVariables,
     errorPolicy: option(ErrorPolicy.t),
     context: option(Js.Json.t),
   };
 
-  let toJs: t('jsVariables) => Js_.t('jsVariables) =
-    t => {
+  let toJs:
+    (
+      t('variables),
+      ~mapJsVariables: 'jsVariables => 'jsVariables,
+      ~serializeVariables: 'variables => 'jsVariables
+    ) =>
+    Js_.t('jsVariables) =
+    (t, ~mapJsVariables, ~serializeVariables) => {
       fetchPolicy: t.fetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
       query: t.query,
-      variables: t.variables,
+      variables: t.variables->serializeVariables->mapJsVariables,
       errorPolicy: t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
       context: t.context,
     };
@@ -365,7 +378,7 @@ module MutationOptions = {
     };
   };
 
-  type t('data, 'jsVariables) = {
+  type t('data, 'variables, 'jsVariables) = {
     context: option(Js.Json.t),
     fetchPolicy: option(FetchPolicy__noCacheExtracted.t),
     mutation: Graphql.documentNode,
@@ -376,17 +389,19 @@ module MutationOptions = {
     refetchQueries: option(RefetchQueryDescription.t),
     update: option(MutationUpdaterFn.t('data)),
     updateQueries: option(MutationQueryReducersMap.t('data)),
-    variables: 'jsVariables,
+    variables: 'variables,
   };
 
   let toJs:
     (
-      t('data, 'jsVariables),
+      t('data, 'variables, 'jsVariables),
+      ~mapJsVariables: 'jsVariables => 'jsVariables,
       ~safeParse: Types.safeParse('data, 'jsData),
-      ~serialize: 'data => 'jsData
+      ~serialize: 'data => 'jsData,
+      ~serializeVariables: 'variables => 'jsVariables
     ) =>
     Js_.t('jsData, 'jsVariables) =
-    (t, ~safeParse, ~serialize) => {
+    (t, ~mapJsVariables, ~safeParse, ~serialize, ~serializeVariables) => {
       awaitRefetchQueries: t.awaitRefetchQueries,
       context: t.context,
       errorPolicy: t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
@@ -404,6 +419,6 @@ module MutationOptions = {
       updateQueries:
         t.updateQueries
         ->Belt.Option.map(MutationQueryReducersMap.toJs(~safeParse)),
-      variables: t.variables,
+      variables: t.variables->serializeVariables->mapJsVariables,
     };
 };

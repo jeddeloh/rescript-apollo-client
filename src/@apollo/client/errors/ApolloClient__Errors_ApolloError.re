@@ -114,22 +114,6 @@ let fromJs: Js_.t => t =
     stack: js.stack,
   };
 
-type makeReason_args = {
-  graphQLErrors: option(array(GraphQLError.t)),
-  networkError: option(t_networkError),
-  errorMessage: option(string),
-  extraInfo: option(Js.Json.t),
-};
-
-// constructor({ graphQLErrors, networkError, errorMessage, extraInfo, }: {
-//     graphQLErrors?: ReadonlyArray<GraphQLError>;
-//     networkError?: Error | ServerParseError | ServerError | null;
-//     errorMessage?: string;
-//     extraInfo?: any;
-// });
-[@bs.module "@apollo/client"] [@bs.new]
-external makeReason: makeReason_args => t = "ApolloError";
-
 let make:
   (
     ~graphQLErrors: array(GraphQLError.t)=?,
@@ -139,5 +123,15 @@ let make:
     unit
   ) =>
   t =
-  (~graphQLErrors=?, ~networkError=?, ~errorMessage=?, ~extraInfo=?, ()) =>
-    makeReason({graphQLErrors, networkError, errorMessage, extraInfo});
+  (~graphQLErrors=?, ~networkError=?, ~errorMessage=?, ~extraInfo=?, ()) => {
+    let errorWithoutNetworkError =
+      Js_.make({
+        graphQLErrors,
+        networkError: Js.Nullable.undefined,
+        errorMessage,
+        extraInfo,
+      })
+      ->fromJs;
+
+    {...errorWithoutNetworkError, networkError};
+  };

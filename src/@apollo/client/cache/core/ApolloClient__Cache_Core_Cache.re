@@ -35,6 +35,18 @@ module ApolloCache = {
 
     type reference;
 
+    // readFragment<FragmentType, TVariables = any>(options: DataProxy.Fragment<TVariables>, optimistic?: boolean): FragmentType | null;
+    [@bs.send]
+    external readFragment:
+      (
+        t('tSerialized),
+        ~options: DataProxy.Fragment.Js_.t,
+        ~optimistic: bool=?,
+        unit
+      ) =>
+      Js.nullable('jsData) =
+      "readFragment";
+
     // readQuery<QueryType, TVariables = any>(options: DataProxy.Query<TVariables>, optimistic?: boolean): QueryType | null;
     [@bs.send]
     external readQuery:
@@ -70,6 +82,18 @@ module ApolloCache = {
   type reference = Js_.reference;
 
   type t('tSerialized) = {
+    [@bs.as "reason_readFragment"]
+    readFragment:
+      'data.
+      (
+        ~fragment: (module Fragment with type t = 'data),
+        ~id: string,
+        ~optimistic: bool=?,
+        ~fragmentName: string=?,
+        unit
+      ) =>
+      option('data),
+
     [@bs.as "reason_readQuery"]
     readQuery:
       'data 'variables 'jsVariables.
@@ -131,6 +155,24 @@ module ApolloCache = {
 
   let fromJs: Js_.t('serialized) => t('serialized) =
     js => {
+      let readFragment =
+          (
+            type data,
+            ~fragment as module Fragment: Fragment with type t = data,
+            ~id,
+            ~optimistic=?,
+            ~fragmentName=?,
+            (),
+          ) => {
+        js
+        ->Js_.readFragment(
+            ~options={id, fragment: Fragment.query, fragmentName},
+            ~optimistic?,
+            (),
+          )
+        ->Js.toOption;
+      };
+
       let readQuery =
           (
             type data,
@@ -209,6 +251,9 @@ module ApolloCache = {
         );
       };
 
-      preserveJsPropsAndContext(js, {readQuery, writeFragment, writeQuery});
+      preserveJsPropsAndContext(
+        js,
+        {readFragment, readQuery, writeFragment, writeQuery},
+      );
     };
 };

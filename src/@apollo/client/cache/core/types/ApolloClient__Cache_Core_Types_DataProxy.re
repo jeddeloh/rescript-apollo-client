@@ -40,16 +40,23 @@ module Fragment = {
     //   fragmentName?: string;
     //   variables?: TVariables;
     // }
-    type t('jsVariables) = {
+    type t = {
       id: string,
       fragment: Graphql.documentNode,
       // We don't allow optional variables because it's not typesafe
-      fragmentName: string,
-      variables: option('jsVariables),
+      // variables: 'jsVariables,
+      fragmentName: option(string),
     };
   };
 
-  type t('jsVariables) = Js_.t('jsVariables);
+  type t =
+    Js_.t = {
+      id: string,
+      fragment: Graphql.documentNode,
+      // We don't allow optional variables because it's not typesafe
+      // variables: 'jsVariables,
+      fragmentName: option(string),
+    };
 };
 
 module WriteQueryOptions = {

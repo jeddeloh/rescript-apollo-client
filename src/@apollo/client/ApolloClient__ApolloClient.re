@@ -339,6 +339,13 @@ module Js_ = {
     Js.Promise.t(ApolloQueryResult.Js_.t('jsData)) =
     "query";
 
+  // readFragment<T = any, TVariables = OperationVariables>(options: DataProxy.Fragment<TVariables>, optimistic?: boolean): T | null;
+  [@bs.send]
+  external readFragment:
+    (t, ~options: DataProxy.Fragment.Js_.t, ~optimistic: bool=?, unit) =>
+    Js.nullable('jsData) =
+    "readFragment";
+
   // readQuery<T = any, TVariables = OperationVariables>(options: DataProxy.Query<TVariables>, optimistic?: boolean): T | null;
   [@bs.send]
   external readQuery:
@@ -437,6 +444,18 @@ type t = {
       'variables
     ) =>
     Promise.t(Belt.Result.t(ApolloQueryResult.t__ok('data), ApolloError.t)),
+
+  [@bs.as "reason_readFragment"]
+  readFragment:
+    'data.
+    (
+      ~fragment: (module Fragment with type t = 'data),
+      ~id: string,
+      ~optimistic: bool=?,
+      ~fragmentName: string=?,
+      unit
+    ) =>
+    option('data),
 
   [@bs.as "reason_readQuery"]
   readQuery:
@@ -714,6 +733,24 @@ let make:
       ->Promise.map(ApolloQueryResult.toResult);
     };
 
+    let readFragment =
+        (
+          type data,
+          ~fragment as module Fragment: Fragment with type t = data,
+          ~id,
+          ~optimistic=?,
+          ~fragmentName=?,
+          (),
+        ) => {
+      jsClient
+      ->Js_.readFragment(
+          ~options={id, fragment: Fragment.query, fragmentName},
+          ~optimistic?,
+          (),
+        )
+      ->Js.toOption;
+    };
+
     let readQuery =
         (
           type data,
@@ -857,6 +894,7 @@ let make:
         onClearStore,
         onResetStore,
         query,
+        readFragment,
         readQuery,
         resetStore,
         restore,

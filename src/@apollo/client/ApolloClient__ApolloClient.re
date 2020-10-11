@@ -266,9 +266,6 @@ module Js_ = {
   module Cast = {
     external asReasonCache: ApolloCache.Js_.t('a) => ApolloCache.t('a) =
       "%identity";
-    type jsCb = unit => Js.Promise.t(unit);
-    type cb = unit => Promise.t(unit);
-    external castCb: cb => jsCb = "%identity";
   };
 
   // export declare class ApolloClient<TCacheShape> implements DataProxy {
@@ -402,7 +399,8 @@ module Js_ = {
 
 type t = {
   [@bs.as "reason_clearStore"]
-  clearStore: unit => Promise.t(Belt.Result.t(array(Js.Json.t), Js.Exn.t)),
+  clearStore:
+    unit => Js.Promise.t(Belt.Result.t(array(Js.Json.t), Js.Exn.t)),
   [@bs.as "reason_mutate"]
   mutate:
     'data 'variables 'jsVariables.
@@ -422,12 +420,12 @@ type t = {
       ~update: MutationUpdaterFn.t('data)=?,
       'variables
     ) =>
-    Promise.t(Belt.Result.t(FetchResult.t__ok('data), ApolloError.t)),
+    Js.Promise.t(Belt.Result.t(FetchResult.t__ok('data), ApolloError.t)),
 
   [@bs.as "reason_onClearStore"]
-  onClearStore: (~cb: unit => Promise.t(unit), unit) => unit,
+  onClearStore: (~cb: unit => Js.Promise.t(unit), unit) => unit,
   [@bs.as "reason_onResetStore"]
-  onResetStore: (~cb: unit => Promise.t(unit), unit) => unit,
+  onResetStore: (~cb: unit => Js.Promise.t(unit), unit) => unit,
   [@bs.as "reason_query"]
   query:
     'data 'jsData 'variables 'jsVariables.
@@ -443,7 +441,9 @@ type t = {
       ~mapJsVariables: 'jsVariables => 'jsVariables=?,
       'variables
     ) =>
-    Promise.t(Belt.Result.t(ApolloQueryResult.t__ok('data), ApolloError.t)),
+    Js.Promise.t(
+      Belt.Result.t(ApolloQueryResult.t__ok('data), ApolloError.t),
+    ),
 
   [@bs.as "reason_readFragment"]
   readFragment:
@@ -475,7 +475,7 @@ type t = {
   [@bs.as "reason_resetStore"]
   resetStore:
     unit =>
-    Promise.t(
+    Js.Promise.t(
       Belt.Result.t(
         option(array(ApolloQueryResult.Js_.t(Js.Json.t))),
         Js.Exn.t,
@@ -605,9 +605,11 @@ let make:
     let clearStore = () =>
       jsClient
       ->Js_.clearStore
-      ->Promise.Js.fromBsPromise
-      ->Promise.Js.toResult
-      ->Promise.mapError(e => Utils.ensureError(Any(e)));
+      ->Js.Promise.then_(value => Js.Promise.resolve(Ok(value)), _)
+      ->Js.Promise.catch(
+          e => Js.Promise.resolve(Error(Utils.ensureError(Any(e)))),
+          _,
+        );
 
     let mutate =
         (
@@ -655,29 +657,33 @@ let make:
             ~serializeVariables=Operation.serializeVariables,
           ),
       )
-      ->Promise.Js.fromBsPromise
-      ->Promise.Js.toResult
-      ->Promise.map(result => {
-          switch (result) {
-          | Ok(jsFetchResult) =>
-            jsFetchResult->FetchResult.fromJs(~safeParse)
-          | Error(error) =>
-            FetchResult.fromError(
-              ApolloError.make(
-                ~networkError=FetchFailure(Utils.(ensureError(Any(error)))),
-                (),
+      ->Js.Promise.then_(
+          jsFetchResult =>
+            Js.Promise.resolve(
+              jsFetchResult
+              ->FetchResult.fromJs(~safeParse)
+              ->FetchResult.toResult,
+            ),
+          _,
+        )
+      ->Js.Promise.catch(
+          error =>
+            Js.Promise.resolve(
+              Error(
+                ApolloError.make(
+                  ~networkError=
+                    FetchFailure(Utils.(ensureError(Any(error)))),
+                  (),
+                ),
               ),
-            )
-          }
-        })
-      ->Promise.map(FetchResult.toResult);
+            ),
+          _,
+        );
     };
 
-    let onClearStore = (~cb) =>
-      jsClient->Js_.onClearStore(~cb=Js_.Cast.castCb(cb));
+    let onClearStore = (~cb) => jsClient->Js_.onClearStore(~cb);
 
-    let onResetStore = (~cb) =>
-      jsClient->Js_.onResetStore(~cb=Js_.Cast.castCb(cb));
+    let onResetStore = (~cb) => jsClient->Js_.onResetStore(~cb);
 
     let query =
         (
@@ -715,22 +721,28 @@ let make:
             ~serializeVariables=Operation.serializeVariables,
           ),
       )
-      ->Promise.Js.fromBsPromise
-      ->Promise.Js.toResult
-      ->Promise.map(result => {
-          switch (result) {
-          | Ok(jsApolloQueryResult) =>
-            jsApolloQueryResult->ApolloQueryResult.fromJs(~safeParse)
-          | Error(error) =>
-            ApolloQueryResult.fromError(
-              ApolloError.make(
-                ~networkError=FetchFailure(Utils.(ensureError(Any(error)))),
-                (),
+      ->Js.Promise.then_(
+          jsApolloQueryResult =>
+            Js.Promise.resolve(
+              jsApolloQueryResult
+              ->ApolloQueryResult.fromJs(~safeParse)
+              ->ApolloQueryResult.toResult,
+            ),
+          _,
+        )
+      ->Js.Promise.catch(
+          error =>
+            Js.Promise.resolve(
+              Error(
+                ApolloError.make(
+                  ~networkError=
+                    FetchFailure(Utils.(ensureError(Any(error)))),
+                  (),
+                ),
               ),
-            )
-          }
-        })
-      ->Promise.map(ApolloQueryResult.toResult);
+            ),
+          _,
+        );
     };
 
     let readFragment =
@@ -783,7 +795,7 @@ let make:
 
     let resetStore:
       unit =>
-      Promise.t(
+      Js.Promise.t(
         Belt.Result.t(
           option(array(ApolloQueryResult.Js_.t(Js.Json.t))),
           Js.Exn.t,
@@ -792,10 +804,14 @@ let make:
       () =>
         jsClient
         ->Js_.resetStore
-        ->Promise.Js.fromBsPromise
-        ->Promise.Js.toResult
-        ->Promise.mapOk(Js.toOption)
-        ->Promise.mapError(e => Utils.ensureError(Any(e)));
+        ->Js.Promise.then_(
+            value => Js.Promise.resolve(Ok(value->Js.toOption)),
+            _,
+          )
+        ->Js.Promise.catch(
+            e => Js.Promise.resolve(Error(Utils.ensureError(Any(e)))),
+            _,
+          );
 
     let restore = (~serializedState) =>
       jsClient->Js_.restore(serializedState)->Js_.Cast.asReasonCache;

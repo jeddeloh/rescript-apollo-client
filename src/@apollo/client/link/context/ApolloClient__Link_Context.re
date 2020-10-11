@@ -19,13 +19,9 @@ module Js_ = {
     ApolloLink.t =
     "setContext";
 
-  type asyncJs =
-    (~operation: GraphQLRequest.t, ~prevContext: Js.Json.t) =>
-    Js.Promise.t(Js.Json.t);
   type async =
     (~operation: GraphQLRequest.t, ~prevContext: Js.Json.t) =>
-    Promise.t(Js.Json.t);
-  external safeCastAsync: async => asyncJs = "%identity";
+    Js.Promise.t(Js.Json.t);
 };
 
 let setContext = Js_.setContext;
@@ -33,10 +29,10 @@ let setContext = Js_.setContext;
 let setContextAsync:
   (
     (~operation: GraphQLRequest.t, ~prevContext: Js.Json.t) =>
-    Promise.t(Js.Json.t)
+    Js.Promise.t(Js.Json.t)
   ) =>
   ApolloLink.t =
-  fn => Js_.setContextAsync(Js_.safeCastAsync(fn));
+  fn => Js_.setContextAsync(fn);
 
 // reason-specific
 module ContextLink = {

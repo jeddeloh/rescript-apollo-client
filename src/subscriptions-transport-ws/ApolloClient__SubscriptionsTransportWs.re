@@ -63,13 +63,13 @@ module ConnectionParamsOptions = {
   type t =
     | ConnectionParams(ConnectionParams.t)
     | Function(unit => ConnectionParams.t)
-    | Promise(Promise.t(ConnectionParams.t));
+    | Promise(Js.Promise.t(ConnectionParams.t));
 
   let toJs: t => Js_.t =
     fun
     | ConnectionParams(v) => Js_.Union.connectionParams(v)
     | Function(v) => Js_.Union.fn(v)
-    | Promise(v) => Js_.Union.promise(v->Promise.Js.toBsPromise);
+    | Promise(v) => Js_.Union.promise(v);
 };
 
 module ClientOptions = {

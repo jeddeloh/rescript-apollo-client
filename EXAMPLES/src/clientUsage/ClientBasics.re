@@ -26,22 +26,35 @@ module TodosQuery = [%graphql
 
 let logTodos = _ =>
   Client.instance.query(~query=(module TodosQuery), ())
-  ->Promise.get(
-      fun
-      | Ok({data: {todos}}) => Js.log2("query To-Dos: ", todos)
-      | Error(error) => Js.log2("Error: ", error),
-    );
+  ->Utils.Promise.then_(result => {
+      Js.Promise.resolve(
+        switch (result) {
+        | Ok({data: {todos}}) => Js.log2("query To-Dos: ", todos)
+        | Error(error) => Js.log2("Error: ", error)
+        },
+      )
+    })
+  ->Utils.Promise.ignore;
+// ->Promise.get(
+//     fun
+//     | Ok({data: {todos}}) => Js.log2("query To-Dos: ", todos)
+//     | Error(error) => Js.log2("Error: ", error),
+//   );
 
 let addTodo = _ =>
   Client.instance.mutate(
     ~mutation=(module AddTodoMutation),
     {text: "Another To-Do"},
   )
-  ->Promise.get(
-      fun
-      | Ok({data}) => Js.log2("mutate result: ", data)
-      | Error(error) => Js.log2("Error: ", error),
-    );
+  ->Utils.Promise.then_(result =>
+      Js.Promise.resolve(
+        switch (result) {
+        | Ok({data}) => Js.log2("mutate result: ", data)
+        | Error(error) => Js.log2("Error: ", error)
+        },
+      )
+    )
+  ->Utils.Promise.ignore;
 
 let observableQuery =
   Client.instance.watchQuery(~query=(module TodosQuery), ());

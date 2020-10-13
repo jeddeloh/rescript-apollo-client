@@ -64,8 +64,6 @@ module GraphQL_PPX = {
   type templateTagReturnType = ApolloClient__Graphql.documentNode;
 };
 
-module Promise = ApolloClient__Promise;
-
 /** Convenient access to all types and the methods for working with those types */
 module Types = {
   module ApolloError = ApolloClient__Errors_ApolloError;

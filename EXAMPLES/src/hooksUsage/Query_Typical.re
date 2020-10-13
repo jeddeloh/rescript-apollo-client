@@ -54,9 +54,17 @@ let make = () => {
                    },
                  (),
                )
-               ->Promise.getError(error =>
-                   Js.log2("Failed to fetch more: ", error)
+               ->Js.Promise.then_(
+                   result => {
+                     switch (result) {
+                     | Ok(_) => Js.log("fetchMore: success!")
+                     | Error(_) => Js.log("fetchMore: failure!")
+                     };
+                     Js.Promise.resolve();
+                   },
+                   _,
                  )
+               ->Utils.Promise.ignore
              }>
              "Fetch More!"->React.string
            </button>

@@ -1,13 +1,14 @@
 {
   "name": "reason-apollo-client",
   "description": "ReasonML / BuckleScript bindings for the Apollo Client ecosystem",
-  "version": "0.0.1-beta.8",
+  "version": "1.0.0-beta.0",
   "keywords": [
     "Apollo",
     "BuckleScript",
     "GraphQL",
     "Reason",
-    "ReasonML"
+    "ReasonML",
+    "ReScript"
   ],
   "license": "MIT",
   "repository": {
@@ -34,6 +35,5 @@
     "@reasonml-community/graphql-ppx": "^1.0.0",
     "bs-platform": "^7.3.0 || ^8.0.0",
     "reason-react": "^0.8.0 || ^0.9.0"
-  },
-  "dependencies": {}
+  }
 }

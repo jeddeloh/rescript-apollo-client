@@ -85,28 +85,32 @@ let make = () => {
 
 Other than some slightly different ergonomics, the underlying functionality is almost identical to the [official Apollo Client 3 docs](https://www.apollographql.com/docs/react/v3.0-beta/get-started/), so that is still a good resource for working with this library.
 
-It's probably worth noting this library leverages records heavily which allows for very similar syntax to working with javascript objects and other benefits, but comes with a couple drawbacks.
-
-- You may need to annotate the types if you're using a record outside of the exact place it is used, so we expose every type from the `ApolloClient.Types` module for convenience
-- Bindings to methods on javascript objects work a little differently. You have to use the method function in the module for that type.
-
+It's probably worth noting this library leverages records heavily which allows for very similar syntax to working with javascript objects and other benefits, but comes with a downside. You may need to annotate the types if you're using a record in a context where the compiler cannot infer what it is. The most common case is when using a non-T-first api like `Js.Promise`. For this reason we expose every type from the `ApolloClient.Types` module for convenience
 Example:
 
 ```reason
   /** Inspecting the types reveals this is a QueryResult.t */
   let queryResult = SomeQuery.use();
 
-  /** I can destructure, pattern match, or access properties that are values like normal */
+  /** I can destructure, pattern match, or access properties just like javascript */
   switch (queryResult) {
     | {loading: true} =>
-    /** do something */
+    /** Show loading */
+    | {data: Some(data), fetchMore} =>
+    let onClick = fetchMore();
+    /** Show data */
   }
 
-  /** But if I want to use a method on the javascript object,
-      I need to use a function defined in the module for that type */
-  queryResult->ApolloClient.Types.QueryResult.fetchMore;
-  /** ☝️ Note that once you know the type, you don't have to go searching for it.
-      Everything is accessible under ApolloClient.Types */
+  /** Sometimes you need to annotate */
+  apolloClient.query(~query=(module SomeQuery), ())
+  |> Js.Promise.then(result => switch (result) {
+    | Some(apolloQueryResult) =>
+      Js.log2("Got data!", apolloQueryResult.ApolloClient.Types.ApolloQueryResult.data)
+      /** ☝️ Note that once you know the type, you don't have to go searching for it.
+        Everything is accessible under ApolloClient.Types */
+    | Error(_) =>
+      Js.log("Check out EXAMPLES/ for T-first promise solutions that don't have this problem!")
+  })
 ```
 
 ## Recommended Editor Extensions (Visual Studio Code)
@@ -152,7 +156,7 @@ let httpLink = ApolloClient.Link.HttpLink.make(...)
 
 Apollo bindings in the Reason / BuckleScript community are pretty confusing as a write this (July 14, 2020), so it's worth providing some context to help you make the right decisions about which library to use.
 
-This library, `reason-apollo-client`, targets Apollo Client 3 and aims to take full advantage of v1.0.0 `graphql-ppx` features (still in beta) and is intended to be a replacement for `reason-apollo` and `reason-apollo-hooks`. You should avoid using those libraries at the same time as this one.
+This library, `reason-apollo-client`, targets Apollo Client 3 and aims to take full advantage of v1.0.0 `graphql-ppx` features and is intended to be a replacement for `reason-apollo` and `reason-apollo-hooks`. You should avoid using those libraries at the same time as this one.
 
 If you have a large code base to migrate from `reason-apollo-hooks`, it might make sense to upgrade to the [reason-apollo-hooks PR](https://github.com/reasonml-community/reason-apollo-hooks/pull/117) that adds support for graphql-ppx 1.0 first. This PR has been used by some larger companies to gradually upgrade.
 

@@ -85,32 +85,33 @@ let make = () => {
 
 Other than some slightly different ergonomics, the underlying functionality is almost identical to the [official Apollo Client 3 docs](https://www.apollographql.com/docs/react/v3.0-beta/get-started/), so that is still a good resource for working with this library.
 
-It's probably worth noting this library leverages records heavily which allows for very similar syntax to working with javascript objects and other benefits, but comes with a downside. You may need to annotate the types if you're using a record in a context where the compiler cannot infer what it is. The most common case is when using a non-T-first api like `Js.Promise`. For this reason we expose every type from the `ApolloClient.Types` module for convenience
-Example:
+It's probably worth noting this library leverages records heavily which allows for very similar syntax to working with javascript objects and other benefits, but comes with a downside. You may need to annotate the types if you're using a record in a context where the compiler cannot infer what it is. The most common case is when using a non-T-first api like `Js.Promise`. For this reason we expose every type from the `ApolloClient.Types` module for convenience. Example:
 
 ```reason
-  /** Inspecting the types reveals this is a QueryResult.t */
   let queryResult = SomeQuery.use();
 
-  /** I can destructure, pattern match, or access properties just like javascript */
+  // I can destructure or access properties just like javascript, and also pattern match!
   switch (queryResult) {
     | {loading: true} =>
-    /** Show loading */
+      // Show loading
     | {data: Some(data), fetchMore} =>
-    let onClick = fetchMore();
-    /** Show data */
+      let onClick = _ => fetchMore();
+      // Show data
   }
 
-  /** Sometimes you need to annotate */
+  // Annotation is necessary in some cases
   apolloClient.query(~query=(module SomeQuery), ())
-  |> Js.Promise.then(result => switch (result) {
+  |> Js.Promise.then(result => // Hover over the type and you can see it is an ApolloQueryResult.t__ok
+    // Let's open the module so the record fields are accessible
+    open ApolloClient.Types.ApolloQueryResult;
+    // ☝️ You don't have to go searching for a type, everything is accessible under ApolloClient.Types
+    switch (result) {
     | Some(apolloQueryResult) =>
-      Js.log2("Got data!", apolloQueryResult.ApolloClient.Types.ApolloQueryResult.data)
-      /** ☝️ Note that once you know the type, you don't have to go searching for it.
-        Everything is accessible under ApolloClient.Types */
+      Js.log2("Got data!", apolloQueryResult.data)
     | Error(_) =>
       Js.log("Check out EXAMPLES/ for T-first promise solutions that don't have this problem!")
-  })
+    }
+  )
 ```
 
 ## Recommended Editor Extensions (Visual Studio Code)

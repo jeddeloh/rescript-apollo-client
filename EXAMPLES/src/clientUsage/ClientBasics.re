@@ -35,11 +35,6 @@ let logTodos = _ =>
       )
     })
   ->Utils.Promise.ignore;
-// ->Promise.get(
-//     fun
-//     | Ok({data: {todos}}) => Js.log2("query To-Dos: ", todos)
-//     | Error(error) => Js.log2("Error: ", error),
-//   );
 
 let addTodo = _ =>
   Client.instance.mutate(

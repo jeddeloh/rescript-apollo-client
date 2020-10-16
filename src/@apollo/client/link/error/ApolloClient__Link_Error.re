@@ -68,15 +68,15 @@ module ErrorResponse = {
       networkError: option(NetworkErrorUnion.t),
       response: option(ExecutionResult.Js_.t(Js.Json.t)),
       operation: Operation.Js_.t,
-      forward: NextLink.Js_.t,
     };
+
+    [@bs.send] external forward: t => NextLink.Js_.t = "forward";
   };
 
   type t_networkError =
-    ApolloError.t_networkError =
-      | FetchFailure(Js.Exn.t)
-      | BadStatus(int, ServerError.t)
-      | BadBody(ServerParseError.t);
+    | FetchFailure(Js.Exn.t)
+    | BadStatus(int, ServerError.t)
+    | BadBody(ServerParseError.t);
 
   type t = {
     graphQLErrors: option(array(GraphQLError.t)),
@@ -99,8 +99,8 @@ module ErrorResponse = {
             }
           ),
       response: js.response,
-      operation: js.operation,
-      forward: js.forward,
+      operation: js.operation->Operation.fromJs,
+      forward: operation => js->Js_.forward(operation->Operation.toJs),
     };
 };
 

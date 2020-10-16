@@ -20,7 +20,7 @@ module Js_ = {
       . Graphql.documentNode,
       LazyQueryHookOptions.Js_.t('jsData, 'jsVariables)
     ) =>
-    QueryTuple.Js_.t('jsData, 'variables, 'jsVariables) =
+    QueryTuple.Js_.t('jsData, 'jsVariables) =
     "useLazyQuery";
 };
 
@@ -38,7 +38,7 @@ let useLazyQuery:
       ~errorPolicy: ErrorPolicy.t=?,
       ~fetchPolicy: WatchQueryFetchPolicy.t=?,
       ~notifyOnNetworkStatusChange: bool=?,
-      ~onCompleted: data => unit=?,
+      ~onCompleted: Types.parseResult(data) => unit=?,
       ~onError: ApolloError.t => unit=?,
       ~partialRefetch: bool=?,
       ~pollInterval: int=?,
@@ -61,6 +61,7 @@ let useLazyQuery:
     ~ssr=?,
     (),
   ) => {
+    let safeParse = Utils.safeParse(Operation.parse);
     let jsQueryTuple =
       Js_.useLazyQuery(.
         Operation.query,
@@ -80,14 +81,15 @@ let useLazyQuery:
             ssr,
             variables: None,
           },
-          ~parse=Operation.parse,
+          ~safeParse,
+          ~serializeVariables=Operation.serializeVariables,
         ),
       );
 
     Utils.useGuaranteedMemo1(
       () => {
         jsQueryTuple->QueryTuple.fromJs(
-          ~parse=Operation.parse,
+          ~safeParse,
           ~serialize=Operation.serialize,
           ~serializeVariables=Operation.serializeVariables,
         )
@@ -111,14 +113,14 @@ let useLazyQueryWithVariables:
       ~fetchPolicy: WatchQueryFetchPolicy.t=?,
       ~mapJsVariables: jsVariables => jsVariables=?,
       ~notifyOnNetworkStatusChange: bool=?,
-      ~onCompleted: data => unit=?,
+      ~onCompleted: Types.parseResult(data) => unit=?,
       ~onError: ApolloError.t => unit=?,
       ~partialRefetch: bool=?,
       ~pollInterval: int=?,
       ~ssr: bool=?,
       variables
     ) =>
-    QueryTuple__noVariables.t(data, jsData, jsVariables) =
+    QueryTuple__noVariables.t(data, jsData, variables, jsVariables) =
   (
     ~query as (module Operation),
     ~client=?,
@@ -135,8 +137,7 @@ let useLazyQueryWithVariables:
     ~ssr=?,
     variables,
   ) => {
-    let jsVariables =
-      variables->Operation.serializeVariables->mapJsVariables;
+    let safeParse = Utils.safeParse(Operation.parse);
 
     let jsQueryTuple =
       Js_.useLazyQuery(.
@@ -155,19 +156,22 @@ let useLazyQueryWithVariables:
             pollInterval,
             query: None,
             ssr,
-            variables: Some(jsVariables),
+            variables: Some(variables),
           },
-          ~parse=Operation.parse,
+          ~safeParse,
+          ~serializeVariables=Operation.serializeVariables,
         ),
       );
 
     Utils.useGuaranteedMemo1(
       () => {
         jsQueryTuple->QueryTuple__noVariables.fromJs(
-          ~parse=Operation.parse,
+          ~mapJsVariables,
+          ~safeParse,
           ~serialize=Operation.serialize,
+          ~serializeVariables=Operation.serializeVariables,
           // Passing in the same variables from above allows us to reuse some types
-          ~variables=jsVariables,
+          ~variables,
         )
       },
       jsQueryTuple,

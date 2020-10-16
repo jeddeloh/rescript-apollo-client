@@ -50,7 +50,7 @@ let make = () => {
                   },
                 },
             ~update=
-              (cache, {data}) =>
+              ({writeFragment, writeQuery}, {data}) =>
                 switch (data) {
                 | Some({todo}) =>
                   /**
@@ -59,7 +59,7 @@ let make = () => {
                    */
                   Js.log2("mutate.update To-Do: ", todo);
                   let _unusedRef =
-                    cache->Cache.writeFragment(
+                    writeFragment(
                       ~fragment=(module Fragments.TodoItem),
                       ~data={
                         __typename: todo.__typename,
@@ -70,7 +70,7 @@ let make = () => {
                       (),
                     );
                   let _unusedRef =
-                    cache->Cache.writeQuery(
+                    writeQuery(
                       ~query=(module TodosQuery),
                       ~data={
                         todos: [|

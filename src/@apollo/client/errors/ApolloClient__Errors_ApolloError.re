@@ -2,6 +2,7 @@ module Graphql = ApolloClient__Graphql;
 module GraphQLError = ApolloClient__Graphql.Error.GraphQLError;
 module ServerError = ApolloClient__Link_Utils_ThrowServerError.ServerError;
 module ServerParseError = ApolloClient__Link_Http_ParseAndCheckHttpResponse.ServerParseError;
+module Types = ApolloClient__Types;
 
 module Js_ = {
   module NetworkErrorUnion: {
@@ -50,8 +51,14 @@ module Js_ = {
   // }
   type t = {
     extraInfo: Js.Json.t,
-    graphQLErrors: array(Graphql.Error.GraphQLError.t),
-    networkError: Js.nullable(NetworkErrorUnion.t), // ACTUAL: Error | null
+    /**
+     This is not actually optional, but apollo-client casts an any to ApolloError in
+     SubscriptionData, and doesn't check the error at all which results in GraphQLErrors 
+     masquerading as ApolloErrors (no graphqlErrors property).
+     See: https://github.com/apollographql/apollo-client/pull/6894
+     */
+    graphQLErrors: option(array(Graphql.Error.GraphQLError.t)),
+    networkError: Js.nullable(NetworkErrorUnion.t),
     // ...extends Error
     name: string,
     message: string,
@@ -73,12 +80,29 @@ module Js_ = {
   // });
   [@bs.module "@apollo/client"] [@bs.new]
   external make: make_args => t = "ApolloError";
+
+  let ensureApolloError = error => [%bs.raw {|
+    function (error, makeApolloError) {
+      // This is not an exhaustive check. It is intended to address the most common subscription error issues only
+      // See: https://github.com/apollographql/apollo-client/pull/6894
+      if (Array.isArray(error.graphQLErrors)) {
+        return error;
+      } else if (error && typeof error.message === "string" && error.extensions && typeof error.extensions.code === "string") {
+        return makeApolloError({graphQLErrors: [error]});
+      }
+    }
+  |}](error, make);
 };
 
 type t_networkError =
+  /* Fetch threw an error for some reason and we caught it */
   | FetchFailure(Js.Exn.t)
+  /* Fetch got a response, but the status code was >=300 */
   | BadStatus(int, ServerError.t)
-  | BadBody(ServerParseError.t);
+  /* Fetch got a response, but it wasn't JSON */
+  | BadBody(ServerParseError.t)
+  /* We got a JSON response, but it wasn't in a shape we could parse */
+  | ParseError(Types.parseError); // ParseError is reason-apollo-client only
 
 type t = {
   extraInfo: Js.Json.t,
@@ -92,7 +116,7 @@ type t = {
 let fromJs: Js_.t => t =
   js => {
     extraInfo: js.extraInfo,
-    graphQLErrors: js.graphQLErrors,
+    graphQLErrors: js.graphQLErrors->Belt.Option.getWithDefault([||]),
     networkError:
       js.networkError
       ->Js.toOption
@@ -111,20 +135,21 @@ let fromJs: Js_.t => t =
 let make:
   (
     ~graphQLErrors: array(GraphQLError.t)=?,
-    ~networkError: Js.Exn.t=?,
+    ~networkError: t_networkError=?,
     ~errorMessage: string=?,
     ~extraInfo: Js.Json.t=?,
     unit
   ) =>
   t =
-  (~graphQLErrors=?, ~networkError=?, ~errorMessage=?, ~extraInfo=?, ()) =>
-    Js_.make({
-      graphQLErrors,
-      networkError:
-        Js.Nullable.fromOption(
-          networkError->Belt.Option.map(Js_.NetworkErrorUnion.error),
-        ),
-      errorMessage,
-      extraInfo,
-    })
-    ->fromJs;
+  (~graphQLErrors=?, ~networkError=?, ~errorMessage=?, ~extraInfo=?, ()) => {
+    let errorWithoutNetworkError =
+      Js_.make({
+        graphQLErrors,
+        networkError: Js.Nullable.undefined,
+        errorMessage,
+        extraInfo,
+      })
+      ->fromJs;
+
+    {...errorWithoutNetworkError, networkError};
+  };

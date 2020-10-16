@@ -18,17 +18,18 @@ module Subscription = {
     //     closed: boolean;
     //     unsubscribe(): void;
     // }
-    type t = {
-      closed: bool
-    };
+    type t = {closed: bool};
 
-    [@bs.send]
-    external unsubscribe: (t) => unit ="unsubscribe";
+    [@bs.send] external unsubscribe: t => unit = "unsubscribe";
   };
 
-  type t = Js_.t;
+  type t = {
+    closed: bool,
+    unsubscribe: unit => unit,
+  };
 
-  let unsubscribe = Js_.unsubscribe;
+  let fromJs: Js_.t => t =
+    js => {closed: js.closed, unsubscribe: () => js->Js_.unsubscribe};
 };
 
 module Observer = {

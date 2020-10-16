@@ -71,7 +71,7 @@ module Js_ = {
   external make: InMemoryCacheConfig.Js_.t => t = "InMemoryCache";
 };
 
-type t = Js_.t;
+type t = ApolloCache.t(Js.Json.t);
 
 let make:
   (
@@ -100,5 +100,6 @@ let make:
         ~typePolicies=?typePolicies->Belt.Option.map(TypePolicies.toJs),
         (),
       ),
-    );
+    )
+    ->ApolloCache.fromJs;
   };

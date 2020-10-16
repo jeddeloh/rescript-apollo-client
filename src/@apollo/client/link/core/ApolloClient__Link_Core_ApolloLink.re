@@ -70,4 +70,10 @@ let from = Js_.from;
 
 let setOnError = Js_.setOnError;
 
-let split: (t, ~test: Operation.t => bool, ~whenTrue: t, ~whenFalse: t) => t = Js_.split;
+let split: (t, ~test: Operation.t => bool, ~whenTrue: t, ~whenFalse: t) => t =
+  (t, ~test, ~whenTrue, ~whenFalse) =>
+    t->Js_.split(
+      ~test=jsOperation => test(jsOperation->Operation.fromJs),
+      ~whenTrue,
+      ~whenFalse,
+    );

@@ -1,4 +1,5 @@
 module Graphql = ApolloClient__Graphql;
+module Utils = ApolloClient__Utils;
 
 module Query = {
   module Js_ = {
@@ -16,6 +17,19 @@ module Query = {
   };
 
   type t('jsVariables) = Js_.t('jsVariables);
+
+  let toJs:
+    (
+      t('variables),
+      ~mapJsVariables: 'jsVariables => 'jsVariables=?,
+      ~serializeVariables: 'variables => 'jsVariables
+    ) =>
+    Js_.t('jsVariables) =
+    (t, ~mapJsVariables=Utils.identity, ~serializeVariables) => {
+      query: t.query,
+      variables: t.variables->serializeVariables->mapJsVariables,
+      id: t.id,
+    };
 };
 
 module Fragment = {
@@ -26,16 +40,23 @@ module Fragment = {
     //   fragmentName?: string;
     //   variables?: TVariables;
     // }
-    type t('jsVariables) = {
+    type t = {
       id: string,
       fragment: Graphql.documentNode,
       // We don't allow optional variables because it's not typesafe
-      fragmentName: string,
-      variables: option('jsVariables),
+      // variables: 'jsVariables,
+      fragmentName: option(string),
     };
   };
 
-  type t('jsVariables) = Js_.t('jsVariables);
+  type t =
+    Js_.t = {
+      id: string,
+      fragment: Graphql.documentNode,
+      // We don't allow optional variables because it's not typesafe
+      // variables: 'jsVariables,
+      fragmentName: option(string),
+    };
 };
 
 module WriteQueryOptions = {
@@ -55,22 +76,27 @@ module WriteQueryOptions = {
     };
   };
 
-  type t('data, 'jsVariables) = {
+  type t('data, 'variables) = {
     data: 'data,
     broadcast: option(bool),
     query: Graphql.documentNode,
-    variables: 'jsVariables,
+    variables: 'variables,
     id: option(string),
   };
 
   let toJs:
-    (t('data, 'jsVariables), ~parse: 'jsData => 'data) =>
+    (
+      t('data, 'variables),
+      ~mapJsVariables: 'jsVariables => 'jsVariables=?,
+      ~serialize: 'data => 'jsData,
+      ~serializeVariables: 'variables => 'jsVariables
+    ) =>
     Js_.t('jsData, 'jsVariables) =
-    (t, ~parse) => {
-      data: t.data->parse,
+    (t, ~mapJsVariables=Utils.identity, ~serialize, ~serializeVariables) => {
+      data: t.data->serialize,
       broadcast: t.broadcast,
       query: t.query,
-      variables: t.variables,
+      variables: t.variables->serializeVariables->mapJsVariables,
       id: t.id,
     };
 };
@@ -94,22 +120,29 @@ module WriteFragmentOptions = {
     };
   };
 
-  type t('data, 'jsVariables) = {
+  type t('data, 'variables) = {
     data: 'data,
     broadcast: option(bool),
     id: string,
     fragment: Graphql.documentNode,
     fragmentName: option(string),
+    // variables: 'variables,
   };
 
   let toJs:
-    (t('data, 'jsVariables), ~parse: 'jsData => 'data) =>
+    (
+      t('data, 'variables),
+      // ~mapJsVariables: 'jsVariables => 'jsVariables=?,
+      ~serialize: 'data => 'jsData
+    ) =>
+    // ~serializeVariables: 'variables => 'jsVariables
     Js_.t('jsData, 'jsVariables) =
-    (t, ~parse) => {
-      data: t.data->parse,
+    (t, ~serialize) => {
+      data: t.data->serialize,
       broadcast: t.broadcast,
       id: t.id,
       fragment: t.fragment,
       fragmentName: t.fragmentName,
+      // variables: t.variables->serializeVariables->mapJsVariables,
     };
 };

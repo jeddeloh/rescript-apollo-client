@@ -1,6 +1,9 @@
+module ApolloError = ApolloClient__Errors_ApolloError;
 module Graphql = ApolloClient__Graphql;
 module GraphQLError = ApolloClient__Graphql.Error.GraphQLError;
 module Observable = ApolloClient__ZenObservable.Observable;
+module Types = ApolloClient__Types;
+module Utils = ApolloClient__Utils;
 
 module GraphQLRequest = {
   module Js_ = {
@@ -25,6 +28,7 @@ module GraphQLRequest = {
 
 module Operation = {
   type useMethodFunctionInThisModuleInstead;
+
   module Js_ = {
     // export interface Operation {
     //     query: DocumentNode;
@@ -39,24 +43,47 @@ module Operation = {
       variables: Js.Json.t,
       operationName: string,
       extensions: Js.Json.t,
-      setContext: useMethodFunctionInThisModuleInstead,
-      getContext: useMethodFunctionInThisModuleInstead,
     };
+
+    [@bs.send] external getContext: t => Js.Json.t = "getContext";
+
+    [@bs.send] external setContext: (t, Js.Json.t) => Js.Json.t = "setContext";
   };
 
-  type t =
-    Js_.t = {
-      query: Graphql.documentNode,
-      variables: Js.Json.t,
-      operationName: string,
-      extensions: Js.Json.t,
-      setContext: useMethodFunctionInThisModuleInstead,
-      getContext: useMethodFunctionInThisModuleInstead,
-    };
+  type t = {
+    query: Graphql.documentNode,
+    variables: Js.Json.t,
+    operationName: string,
+    extensions: Js.Json.t,
+    [@bs.as "reason_setContext"]
+    setContext: Js.Json.t => Js.Json.t,
+    [@bs.as "reason_getContext"]
+    getContext: unit => Js.Json.t,
+  };
 
-  [@bs.send] external getContext: t => Js.Json.t = "getContext";
+  let preserveJsPropsAndContext: (Js_.t, t) => t = [%bs.raw
+    {|
+      function (js, t) {
+        return Object.assign(js, t)
+      }
+    |}
+  ];
 
-  [@bs.send] external setContext: (t, Js.Json.t) => Js.Json.t = "setContext";
+  let fromJs: Js_.t => t =
+    js =>
+      preserveJsPropsAndContext(
+        js,
+        {
+          query: js.query,
+          variables: js.variables,
+          operationName: js.operationName,
+          extensions: js.extensions,
+          setContext: context => js->Js_.setContext(context),
+          getContext: () => js->Js_.getContext,
+        },
+      );
+
+  external toJs: t => Js_.t = "%identity";
 };
 
 module FetchResult = {
@@ -82,16 +109,56 @@ module FetchResult = {
     extensions: option(Js.Json.t), // ACTUAL: Record<string, any>
     context: option(Js.Json.t), // ACTUAL: Record<string, any>
     // ...extends ExecutionResult
-    errors: option(array(GraphQLError.t)),
+    error: option(ApolloError.t),
   };
 
-  let fromJs: (Js_.t('jsData), ~parse: 'jsData => 'data) => t('data) =
-    (js, ~parse) => {
-      {
-        data: js.data->Js.toOption->Belt.Option.map(parse),
-        extensions: js.extensions,
-        context: js.context,
-        errors: js.errors,
+  let fromJs:
+    (Js_.t('jsData), ~safeParse: Types.safeParse('data, 'jsData)) =>
+    t('data) =
+    (js, ~safeParse) => {
+      let (data, error) =
+        Utils.safeParseAndLiftToCommonResultProps(
+          ~jsData=js.data->Js.toOption,
+          ~graphQLErrors=?js.errors,
+          safeParse,
+        );
+      {data, error, extensions: js.extensions, context: js.context};
+    };
+
+  let fromError: ApolloError.t => t('data) =
+    error => {
+      data: None,
+      extensions: None,
+      context: None,
+      error: Some(error),
+    };
+
+  type t__ok('data) = {
+    data: 'data,
+    error: option(ApolloError.t),
+    extensions: option(Js.Json.t),
+    context: option(Js.Json.t),
+  };
+
+  let toResult: t('data) => Belt.Result.t(t__ok('data), ApolloError.t) =
+    fetchResult => {
+      switch (fetchResult) {
+      | {data: Some(data)} =>
+        Ok({
+          data,
+          error: fetchResult.error,
+          extensions: fetchResult.extensions,
+          context: fetchResult.context,
+        })
+      | {error: Some(error)} => Error(error)
+      | {data: None, error: None} =>
+        Error(
+          ApolloError.make(
+            ~errorMessage=
+              "No data and no error on FetchResult.t. Shouldn't this be impossible?",
+            (),
+          ),
+        )
       };
     };
 };
@@ -103,7 +170,7 @@ module NextLink = {
   };
 
   // These are intentionally Js_.t because we can't know what to parse
-  type t = Js_.t;
+  type t = Operation.t => Observable.t(FetchResult.Js_.t(Js.Json.t));
 };
 
 module RequestHandler = {

@@ -1,5 +1,7 @@
+module ApolloError = ApolloClient__Errors_ApolloError;
 module Graphql = ApolloClient__Graphql;
 module FetchResult = ApolloClient__Link_Core_Types.FetchResult;
+module NetworkStatus = ApolloClient__Core_NetworkStatus.NetworkStatus;
 module Resolver = ApolloClient__Core_LocalState.Resolver;
 module Types = ApolloClient__Types;
 module Utils = ApolloClient__Utils;
@@ -57,18 +59,69 @@ module ApolloQueryResult = {
 
   type t('data) = {
     data: option('data),
-    errors: option(array(Graphql.Error.GraphQLError.t)),
+    /**
+     * Intentionally elevated from array(Graphql.Error.GraphQLError.t) to ApolloError.
+     * This allows us to incorporate network and parse failures into a single result.
+     */
+    error: option(ApolloError.t),
     loading: bool,
-    networkStatus: int,
+    networkStatus: NetworkStatus.t,
   };
 
   let fromJs:
-    (Js_.t('jsData), ~parse: 'jsData => 'parsedData) => t('parsedData) =
-    (js, ~parse) => {
-      data: js.data->Belt.Option.map(parse),
-      errors: js.errors,
-      loading: js.loading,
-      networkStatus: js.networkStatus,
+    (Js_.t('jsData), ~safeParse: Types.safeParse('data, 'jsData)) =>
+    t('data) =
+    (js, ~safeParse) => {
+      let (data, error) =
+        Utils.safeParseAndLiftToCommonResultProps(
+          ~jsData=js.data,
+          ~graphQLErrors=?js.errors,
+          safeParse,
+        );
+
+      {
+        data,
+        error,
+        loading: js.loading,
+        networkStatus: js.networkStatus->NetworkStatus.fromJs,
+      };
+    };
+
+  let fromError: ApolloError.t => t('data) =
+    error => {
+      data: None,
+      error: Some(error),
+      loading: false,
+      networkStatus: Error,
+    };
+
+  type t__ok('data) = {
+    data: 'data,
+    error: option(ApolloError.t),
+    loading: bool,
+    networkStatus: NetworkStatus.t,
+  };
+
+  let toResult: t('data) => Belt.Result.t(t__ok('data), ApolloError.t) =
+    apolloQueryResult => {
+      switch (apolloQueryResult) {
+      | {data: Some(data)} =>
+        Ok({
+          data,
+          error: apolloQueryResult.error,
+          loading: apolloQueryResult.loading,
+          networkStatus: apolloQueryResult.networkStatus,
+        })
+      | {error: Some(error)} => Error(error)
+      | {data: None, error: None} =>
+        Error(
+          ApolloError.make(
+            ~errorMessage=
+              "No data and no error on ApolloQueryResult.t. Shouldn't this be impossible?",
+            (),
+          ),
+        )
+      };
     };
 };
 
@@ -97,15 +150,15 @@ module MutationQueryReducer = {
   type t('data) = (Js.Json.t, options('data)) => Js.Json.t;
 
   let toJs:
-    (t('data), ~parse: 'jsData => 'data) =>
+    (t('data), ~safeParse: Types.safeParse('data, 'jsData)) =>
     (. Js.Json.t, Js_.options('jsData)) => Js.Json.t =
-    (t, ~parse) =>
+    (t, ~safeParse) =>
       (. previousResult, jsOptions) =>
         t(
           previousResult,
           {
             mutationResult:
-              jsOptions.mutationResult->FetchResult.fromJs(~parse),
+              jsOptions.mutationResult->FetchResult.fromJs(~safeParse),
             queryName: jsOptions.queryName,
             queryVariables: jsOptions.queryVariables,
           },
@@ -124,11 +177,13 @@ module MutationQueryReducersMap = {
 
   type t('data) = Js.Dict.t(MutationQueryReducer.t('data));
 
-  let toJs: (t('data), ~parse: 'jsData => 'data) => Js_.t('jsData) =
-    (t, ~parse) => {
+  let toJs:
+    (t('data), ~safeParse: Types.safeParse('data, 'jsData)) =>
+    Js_.t('jsData) =
+    (t, ~safeParse) => {
       Js.Dict.map(
         (. mutationQueryReducer) =>
-          mutationQueryReducer->MutationQueryReducer.toJs(~parse),
+          mutationQueryReducer->MutationQueryReducer.toJs(~safeParse),
         t,
       );
     };

@@ -145,8 +145,6 @@ module ClientOptions = {
 };
 
 module SubscriptionClient = {
-  type t;
-
   type webSocketImpl;
 
   module Js_ = {
@@ -168,7 +166,7 @@ module SubscriptionClient = {
     //     applyMiddlewares(options: OperationOptions): Promise<OperationOptions>;
     //     use(middlewares: Middleware[]): SubscriptionClient;
     // }
-    type nonrec t = t;
+    type t;
 
     [@bs.new] [@bs.module "subscriptions-transport-ws"]
     external make:
@@ -187,6 +185,19 @@ module SubscriptionClient = {
       "close";
   };
 
+  type t = {
+    [@bs.as "reason_close"]
+    close: (~isForced: bool=?, ~closedByUser: bool=?, unit) => unit,
+  };
+
+  let preserveJsPropsAndContext: (Js_.t, t) => t = [%bs.raw
+    {|
+      function (js, t) {
+        return Object.assign(js, t)
+      }
+    |}
+  ];
+
   let make:
     (
       ~url: string,
@@ -197,14 +208,18 @@ module SubscriptionClient = {
     ) =>
     t =
     (~url, ~options=?, ~webSocketImpl=?, ~webSocketProtocols=?, ()) => {
-      Js_.make(
-        ~url,
-        ~options=?options->Belt.Option.map(ClientOptions.toJs),
-        ~webSocketImpl?,
-        ~webSocketProtocols?,
-        (),
-      );
-    };
+      let jsSubscriptionClient =
+        Js_.make(
+          ~url,
+          ~options=?options->Belt.Option.map(ClientOptions.toJs),
+          ~webSocketImpl?,
+          ~webSocketProtocols?,
+          (),
+        );
 
-  let close = Js_.close;
+      let close = (~isForced=?, ~closedByUser=?, ()) =>
+        jsSubscriptionClient->Js_.close(~isForced?, ~closedByUser?, ());
+
+      preserveJsPropsAndContext(jsSubscriptionClient, {close: close});
+    };
 };

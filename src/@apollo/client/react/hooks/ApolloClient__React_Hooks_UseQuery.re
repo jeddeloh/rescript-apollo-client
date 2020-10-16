@@ -36,7 +36,7 @@ let useQuery:
       ~fetchPolicy: WatchQueryFetchPolicy.t=?,
       ~mapJsVariables: jsVariables => jsVariables=?,
       ~notifyOnNetworkStatusChange: bool=?,
-      ~onCompleted: data => unit=?,
+      ~onCompleted: Types.parseResult(data) => unit=?,
       ~onError: ApolloError.t => unit=?,
       ~partialRefetch: bool=?,
       ~pollInterval: int=?,
@@ -44,7 +44,7 @@ let useQuery:
       ~ssr: bool=?,
       variables
     ) =>
-    QueryResult.t(data, jsData, jsVariables) =
+    QueryResult.t(data, jsData, variables, jsVariables) =
   (
     ~query as (module Operation),
     ~client=?,
@@ -62,8 +62,7 @@ let useQuery:
     ~ssr=?,
     variables,
   ) => {
-    let jsVariables =
-      variables->Operation.serializeVariables->mapJsVariables;
+    let safeParse = Utils.safeParse(Operation.parse);
 
     let jsQueryResult =
       Js_.useQuery(.
@@ -83,17 +82,20 @@ let useQuery:
             query: None,
             skip,
             ssr,
-            variables: jsVariables,
+            variables,
           },
-          ~parse=Operation.parse,
+          ~mapJsVariables,
+          ~safeParse,
+          ~serializeVariables=Operation.serializeVariables,
         ),
       );
 
     Utils.useGuaranteedMemo1(
       () => {
         jsQueryResult->QueryResult.fromJs(
-          ~parse=Operation.parse,
+          ~safeParse,
           ~serialize=Operation.serialize,
+          ~serializeVariables=Operation.serializeVariables,
         )
       },
       jsQueryResult,

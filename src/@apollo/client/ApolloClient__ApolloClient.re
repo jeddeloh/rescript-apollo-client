@@ -1,13 +1,14 @@
-module ApolloQueryResult = ApolloClient__Core_Types.ApolloQueryResult;
-module ApolloLink = ApolloClient__Link_Core_ApolloLink;
 module ApolloCache = ApolloClient__Cache_Core_Cache.ApolloCache;
+module ApolloError = ApolloClient__Errors_ApolloError;
+module ApolloLink = ApolloClient__Link_Core_ApolloLink;
+module ApolloQueryResult = ApolloClient__Core_Types.ApolloQueryResult;
 module DataProxy = ApolloClient__Cache_Core_Types.DataProxy;
 module ErrorPolicy = ApolloClient__Core_WatchQueryOptions.ErrorPolicy;
 module FetchPolicy = ApolloClient__Core_WatchQueryOptions.FetchPolicy;
 module FetchPolicy__noCacheExtracted = ApolloClient__Core_WatchQueryOptions.FetchPolicy__noCacheExtracted;
+module FetchResult = ApolloClient__Link_Core_Types.FetchResult;
 module FragmentMatcher = ApolloClient__Core_LocalState.FragmentMatcher;
 module Graphql = ApolloClient__Graphql;
-module FetchResult = ApolloClient__Link_Core_Types.FetchResult;
 module MutationOptions = ApolloClient__Core_WatchQueryOptions.MutationOptions;
 module MutationQueryReducersMap = ApolloClient__Core_WatchQueryOptions.MutationQueryReducersMap;
 module MutationUpdaterFn = ApolloClient__Core_WatchQueryOptions.MutationUpdaterFn;
@@ -206,7 +207,7 @@ module ApolloClientOptions = {
       credentials: option(string),
       headers: option(Js.Dict.t(string)),
       link: option(ApolloLink.Js_.t),
-      cache: ApolloCache.Js_.t(Js.Json.t),
+      cache: ApolloCache.t(Js.Json.t), // Non-Js_ ApolloCache is correct here
       ssrForceFetchDelay: option(int),
       ssrMode: option(bool),
       connectToDevTools: option(bool),
@@ -226,7 +227,7 @@ module ApolloClientOptions = {
     credentials: option(string),
     headers: option(Js.Dict.t(string)),
     link: option(ApolloLink.t),
-    cache: ApolloCache.Js_.t(Js.Json.t),
+    cache: ApolloCache.t(Js.Json.t),
     ssrForceFetchDelay: option(int),
     ssrMode: option(bool),
     connectToDevTools: option(bool),
@@ -261,9 +262,12 @@ module ApolloClientOptions = {
     };
 };
 
-type t;
-
 module Js_ = {
+  module Cast = {
+    external asReasonCache: ApolloCache.Js_.t('a) => ApolloCache.t('a) =
+      "%identity";
+  };
+
   // export declare class ApolloClient<TCacheShape> implements DataProxy {
   //     link: ApolloLink;
   //     cache: ApolloCache<TCacheShape>;
@@ -302,8 +306,7 @@ module Js_ = {
   //     setLocalStateFragmentMatcher(fragmentMatcher: FragmentMatcher): void;
   //     setLink(newLink: ApolloLink): void;
   // }
-
-  type nonrec t = t;
+  type t;
 
   // clearStore(): Promise<any[]>;
   [@bs.send]
@@ -333,6 +336,13 @@ module Js_ = {
     Js.Promise.t(ApolloQueryResult.Js_.t('jsData)) =
     "query";
 
+  // readFragment<T = any, TVariables = OperationVariables>(options: DataProxy.Fragment<TVariables>, optimistic?: boolean): T | null;
+  [@bs.send]
+  external readFragment:
+    (t, ~options: DataProxy.Fragment.Js_.t, ~optimistic: bool=?, unit) =>
+    Js.nullable('jsData) =
+    "readFragment";
+
   // readQuery<T = any, TVariables = OperationVariables>(options: DataProxy.Query<TVariables>, optimistic?: boolean): T | null;
   [@bs.send]
   external readQuery:
@@ -347,12 +357,14 @@ module Js_ = {
   // resetStore(): Promise<ApolloQueryResult<any>[] | null>;
   [@bs.send]
   external resetStore:
-    t => Js.Promise.t(Js.nullable(array(ApolloQueryResult.t(Js.Json.t)))) =
+    t =>
+    Js.Promise.t(Js.nullable(array(ApolloQueryResult.Js_.t(Js.Json.t)))) =
     "resetStore";
 
   // restore(serializedState: TCacheShape): ApolloCache<TCacheShape>;
   [@bs.send]
-  external restore: (t, Js.Json.t) => ApolloCache.t(Js.Json.t) = "restore";
+  external restore: (t, Js.Json.t) => ApolloCache.Js_.t(Js.Json.t) =
+    "restore";
 
   // setLink(newLink: ApolloLink): void;
   [@bs.send] external setLink: (t, ApolloLink.Js_.t) => unit = "setLink";
@@ -384,6 +396,149 @@ module Js_ = {
   [@bs.module "@apollo/client"] [@bs.new]
   external make: ApolloClientOptions.Js_.t => t = "ApolloClient";
 };
+
+type t = {
+  [@bs.as "reason_clearStore"]
+  clearStore:
+    unit => Js.Promise.t(Belt.Result.t(array(Js.Json.t), Js.Exn.t)),
+  [@bs.as "reason_mutate"]
+  mutate:
+    'data 'variables 'jsVariables.
+    (
+      ~mutation: (module Operation with
+                    type t = 'data and
+                    type t_variables = 'variables and
+                    type Raw.t_variables = 'jsVariables),
+      ~awaitRefetchQueries: bool=?,
+      ~context: Js.Json.t=?,
+      ~errorPolicy: ErrorPolicy.t=?,
+      ~fetchPolicy: FetchPolicy__noCacheExtracted.t=?,
+      ~mapJsVariables: 'jsVariables => 'jsVariables=?,
+      ~optimisticResponse: 'jsVariables => 'data=?,
+      ~refetchQueries: RefetchQueryDescription.t=?,
+      ~updateQueries: MutationQueryReducersMap.t('data)=?,
+      ~update: MutationUpdaterFn.t('data)=?,
+      'variables
+    ) =>
+    Js.Promise.t(Belt.Result.t(FetchResult.t__ok('data), ApolloError.t)),
+
+  [@bs.as "reason_onClearStore"]
+  onClearStore: (~cb: unit => Js.Promise.t(unit), unit) => unit,
+  [@bs.as "reason_onResetStore"]
+  onResetStore: (~cb: unit => Js.Promise.t(unit), unit) => unit,
+  [@bs.as "reason_query"]
+  query:
+    'data 'jsData 'variables 'jsVariables.
+    (
+      ~query: (module Operation with
+                 type t = 'data and
+                 type t_variables = 'variables and
+                 type Raw.t = 'jsData and
+                 type Raw.t_variables = 'jsVariables),
+      ~context: Js.Json.t=?,
+      ~errorPolicy: ErrorPolicy.t=?,
+      ~fetchPolicy: FetchPolicy.t=?,
+      ~mapJsVariables: 'jsVariables => 'jsVariables=?,
+      'variables
+    ) =>
+    Js.Promise.t(
+      Belt.Result.t(ApolloQueryResult.t__ok('data), ApolloError.t),
+    ),
+
+  [@bs.as "reason_readFragment"]
+  readFragment:
+    'data.
+    (
+      ~fragment: (module Fragment with type t = 'data),
+      ~id: string,
+      ~optimistic: bool=?,
+      ~fragmentName: string=?,
+      unit
+    ) =>
+    option('data),
+
+  [@bs.as "reason_readQuery"]
+  readQuery:
+    'data 'variables 'jsVariables.
+    (
+      ~query: (module Operation with
+                 type t = 'data and
+                 type t_variables = 'variables and
+                 type Raw.t_variables = 'jsVariables),
+      ~id: string=?,
+      ~mapJsVariables: 'jsVariables => 'jsVariables=?,
+      ~optimistic: bool=?,
+      'variables
+    ) =>
+    option('data),
+
+  [@bs.as "reason_resetStore"]
+  resetStore:
+    unit =>
+    Js.Promise.t(
+      Belt.Result.t(
+        option(array(ApolloQueryResult.Js_.t(Js.Json.t))),
+        Js.Exn.t,
+      ),
+    ),
+  [@bs.as "reason_restore"]
+  restore: (~serializedState: Js.Json.t) => ApolloCache.t(Js.Json.t),
+  [@bs.as "reason_setLink"]
+  setLink: ApolloLink.t => unit,
+  [@bs.as "reason_watchQuery"]
+  watchQuery:
+    'data 'variables 'jsVariables.
+    (
+      ~query: (module Operation with
+                 type t = 'data and
+                 type t_variables = 'variables and
+                 type Raw.t_variables = 'jsVariables),
+      ~context: Js.Json.t=?,
+      ~errorPolicy: ErrorPolicy.t=?,
+      ~fetchPolicy: WatchQueryFetchPolicy.t=?,
+      ~mapJsVariables: 'jsVariables => 'jsVariables=?,
+      'variables
+    ) =>
+    ObservableQuery.t('data),
+
+  [@bs.as "reason_writeFragment"]
+  writeFragment:
+    'data 'jsVariables.
+    (
+      ~fragment: (module Fragment with type t = 'data),
+      ~data: 'data,
+      ~broadcast: bool=?,
+      ~id: string,
+      ~fragmentName: string=?,
+      unit
+    ) =>
+    unit,
+
+  [@bs.as "reason_writeQuery"]
+  writeQuery:
+    'data 'variables 'jsVariables.
+    (
+      ~query: (module Operation with
+                 type t = 'data and
+                 type t_variables = 'variables and
+                 type Raw.t_variables = 'jsVariables),
+      ~broadcast: bool=?,
+      ~data: 'data,
+      ~id: string=?,
+      ~mapJsVariables: 'jsVariables => 'jsVariables=?,
+      'variables
+    ) =>
+    unit,
+
+};
+
+let preserveJsPropsAndContext: (Js_.t, t) => t = [%bs.raw
+  {|
+    function (js, t) {
+      return Object.assign(js, t)
+    }
+  |}
+];
 
 let make:
   (
@@ -424,291 +579,345 @@ let make:
     ~name=?,
     ~version=?,
     (),
-  ) =>
-    Js_.make(
-      ApolloClientOptions.toJs({
-        uri,
-        credentials,
-        headers,
-        link,
-        cache,
-        ssrForceFetchDelay,
-        ssrMode,
-        connectToDevTools,
-        queryDeduplication,
-        defaultOptions,
-        assumeImmutableResults,
-        resolvers,
-        typeDefs,
-        fragmentMatcher,
-        name,
-        version,
-      }),
-    );
-
-let clearStore = Js_.clearStore;
-
-let mutate:
-  type data variables jsVariables.
-    (
-      t,
-      ~mutation: (module Operation with
-                    type t = data and
-                    type t_variables = variables and
-                    type Raw.t_variables = jsVariables),
-      ~awaitRefetchQueries: bool=?,
-      ~context: Js.Json.t=?,
-      ~errorPolicy: ErrorPolicy.t=?,
-      ~fetchPolicy: FetchPolicy__noCacheExtracted.t=?,
-      ~mapJsVariables: jsVariables => jsVariables=?,
-      ~optimisticResponse: jsVariables => data=?,
-      ~refetchQueries: RefetchQueryDescription.t=?,
-      ~updateQueries: MutationQueryReducersMap.t(data)=?,
-      ~update: MutationUpdaterFn.t(data)=?,
-      variables
-    ) =>
-    Js.Promise.t(FetchResult.t(data)) =
-  (
-    client,
-    ~mutation as (module Operation),
-    ~awaitRefetchQueries=?,
-    ~context=?,
-    ~errorPolicy=?,
-    ~fetchPolicy=?,
-    ~mapJsVariables=Utils.identity,
-    ~optimisticResponse=?,
-    ~refetchQueries=?,
-    ~updateQueries=?,
-    ~update=?,
-    variables,
   ) => {
-    let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
+    let jsClient =
+      Js_.make(
+        ApolloClientOptions.toJs({
+          uri,
+          credentials,
+          headers,
+          link,
+          cache,
+          ssrForceFetchDelay,
+          ssrMode,
+          connectToDevTools,
+          queryDeduplication,
+          defaultOptions,
+          assumeImmutableResults,
+          resolvers,
+          typeDefs,
+          fragmentMatcher,
+          name,
+          version,
+        }),
+      );
 
-    Js_.mutate(
-      client,
-      ~options=
-        MutationOptions.toJs(
-          {
-            awaitRefetchQueries,
-            context,
-            errorPolicy,
-            fetchPolicy,
-            mutation: Operation.query,
-            optimisticResponse,
-            updateQueries,
-            refetchQueries,
-            update,
-            variables: jsVariables,
-          },
-          ~parse=Operation.parse,
-          ~serialize=Operation.serialize,
+    let clearStore = () =>
+      jsClient
+      ->Js_.clearStore
+      ->Js.Promise.then_(value => Js.Promise.resolve(Ok(value)), _)
+      ->Js.Promise.catch(
+          e => Js.Promise.resolve(Error(Utils.ensureError(Any(e)))),
+          _,
+        );
+
+    let mutate =
+        (
+          type data,
+          type variables,
+          type jsVariables,
+          ~mutation as
+            module Operation:
+              Operation with
+                type t = data and
+                type t_variables = variables and
+                type Raw.t_variables = jsVariables,
+          ~awaitRefetchQueries=?,
+          ~context=?,
+          ~errorPolicy=?,
+          ~fetchPolicy=?,
+          ~mapJsVariables=Utils.identity,
+          ~optimisticResponse=?,
+          ~refetchQueries=?,
+          ~updateQueries=?,
+          ~update=?,
+          variables,
+        ) => {
+      let safeParse = Utils.safeParse(Operation.parse);
+
+      Js_.mutate(
+        jsClient,
+        ~options=
+          MutationOptions.toJs(
+            {
+              awaitRefetchQueries,
+              context,
+              errorPolicy,
+              fetchPolicy,
+              mutation: Operation.query,
+              optimisticResponse,
+              updateQueries,
+              refetchQueries,
+              update,
+              variables,
+            },
+            ~mapJsVariables,
+            ~safeParse,
+            ~serialize=Operation.serialize,
+            ~serializeVariables=Operation.serializeVariables,
+          ),
+      )
+      ->Js.Promise.then_(
+          jsFetchResult =>
+            Js.Promise.resolve(
+              jsFetchResult
+              ->FetchResult.fromJs(~safeParse)
+              ->FetchResult.toResult,
+            ),
+          _,
+        )
+      ->Js.Promise.catch(
+          error =>
+            Js.Promise.resolve(
+              Error(
+                ApolloError.make(
+                  ~networkError=
+                    FetchFailure(Utils.(ensureError(Any(error)))),
+                  (),
+                ),
+              ),
+            ),
+          _,
+        );
+    };
+
+    let onClearStore = (~cb) => jsClient->Js_.onClearStore(~cb);
+
+    let onResetStore = (~cb) => jsClient->Js_.onResetStore(~cb);
+
+    let query =
+        (
+          type data,
+          type jsData,
+          type variables,
+          type jsVariables,
+          ~query as
+            module Operation:
+              Operation with
+                type t = data and
+                type t_variables = variables and
+                type Raw.t = jsData and
+                type Raw.t_variables = jsVariables,
+          ~context=?,
+          ~errorPolicy=?,
+          ~fetchPolicy=?,
+          ~mapJsVariables=Utils.identity,
+          variables,
+        ) => {
+      let safeParse = Utils.safeParse(Operation.parse);
+
+      Js_.query(
+        jsClient,
+        ~options=
+          QueryOptions.toJs(
+            {
+              fetchPolicy,
+              query: Operation.query,
+              variables,
+              errorPolicy,
+              context,
+            },
+            ~mapJsVariables,
+            ~serializeVariables=Operation.serializeVariables,
+          ),
+      )
+      ->Js.Promise.then_(
+          jsApolloQueryResult =>
+            Js.Promise.resolve(
+              jsApolloQueryResult
+              ->ApolloQueryResult.fromJs(~safeParse)
+              ->ApolloQueryResult.toResult,
+            ),
+          _,
+        )
+      ->Js.Promise.catch(
+          error =>
+            Js.Promise.resolve(
+              Error(
+                ApolloError.make(
+                  ~networkError=
+                    FetchFailure(Utils.(ensureError(Any(error)))),
+                  (),
+                ),
+              ),
+            ),
+          _,
+        );
+    };
+
+    let readFragment =
+        (
+          type data,
+          ~fragment as module Fragment: Fragment with type t = data,
+          ~id,
+          ~optimistic=?,
+          ~fragmentName=?,
+          (),
+        ) => {
+      jsClient
+      ->Js_.readFragment(
+          ~options={id, fragment: Fragment.query, fragmentName},
+          ~optimistic?,
+          (),
+        )
+      ->Js.toOption;
+    };
+
+    let readQuery =
+        (
+          type data,
+          type variables,
+          type jsVariables,
+          ~query as
+            module Operation:
+              Operation with
+                type t = data and
+                type t_variables = variables and
+                type Raw.t_variables = jsVariables,
+          ~id=?,
+          ~mapJsVariables=Utils.identity,
+          ~optimistic=?,
+          variables,
+        ) => {
+      Js_.readQuery(
+        jsClient,
+        ~options=
+          DataProxy.Query.toJs(
+            {id, query: Operation.query, variables},
+            ~mapJsVariables,
+            ~serializeVariables=Operation.serializeVariables,
+          ),
+        ~optimistic,
+      )
+      ->Js.toOption
+      ->Belt.Option.map(Operation.parse);
+    };
+
+    let resetStore:
+      unit =>
+      Js.Promise.t(
+        Belt.Result.t(
+          option(array(ApolloQueryResult.Js_.t(Js.Json.t))),
+          Js.Exn.t,
         ),
-    )
-    ->Js.Promise.then_(
-        jsResult =>
-          jsResult
-          ->FetchResult.fromJs(_, ~parse=Operation.parse)
-          ->Js.Promise.resolve,
-        _,
+      ) =
+      () =>
+        jsClient
+        ->Js_.resetStore
+        ->Js.Promise.then_(
+            value => Js.Promise.resolve(Ok(value->Js.toOption)),
+            _,
+          )
+        ->Js.Promise.catch(
+            e => Js.Promise.resolve(Error(Utils.ensureError(Any(e)))),
+            _,
+          );
+
+    let restore = (~serializedState) =>
+      jsClient->Js_.restore(serializedState)->Js_.Cast.asReasonCache;
+
+    let setLink = link => jsClient->Js_.setLink(link);
+
+    let watchQuery =
+        (
+          type data,
+          type variables,
+          type jsVariables,
+          ~query as
+            module Operation:
+              Operation with
+                type t = data and
+                type t_variables = variables and
+                type Raw.t_variables = jsVariables,
+          ~context=?,
+          ~errorPolicy=?,
+          ~fetchPolicy=?,
+          ~mapJsVariables=Utils.identity,
+          variables,
+        ) => {
+      let safeParse = Utils.safeParse(Operation.parse);
+
+      jsClient
+      ->Js_.watchQuery(
+          ~options=
+            WatchQueryOptions.toJs(
+              {
+                fetchPolicy,
+                query: Operation.query,
+                variables,
+                errorPolicy,
+                context,
+              },
+              ~mapJsVariables,
+              ~serializeVariables=Operation.serializeVariables,
+            ),
+        )
+      ->ObservableQuery.fromJs(~safeParse);
+    };
+
+    let writeFragment =
+        (
+          type data,
+          ~fragment as module Fragment: Fragment with type t = data,
+          ~data: data,
+          ~broadcast=?,
+          ~id,
+          ~fragmentName=?,
+          (),
+        ) => {
+      jsClient->Js_.writeFragment(
+        ~options=
+          DataProxy.WriteFragmentOptions.toJs(
+            {broadcast, data, id, fragment: Fragment.query, fragmentName},
+            ~serialize=Fragment.serialize,
+          ),
       );
-  };
+    };
 
-let onClearStore = Js_.onClearStore;
-
-let onResetStore = Js_.onResetStore;
-
-let query:
-  type data variables jsVariables.
-    (
-      t,
-      ~query: (module Operation with
-                 type t = data and
-                 type t_variables = variables and
-                 type Raw.t_variables = jsVariables),
-      ~context: Js.Json.t=?,
-      ~errorPolicy: ErrorPolicy.t=?,
-      ~fetchPolicy: FetchPolicy.t=?,
-      ~mapJsVariables: jsVariables => jsVariables=?,
-      variables
-    ) =>
-    Js.Promise.t(ApolloQueryResult.t(data)) =
-  (
-    client,
-    ~query as (module Operation),
-    ~context=?,
-    ~errorPolicy=?,
-    ~fetchPolicy=?,
-    ~mapJsVariables=Utils.identity,
-    variables,
-  ) => {
-    let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
-
-    Js_.query(
-      client,
-      ~options=
-        QueryOptions.toJs({
-          fetchPolicy,
-          query: Operation.query,
-          variables: jsVariables,
-          errorPolicy,
-          context,
-        }),
-    )
-    ->Js.Promise.then_(
-        jsResult =>
-          jsResult
-          ->ApolloQueryResult.fromJs(_, ~parse=Operation.parse)
-          ->Js.Promise.resolve,
-        _,
+    let writeQuery =
+        (
+          type data,
+          type variables,
+          type jsVariables,
+          ~query as
+            module Operation:
+              Operation with
+                type t = data and
+                type t_variables = variables and
+                type Raw.t_variables = jsVariables,
+          ~broadcast=?,
+          ~data,
+          ~id=?,
+          ~mapJsVariables=Utils.identity,
+          variables,
+        ) => {
+      jsClient->Js_.writeQuery(
+        ~options=
+          DataProxy.WriteQueryOptions.toJs(
+            {broadcast, data, id, query: Operation.query, variables},
+            ~mapJsVariables,
+            ~serialize=Operation.serialize,
+            ~serializeVariables=Operation.serializeVariables,
+          ),
       );
-  };
+    };
 
-let resetStore = Js_.resetStore;
-
-let readQuery:
-  type data variables jsVariables.
-    (
-      t,
-      ~query: (module Operation with
-                 type t = data and
-                 type t_variables = variables and
-                 type Raw.t_variables = jsVariables),
-      ~id: string=?,
-      ~mapJsVariables: jsVariables => jsVariables=?,
-      ~optimistic: bool=?,
-      variables
-    ) =>
-    option(data) =
-  (
-    client,
-    ~query as (module Operation),
-    ~id=?,
-    ~mapJsVariables=Utils.identity,
-    ~optimistic=?,
-    variables,
-  ) => {
-    let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
-
-    Js_.readQuery(
-      client,
-      ~options={id, query: Operation.query, variables: jsVariables},
-      ~optimistic,
-    )
-    ->Js.toOption
-    ->Belt.Option.map(Operation.parse);
-  };
-
-let restore = Js_.restore;
-
-let setLink: (t, ApolloLink.t) => unit = Js_.setLink;
-
-let watchQuery:
-  type data variables jsVariables.
-    (
-      t,
-      ~query: (module Operation with
-                 type t = data and
-                 type t_variables = variables and
-                 type Raw.t_variables = jsVariables),
-      ~context: Js.Json.t=?,
-      ~errorPolicy: ErrorPolicy.t=?,
-      ~fetchPolicy: WatchQueryFetchPolicy.t=?,
-      ~mapJsVariables: jsVariables => jsVariables=?,
-      variables
-    ) =>
-    ObservableQuery.t(data) =
-  (
-    client,
-    ~query as (module Operation),
-    ~context=?,
-    ~errorPolicy=?,
-    ~fetchPolicy=?,
-    ~mapJsVariables=Utils.identity,
-    variables,
-  ) => {
-    let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
-
-    Js_.watchQuery(
-      client,
-      ~options=
-        WatchQueryOptions.toJs({
-          fetchPolicy,
-          query: Operation.query,
-          variables: Some(jsVariables),
-          errorPolicy,
-          context,
-        }),
-    )
-    ->ObservableQuery.fromJs(~parse=Operation.parse);
-  };
-
-let writeFragment:
-  type data jsVariables.
-    (
-      t,
-      ~fragment: (module Fragment with type t = data),
-      ~data: data,
-      ~broadcast: bool=?,
-      ~id: string,
-      ~fragmentName: string=?,
-      unit
-    ) =>
-    unit =
-  (
-    client,
-    ~fragment as (module Fragment),
-    ~data: data,
-    ~broadcast=?,
-    ~id,
-    ~fragmentName=?,
-    (),
-  ) => {
-    Js_.writeFragment(
-      client,
-      ~options={
-        broadcast,
-        data: data->Fragment.serialize,
-        id,
-        fragment: Fragment.query,
-        fragmentName,
-      },
-    );
-  };
-
-let writeQuery:
-  type data variables jsVariables.
-    (
-      t,
-      ~query: (module Operation with
-                 type t = data and
-                 type t_variables = variables and
-                 type Raw.t_variables = jsVariables),
-      ~broadcast: bool=?,
-      ~data: data,
-      ~id: string=?,
-      ~mapJsVariables: jsVariables => jsVariables=?,
-      variables
-    ) =>
-    unit =
-  (
-    client,
-    ~query as (module Operation),
-    ~broadcast=?,
-    ~data,
-    ~id=?,
-    ~mapJsVariables=Utils.identity,
-    variables,
-  ) => {
-    let jsVariables = variables->Operation.serializeVariables->mapJsVariables;
-
-    Js_.writeQuery(
-      client,
-      ~options={
-        broadcast,
-        data: data->Operation.serialize,
-        id,
-        query: Operation.query,
-        variables: jsVariables,
+    preserveJsPropsAndContext(
+      jsClient,
+      {
+        clearStore,
+        mutate,
+        onClearStore,
+        onResetStore,
+        query,
+        readFragment,
+        readQuery,
+        resetStore,
+        restore,
+        setLink,
+        watchQuery,
+        writeFragment,
+        writeQuery,
       },
     );
   };

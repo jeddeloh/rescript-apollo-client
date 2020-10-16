@@ -19,7 +19,7 @@ let make = () => {
   <div>
     {switch (queryResult) {
      | {loading: true, data: None} => <p> "Loading"->React.string </p>
-     | {loading, data: Some({todos}), error} =>
+     | {loading, data: Some({todos}), error, fetchMore} =>
        <>
          <dialog>
            {loading ? <p> "Refreshing..."->React.string </p> : React.null}
@@ -41,21 +41,30 @@ let make = () => {
          <p>
            <button
              onClick={_ =>
-               queryResult
-               ->QueryResult.fetchMore(
-                   ~updateQuery=
-                     (previousData, {fetchMoreResult}) => {
-                       switch (fetchMoreResult) {
-                       | Some({todos: newTodos}) => {
-                           todos:
-                             Belt.Array.concat(previousData.todos, newTodos),
-                         }
-                       | None => previousData
+               fetchMore(
+                 ~updateQuery=
+                   (previousData, {fetchMoreResult}) => {
+                     switch (fetchMoreResult) {
+                     | Some({todos: newTodos}) => {
+                         todos:
+                           Belt.Array.concat(previousData.todos, newTodos),
                        }
-                     },
-                   (),
+                     | None => previousData
+                     }
+                   },
+                 (),
+               )
+               ->Js.Promise.then_(
+                   result => {
+                     switch (result) {
+                     | Ok(_) => Js.log("fetchMore: success!")
+                     | Error(_) => Js.log("fetchMore: failure!")
+                     };
+                     Js.Promise.resolve();
+                   },
+                   _,
                  )
-               ->ignore
+               ->Utils.Promise.ignore
              }>
              "Fetch More!"->React.string
            </button>

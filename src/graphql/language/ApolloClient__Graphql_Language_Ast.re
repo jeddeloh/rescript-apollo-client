@@ -1,4 +1,8 @@
-module Source = ApolloClient__Graphql_Language_Source;
+module ASTNode = {
+  type t;
+};
+
+module Source = ApolloClient__Graphql_Language_Source.Source;
 
 // export interface FieldNode {
 //   readonly kind: 'Field';

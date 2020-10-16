@@ -1,5 +1,6 @@
 module DataProxy = ApolloClient__Cache_Core_Types.DataProxy;
 module Types = ApolloClient__Types;
+module Utils = ApolloClient__Utils;
 
 module type Fragment = Types.Fragment;
 module type Operation = Types.Operation;
@@ -33,6 +34,18 @@ module ApolloCache = {
     type t('tSerialized);
 
     type reference;
+
+    // readFragment<FragmentType, TVariables = any>(options: DataProxy.Fragment<TVariables>, optimistic?: boolean): FragmentType | null;
+    [@bs.send]
+    external readFragment:
+      (
+        t('tSerialized),
+        ~options: DataProxy.Fragment.Js_.t,
+        ~optimistic: bool=?,
+        unit
+      ) =>
+      Js.nullable('jsData) =
+      "readFragment";
 
     // readQuery<QueryType, TVariables = any>(options: DataProxy.Query<TVariables>, optimistic?: boolean): QueryType | null;
     [@bs.send]
@@ -68,93 +81,179 @@ module ApolloCache = {
 
   type reference = Js_.reference;
 
-  type t('tSerialized) = Js_.t('tSerialized);
-
-  let readQuery:
-    type data jsVariables.
+  type t('tSerialized) = {
+    [@bs.as "reason_readFragment"]
+    readFragment:
+      'data.
       (
-        t('tSerialized),
-        ~query: (module Operation with
-                   type t = data and type Raw.t_variables = jsVariables),
-        ~id: string=?,
+        ~fragment: (module Fragment with type t = 'data),
+        ~id: string,
         ~optimistic: bool=?,
-        jsVariables
+        ~fragmentName: string=?,
+        unit
       ) =>
-      option(data) =
-    (client, ~query as (module Operation), ~id=?, ~optimistic=?, variables) => {
-      Js_.readQuery(
-        client,
-        ~options={id, query: Operation.query, variables},
-        ~optimistic,
-      )
-      ->Js.toOption
-      ->Belt.Option.map(Operation.parse);
-    };
+      option('data),
 
-  let writeFragment:
-    type data jsVariables.
+    [@bs.as "reason_readQuery"]
+    readQuery:
+      'data 'variables 'jsVariables.
       (
-        t('tSerialized),
-        ~fragment: (module Fragment with type t = data),
-        ~data: data,
+        ~query: (module Operation with
+                   type t = 'data and
+                   type t_variables = 'variables and
+                   type Raw.t_variables = 'jsVariables),
+        ~id: string=?,
+        ~mapJsVariables: 'jsVariables => 'jsVariables=?,
+        ~optimistic: bool=?,
+        'variables
+      ) =>
+      option('data),
+
+    [@bs.as "reason_writeFragment"]
+    writeFragment:
+      'data.
+      (
+        ~fragment: (module Fragment with type t = 'data),
+        ~data: 'data,
         ~broadcast: bool=?,
         ~id: string,
         ~fragmentName: string=?,
         unit
       ) =>
-      // jsVariables
-      option(reference) =
-    (
-      client,
-      ~fragment as (module Fragment),
-      ~data: data,
-      ~broadcast=?,
-      ~id,
-      ~fragmentName=?,
-      (),
-    ) => {
-      // variables,
-      Js_.writeFragment(
-        client,
-        ~options={
-          broadcast,
-          data: data->Fragment.serialize,
-          id,
-          fragment: Fragment.query,
-          fragmentName,
-        },
-      );
-    };
+      option(reference),
 
-  let writeQuery:
-    type data jsVariables.
+    [@bs.as "reason_writeQuery"]
+    writeQuery:
+      'data 'variables 'jsVariables.
       (
-        t('tSerialized),
         ~query: (module Operation with
-                   type t = data and type Raw.t_variables = jsVariables),
+                   type t = 'data and
+                   type t_variables = 'variables and
+                   type Raw.t_variables = 'jsVariables),
         ~broadcast: bool=?,
-        ~data: data,
+        ~data: 'data,
         ~id: string=?,
-        jsVariables
+        ~mapJsVariables: 'jsVariables => 'jsVariables=?,
+        'variables
       ) =>
-      option(reference) =
-    (
-      client,
-      ~query as (module Operation),
-      ~broadcast=?,
-      ~data,
-      ~id=?,
-      variables,
-    ) => {
-      Js_.writeQuery(
-        client,
-        ~options={
-          broadcast,
-          data: data->Operation.serialize,
-          id,
-          query: Operation.query,
-          variables,
-        },
+      option(reference),
+
+  };
+
+  let preserveJsPropsAndContext: (Js_.t('a), t('a)) => t('a) =
+    (js, t) =>
+      [%bs.raw
+        {|
+          function (js, t) {
+            return Object.assign(js, t)
+          }
+        |}
+      ](
+        js,
+        t,
+      );
+
+  let fromJs: Js_.t('serialized) => t('serialized) =
+    js => {
+      let readFragment =
+          (
+            type data,
+            ~fragment as module Fragment: Fragment with type t = data,
+            ~id,
+            ~optimistic=?,
+            ~fragmentName=?,
+            (),
+          ) => {
+        js
+        ->Js_.readFragment(
+            ~options={id, fragment: Fragment.query, fragmentName},
+            ~optimistic?,
+            (),
+          )
+        ->Js.toOption;
+      };
+
+      let readQuery =
+          (
+            type data,
+            type variables,
+            type jsVariables,
+            ~query as
+              module Operation:
+                Operation with
+                  type t = data and
+                  type t_variables = variables and
+                  type Raw.t_variables = jsVariables,
+            ~id=?,
+            ~mapJsVariables=Utils.identity,
+            ~optimistic=?,
+            variables,
+          ) => {
+        js
+        ->Js_.readQuery(
+            ~options=
+              DataProxy.Query.toJs(
+                {id, query: Operation.query, variables},
+                ~mapJsVariables,
+                ~serializeVariables=Operation.serializeVariables,
+              ),
+            ~optimistic,
+          )
+        ->Js.toOption
+        ->Belt.Option.map(Operation.parse);
+      };
+
+      let writeFragment =
+          (
+            type data,
+            ~fragment as module Fragment: Fragment with type t = data,
+            ~data: data,
+            ~broadcast=?,
+            ~id,
+            ~fragmentName=?,
+            // variables,
+            (),
+          ) => {
+        js->Js_.writeFragment(
+          ~options=
+            DataProxy.WriteFragmentOptions.toJs(
+              {broadcast, data, id, fragment: Fragment.query, fragmentName},
+              ~serialize=Fragment.serialize,
+            ),
+        );
+      };
+
+      let writeQuery =
+          (
+            type data,
+            type variables,
+            type jsVariables,
+            ~query as
+              module Operation:
+                Operation with
+                  type t = data and
+                  type t_variables = variables and
+                  type Raw.t_variables = jsVariables,
+            ~broadcast=?,
+            ~data,
+            ~id=?,
+            ~mapJsVariables=Utils.identity,
+            variables,
+          ) => {
+        js->Js_.writeQuery(
+          ~options=
+            DataProxy.WriteQueryOptions.toJs(
+              {broadcast, data, id, query: Operation.query, variables},
+              ~mapJsVariables,
+              ~serialize=Operation.serialize,
+              ~serializeVariables=Operation.serializeVariables,
+            ),
+        );
+      };
+
+      preserveJsPropsAndContext(
+        js,
+        {readFragment, readQuery, writeFragment, writeQuery},
       );
     };
 };

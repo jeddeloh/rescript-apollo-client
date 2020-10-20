@@ -28,7 +28,7 @@
   ],
   "suffix": ".bs.js",
   "bs-dependencies": [
-    "reason-apollo-client",
+    "res-apollo-client",
     "@reasonml-community/graphql-ppx",
     "reason-promise",
     "reason-react"

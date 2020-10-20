@@ -53,7 +53,7 @@ module Js_ = {
     extraInfo: Js.Json.t,
     /**
      This is not actually optional, but apollo-client casts an any to ApolloError in
-     SubscriptionData, and doesn't check the error at all which results in GraphQLErrors 
+     SubscriptionData, and doesn't check the error at all which results in GraphQLErrors
      masquerading as ApolloErrors (no graphqlErrors property).
      See: https://github.com/apollographql/apollo-client/pull/6894
      */
@@ -81,7 +81,9 @@ module Js_ = {
   [@bs.module "@apollo/client"] [@bs.new]
   external make: make_args => t = "ApolloError";
 
-  let ensureApolloError = error => [%bs.raw {|
+  let ensureApolloError = error =>
+    [%bs.raw
+      {|
     function (error, makeApolloError) {
       // This is not an exhaustive check. It is intended to address the most common subscription error issues only
       // See: https://github.com/apollographql/apollo-client/pull/6894
@@ -91,7 +93,11 @@ module Js_ = {
         return makeApolloError({graphQLErrors: [error]});
       }
     }
-  |}](error, make);
+  |}
+    ](
+      error,
+      make,
+    );
 };
 
 type t_networkError =
@@ -102,7 +108,7 @@ type t_networkError =
   /* Fetch got a response, but it wasn't JSON */
   | BadBody(ServerParseError.t)
   /* We got a JSON response, but it wasn't in a shape we could parse */
-  | ParseError(Types.parseError); // ParseError is reason-apollo-client only
+  | ParseError(Types.parseError); // ParseError is res-apollo-client only
 
 type t = {
   extraInfo: Js.Json.t,

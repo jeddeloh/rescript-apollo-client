@@ -1,6 +1,6 @@
 module ReasonPromise = {
   /**
-   Promises of result('a, 'e) coming from `reason-apollo-client` will never reject.
+   Promises of result('a, 'e) coming from `res-apollo-client` will never reject.
    It's safe to simply cast these to a Promise.t(result('a, 'e)).
    See https://github.com/aantron/promise#Bindings
    */
@@ -19,7 +19,7 @@ module ReasonPromise = {
  */
 module Promise = {
   /**
-   Promises in reason-apollo-client never reject, so we're not using catch here.
+   Promises in res-apollo-client never reject, so we're not using catch here.
    Instead we'd add a global uncaught promise handler to report any situations where
    what should be impossible is ocurring.
    */

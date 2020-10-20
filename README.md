@@ -1,12 +1,12 @@
 <p align="center">
-    <img src="assets/logo-v1.png" alt="Logo">
+    <img src="assets/logo-mashup.png" alt="Logo">
   	<br><br>
-    ReasonML / BuckleScript bindings for the Apollo Client ecosystem
+    ReScript bindings for the Apollo Client ecosystem
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/reason-apollo-client">
-    <img src="https://badge.fury.io/js/reason-apollo-client.svg" alt="npm version" />
+  <a href="https://www.npmjs.com/package/res-apollo-client">
+    <img src="https://badge.fury.io/js/res-apollo-client.svg" alt="npm version" />
   </a>
 </p>
 
@@ -30,7 +30,7 @@ You should now have a `graphql_schema.json` in your project somewhere. Make sure
 ### 2. Apollo Client
 
 ```sh
-npm install reason-apollo-client @apollo/client
+npm install res-apollo-client @apollo/client
 ```
 
 ### 3. Apollo-Specific `graphql-ppx` Configuration
@@ -51,18 +51,18 @@ Add the following under `bs-dependencies` and `graphql`, in your `bsconfig.json`
   "ppx-flags": ["@reasonml-community/graphql-ppx/ppx"],
   "bs-dependencies: [
     "@reasonml-community/graphql-ppx"
-+   "reason-apollo-client"
++   "res-apollo-client"
   ]
 }
 ```
 
 - `"apollo-mode"` automaticaly sprinkles `__typename` throughout our operation and fragment definitions
 - `"-template-tag-*"` is how we tell `graphql-ppx` to wrap every operation with `gql`
-- `"extend-*"` allows `reason-apollo-client` to automatically decorate the generated modules with Apollo-specific things like the correct hook for that operation!
+- `"extend-*"` allows `res-apollo-client` to automatically decorate the generated modules with Apollo-specific things like the correct hook for that operation!
 
 ## Usage
 
-The [EXAMPLES/](https://github.com/reasonml-community/reason-apollo-client/tree/master/EXAMPLES) directory is the best documentation at the moment (real docs are coming), but in short, the appropriate hook is exposed as a `use` function on the graphql module. If variables are required, they are the last argument:
+The [EXAMPLES/](https://github.com/reasonml-community/res-apollo-client/tree/master/EXAMPLES) directory is the best documentation at the moment (real docs are coming), but in short, the appropriate hook is exposed as a `use` function on the graphql module. If variables are required, they are the last argument:
 
 ```reason
 module ExampleQuery = [%graphql {|
@@ -157,7 +157,7 @@ let httpLink = ApolloClient.Link.HttpLink.make(...)
 
 Apollo bindings in the Reason / BuckleScript community are pretty confusing as a write this (July 14, 2020), so it's worth providing some context to help you make the right decisions about which library to use.
 
-This library, `reason-apollo-client`, targets Apollo Client 3 and aims to take full advantage of v1.0.0 `graphql-ppx` features and is intended to be a replacement for `reason-apollo` and `reason-apollo-hooks`. You should avoid using those libraries at the same time as this one.
+This library, `res-apollo-client`, targets Apollo Client 3 and aims to take full advantage of v1.0.0 `graphql-ppx` features and is intended to be a replacement for `reason-apollo` and `reason-apollo-hooks`. You should avoid using those libraries at the same time as this one.
 
 If you have a large code base to migrate from `reason-apollo-hooks`, it might make sense to upgrade to the [reason-apollo-hooks PR](https://github.com/reasonml-community/reason-apollo-hooks/pull/117) that adds support for graphql-ppx 1.0 first. This PR has been used by some larger companies to gradually upgrade.
 

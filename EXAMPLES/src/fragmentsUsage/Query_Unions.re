@@ -48,6 +48,10 @@ module TicketResultsComp = {
           Js.log(ticketField);
           <p>{ReasonReact.string("Future!!")}</p>
         }
+        | _ => {
+          Js.log("Everything else... shouldn't get here");
+          <p>{ReasonReact.string("Something's wrong")}</p>
+        }
         }
       }
     </div>;

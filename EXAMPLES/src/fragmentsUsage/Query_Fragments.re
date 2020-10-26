@@ -27,7 +27,8 @@ module TodoCount = {
 [@react.component]
 let make = () => {
   let queryResult = TodosQuery.use();
-
+  Js.log("queryResult");
+  Js.log(queryResult);
   <div>
     {switch (queryResult) {
      | {loading: true, data: None} => <p> "Loading"->React.string </p>

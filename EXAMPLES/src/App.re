@@ -18,5 +18,7 @@ let make = () => {
     <ClientBasics />
     <h2> "Fragments"->React.string </h2>
     <Query_Fragments />
+    <h2> "Unions"->React.string </h2>
+    <Query_Unions />
   </ApolloClient.React.ApolloProvider>;
 };

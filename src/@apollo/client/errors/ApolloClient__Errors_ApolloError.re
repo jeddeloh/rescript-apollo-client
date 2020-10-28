@@ -53,7 +53,7 @@ module Js_ = {
     extraInfo: Js.Json.t,
     /**
      This is not actually optional, but apollo-client casts an any to ApolloError in
-     SubscriptionData, and doesn't check the error at all which results in GraphQLErrors 
+     SubscriptionData, and doesn't check the error at all which results in GraphQLErrors
      masquerading as ApolloErrors (no graphqlErrors property).
      See: https://github.com/apollographql/apollo-client/pull/6894
      */
@@ -81,17 +81,24 @@ module Js_ = {
   [@bs.module "@apollo/client"] [@bs.new]
   external make: make_args => t = "ApolloError";
 
-  let ensureApolloError = error => [%bs.raw {|
-    function (error, makeApolloError) {
-      // This is not an exhaustive check. It is intended to address the most common subscription error issues only
-      // See: https://github.com/apollographql/apollo-client/pull/6894
-      if (Array.isArray(error.graphQLErrors)) {
-        return error;
-      } else if (error && typeof error.message === "string" && error.extensions && typeof error.extensions.code === "string") {
-        return makeApolloError({graphQLErrors: [error]});
-      }
-    }
-  |}](error, make);
+  let ensureApolloError: t => t =
+    error =>
+      [%bs.raw
+        {|
+          function (error, makeApolloError) {
+            // This is not an exhaustive check. It is intended to address the most common subscription error issues only
+            // See: https://github.com/apollographql/apollo-client/pull/6894
+            if (Array.isArray(error.graphQLErrors)) {
+              return error;
+            } else if (error && typeof error.message === "string" && error.extensions) {
+              return makeApolloError({graphQLErrors: [error]});
+            }
+          }
+        |}
+      ](
+        error,
+        make,
+      );
 };
 
 type t_networkError =
@@ -114,22 +121,25 @@ type t = {
 };
 
 let fromJs: Js_.t => t =
-  js => {
-    extraInfo: js.extraInfo,
-    graphQLErrors: js.graphQLErrors->Belt.Option.getWithDefault([||]),
-    networkError:
-      js.networkError
-      ->Js.toOption
-      ->Belt.Option.map(networkError =>
-          switch (networkError->Js_.NetworkErrorUnion.classify) {
-          | Error(error) => FetchFailure(error)
-          | ServerError(error) => BadStatus(error.statusCode, error)
-          | ServerParseError(error) => BadBody(error)
-          }
-        ),
-    name: js.name,
-    message: js.message,
-    stack: js.stack,
+  untrustedJs => {
+    let js = Js_.ensureApolloError(untrustedJs);
+    {
+      extraInfo: js.extraInfo,
+      graphQLErrors: js.graphQLErrors->Belt.Option.getWithDefault([||]),
+      networkError:
+        js.networkError
+        ->Js.toOption
+        ->Belt.Option.map(networkError =>
+            switch (networkError->Js_.NetworkErrorUnion.classify) {
+            | Error(error) => FetchFailure(error)
+            | ServerError(error) => BadStatus(error.statusCode, error)
+            | ServerParseError(error) => BadBody(error)
+            }
+          ),
+      name: js.name,
+      message: js.message,
+      stack: js.stack,
+    };
   };
 
 let make:

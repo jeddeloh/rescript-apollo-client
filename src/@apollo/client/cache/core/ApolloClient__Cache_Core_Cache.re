@@ -170,7 +170,8 @@ module ApolloCache = {
             ~optimistic?,
             (),
           )
-        ->Js.toOption;
+        ->Js.toOption
+        ->Belt.Option.map(Fragment.parse);
       };
 
       let readQuery =

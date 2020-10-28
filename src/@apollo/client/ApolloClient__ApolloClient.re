@@ -760,7 +760,8 @@ let make:
           ~optimistic?,
           (),
         )
-      ->Js.toOption;
+      ->Js.toOption
+      ->Belt.Option.map(Fragment.parse);
     };
 
     let readQuery =

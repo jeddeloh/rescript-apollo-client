@@ -3,17 +3,28 @@ module NetworkStatus = {
     type t = int;
   };
 
-  [@bs.deriving jsConverter]
   type t =
-    | [@bs.as 1] Loading
-    | [@bs.as 2] SetVariables
-    | [@bs.as 3] FetchMore
-    | [@bs.as 4] Refetch
-    | [@bs.as 6] Poll
-    | [@bs.as 7] Ready
-    | [@bs.as 8] Error;
+    | Loading
+    | SetVariables
+    | FetchMore
+    | Refetch
+    | Poll
+    | Ready
+    | Error
+    // Apollo types are not accurate. See:
+    // https://github.com/reasonml-community/reason-apollo-client/issues/68
+    | SkippedOrNotPresent;
 
-  let toJs: t => Js_.t = tToJs;
-
-  let fromJs: Js_.t => t = string => tFromJs(string)->Belt.Option.getExn;
+  let fromJs: Js_.t => t =
+    js =>
+      switch (js) {
+      | 1 => Loading
+      | 2 => SetVariables
+      | 3 => FetchMore
+      | 4 => Refetch
+      | 6 => Poll
+      | 7 => Ready
+      | 8 => Error
+      | _ => SkippedOrNotPresent
+      };
 };

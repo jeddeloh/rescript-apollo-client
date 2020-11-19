@@ -1,8 +1,8 @@
 module.exports = {
   title: 'Rescript Apollo Client',
   tagline: 'Rescript bindings for the Apollo Client ecosystem',
-  url: 'https://your-docusaurus-test-site.com',
-  baseUrl: '/',
+  url: 'https://reasonml-community.github.io/rescript-apollo-client',
+  baseUrl: '/rescript-apollo-client/',
   onBrokenLinks: 'throw',
   favicon: 'img/favicon.ico',
   organizationName: 'reasonml-community', // Usually your GitHub org/user name.

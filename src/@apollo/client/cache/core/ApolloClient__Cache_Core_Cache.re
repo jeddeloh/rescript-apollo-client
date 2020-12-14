@@ -92,7 +92,7 @@ module ApolloCache = {
         ~fragmentName: string=?,
         unit
       ) =>
-      option('data),
+      option(Types.parseResult('data)),
 
     [@bs.as "reason_readQuery"]
     readQuery:
@@ -107,7 +107,7 @@ module ApolloCache = {
         ~optimistic: bool=?,
         'variables
       ) =>
-      option('data),
+      option(Types.parseResult('data)),
 
     [@bs.as "reason_writeFragment"]
     writeFragment:
@@ -164,6 +164,8 @@ module ApolloCache = {
             ~fragmentName=?,
             (),
           ) => {
+        let safeParse = Utils.safeParse(Fragment.parse);
+
         js
         ->Js_.readFragment(
             ~options={id, fragment: Fragment.query, fragmentName},
@@ -171,7 +173,7 @@ module ApolloCache = {
             (),
           )
         ->Js.toOption
-        ->Belt.Option.map(Fragment.parse);
+        ->Belt.Option.map(safeParse);
       };
 
       let readQuery =
@@ -190,6 +192,8 @@ module ApolloCache = {
             ~optimistic=?,
             variables,
           ) => {
+        let safeParse = Utils.safeParse(Operation.parse);
+
         js
         ->Js_.readQuery(
             ~options=
@@ -201,7 +205,7 @@ module ApolloCache = {
             ~optimistic,
           )
         ->Js.toOption
-        ->Belt.Option.map(Operation.parse);
+        ->Belt.Option.map(safeParse);
       };
 
       let writeFragment =

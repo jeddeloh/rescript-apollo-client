@@ -452,7 +452,7 @@ module QueryResult = {
                       jsFetchMoreOptions.fetchMoreResult
                       ->Belt.Option.map(safeParse),
                     ) {
-                    | (Data(previousResult), Some(Data(fetchMoreResult))) =>
+                    | (Ok(previousResult), Some(Ok(fetchMoreResult))) =>
                       updateQuery(
                         previousResult,
                         {
@@ -461,7 +461,7 @@ module QueryResult = {
                         },
                       )
                       ->serialize
-                    | (Data(previousResult), None) =>
+                    | (Ok(previousResult), None) =>
                       updateQuery(
                         previousResult,
                         {
@@ -470,10 +470,10 @@ module QueryResult = {
                         },
                       )
                       ->serialize
-                    | (ParseError(parseError), _)
-                    | (Data(_), Some(ParseError(parseError))) =>
+                    | (Error(parseError), _)
+                    | (Ok(_), Some(Error(parseError))) =>
                       parseErrorDuringCall.contents =
-                        Some(ParseError(parseError));
+                        Some(Error(parseError));
                       previousResult;
                     };
                   }
@@ -489,7 +489,7 @@ module QueryResult = {
             jsApolloQueryResult =>
               Js.Promise.resolve(
                 switch (parseErrorDuringCall.contents) {
-                | Some(ParseError(parseError)) =>
+                | Some(Error(parseError)) =>
                   Error(
                     ApolloError.make(
                       ~networkError=ParseError(parseError),

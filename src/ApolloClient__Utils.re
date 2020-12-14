@@ -35,9 +35,9 @@ external asJson: 'any => Js.Json.t = "%identity";
 let safeParse: ('jsData => 'data) => Types.safeParse('data, 'jsData) =
   (parse, jsData) =>
     switch (parse(jsData)) {
-    | data => Data(data)
+    | data => Ok(data)
     | exception (Js.Exn.Error(error)) =>
-      ParseError({jsData: jsData->asJson, error})
+      Error({value: jsData->asJson, error})
     };
 
 let safeParseAndLiftToCommonResultProps:
@@ -58,7 +58,7 @@ let safeParseAndLiftToCommonResultProps:
       };
 
     switch (jsData->Belt.Option.map(jsData => safeParse(jsData))) {
-    | Some(ParseError(parseError)) =>
+    | Some(Error(parseError)) =>
       // Be careful we do not overwrite an existing error with a ParseError
       existingError->Belt.Option.isSome
         ? (None, existingError)
@@ -72,7 +72,7 @@ let safeParseAndLiftToCommonResultProps:
             ),
           ),
         )
-    | Some(Data(data)) => (Some(data), existingError)
+    | Some(Ok(data)) => (Some(data), existingError)
     | None => (None, existingError)
     };
   };

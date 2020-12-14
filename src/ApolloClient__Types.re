@@ -33,12 +33,10 @@ module type OperationNoRequiredVars = {
 };
 
 type parseError = {
-  jsData: Js.Json.t,
+  value: Js.Json.t,
   error: Js.Exn.t,
 };
 
-type parseResult('data) =
-  | Data('data)
-  | ParseError(parseError);
+type parseResult('data) = result('data, parseError);
 
 type safeParse('data, 'jsData) = 'jsData => parseResult('data);

@@ -209,15 +209,15 @@ module UpdateQueryFn = {
     ) =>
       (. jsQueryData, {subscriptionData: {data}}) =>
         switch (jsQueryData->querySafeParse, data->subscriptionSafeParse) {
-        | (Data(queryData), Data(subscriptionData)) =>
+        | (Ok(queryData), Ok(subscriptionData)) =>
           t(queryData, {
                          subscriptionData: {
                            data: subscriptionData,
                          },
                        })
           ->querySerialize
-        | (ParseError(parseError), _)
-        | (_, ParseError(parseError)) =>
+        | (Error(parseError), _)
+        | (_, Error(parseError)) =>
           onParseError(parseError);
           jsQueryData;
         };

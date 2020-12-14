@@ -455,7 +455,7 @@ type t = {
       ~fragmentName: string=?,
       unit
     ) =>
-    option('data),
+    option(Types.parseResult('data)),
 
   [@bs.as "reason_readQuery"]
   readQuery:
@@ -470,7 +470,7 @@ type t = {
       ~optimistic: bool=?,
       'variables
     ) =>
-    option('data),
+    option(Types.parseResult('data)),
 
   [@bs.as "reason_resetStore"]
   resetStore:
@@ -754,6 +754,8 @@ let make:
           ~fragmentName=?,
           (),
         ) => {
+      let safeParse = Utils.safeParse(Fragment.parse);
+
       jsClient
       ->Js_.readFragment(
           ~options={id, fragment: Fragment.query, fragmentName},
@@ -761,7 +763,7 @@ let make:
           (),
         )
       ->Js.toOption
-      ->Belt.Option.map(Fragment.parse);
+      ->Belt.Option.map(safeParse);
     };
 
     let readQuery =
@@ -780,6 +782,8 @@ let make:
           ~optimistic=?,
           variables,
         ) => {
+      let safeParse = Utils.safeParse(Operation.parse);
+
       Js_.readQuery(
         jsClient,
         ~options=
@@ -791,7 +795,7 @@ let make:
         ~optimistic,
       )
       ->Js.toOption
-      ->Belt.Option.map(Operation.parse);
+      ->Belt.Option.map(safeParse);
     };
 
     let resetStore:

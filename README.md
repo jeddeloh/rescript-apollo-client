@@ -1,3 +1,5 @@
+> ⚠️ **NOTICE:** This package will be published under `rescript-apollo-client` going forward
+
 <p align="center">
     <img src="assets/logo-v1.png" alt="Logo">
   	<br><br>

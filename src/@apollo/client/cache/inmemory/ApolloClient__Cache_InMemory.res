@@ -1,0 +1,2 @@
+module InMemoryCache = ApolloClient__Cache_InMemory_InMemoryCache
+module Policies = ApolloClient__Cache_InMemory_Policies

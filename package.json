@@ -1,6 +1,6 @@
 {
-  "name": "reason-apollo-client",
-  "description": "ReasonML / BuckleScript bindings for the Apollo Client ecosystem",
+  "name": "rescript-apollo-client",
+  "description": "ReScript bindings for the Apollo Client ecosystem",
   "version": "1.0.0",
   "keywords": [
     "Apollo",
@@ -13,7 +13,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/reasonml-community/reason-apollo-client"
+    "url": "https://github.com/reasonml-community/rescript-apollo-client"
   },
   "scripts": {
     "build": "bsb -make-world",

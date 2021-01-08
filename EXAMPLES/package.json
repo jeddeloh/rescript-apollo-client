@@ -1,7 +1,7 @@
 {
   "name": "examples",
   "version": "0.0.0",
-  "description": "Examples for reason-apollo-client",
+  "description": "Examples for rescript-apollo-client",
   "private": true,
   "scripts": {
     "clean": "bsb -clean-world",
@@ -23,7 +23,7 @@
     "graphql": "15.3.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
-    "reason-apollo-client": "1.0.0",
+    "rescript-apollo-client": "1.0.0",
     "reason-promise": "1.1.1",
     "reason-react": "0.9.1",
     "subscriptions-transport-ws": "0.9.16"

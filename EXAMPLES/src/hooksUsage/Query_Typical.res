@@ -1,6 +1,5 @@
-module QueryResult = ApolloClient.Types.QueryResult
-
-module TodosQuery = %graphql(`
+module TodosQuery = %graphql(
+  `
     query TodosQuery {
       todos: allTodos {
         id
@@ -8,7 +7,8 @@ module TodosQuery = %graphql(`
         completed
       }
     }
-  `)
+  `
+)
 
 @react.component
 let make = () => {

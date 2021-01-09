@@ -3,5 +3,8 @@ module.exports = {
     {
       "Getting Started  ": ["overview", "installation"],
     },
+    {
+      Fetching: ["queries", "mutations"],
+    },
   ],
 };

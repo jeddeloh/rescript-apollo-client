@@ -1,5 +1,17 @@
-module Cache = ApolloClient.Cache
+---
+id: mutations
+title: Mutations
+sidebar_label: Mutations
+slug: /mutations
+---
 
+## Using React Hooks
+
+### Basic usage
+
+Create a mutation module using `graphql-ppx`. We'll use this throughout the examples on this page.
+
+```
 module AddTodoMutation = %graphql(
   `
     mutation AddTodo($text: String!) {
@@ -11,19 +23,26 @@ module AddTodoMutation = %graphql(
     }
   `
 )
+```
 
-module TodosQuery = %graphql(
-  `
-    query TodosQuery {
-      todos: allTodos {
-        id
-        completed
-        text
-      }
-    }
-  `
-)
+Call the `use` hook in a component
 
+```reason
+@react.component
+let make = () => {
+  let (mutate, _mutationResult) = AddTodoMutation.use()
+
+  <button onClick={_ => mutate({text: "Some text"})->ignore}>
+    {"Add To-Do"->React.string}
+  </button>
+}
+```
+
+### Post-Mutation Updates
+
+This section needs improvements, but for now here's an examples of refetching data after a mutation, updating the cache, and optimistic updates.
+
+```reason
 @react.component
 let make = () => {
   let (mutate, result) = AddTodoMutation.use()
@@ -31,10 +50,6 @@ let make = () => {
   switch result {
   | {called: false} => <>
       {"Not called... "->React.string}
-      <button onClick={_ => mutate({text: "Another To-Do"})->ignore}>
-        {"Add To-Do"->React.string}
-      </button>
-      {" "->React.string}
       <button
         onClick={_ =>
           mutate(
@@ -49,12 +64,8 @@ let make = () => {
             ~update=({writeFragment, writeQuery}, {data}) =>
               switch data {
               | Some({todo}) =>
-                @ocaml.doc(
-                  "
-                   * Apollo docs use cache.modify, but it's not typesafe. I recommend some
-                   * combination of readQuery / writeQuery / writeFragment
-                   "
-                )
+                // Apollo docs use cache.modify, but it's not typesafe. I recommend some
+                // combination of readQuery / writeQuery / writeFragment
                 Js.log2("mutate.update To-Do: ", todo)
                 let _unusedRef = writeFragment(
                   ~fragment=module(Fragments.TodoItem),
@@ -85,7 +96,7 @@ let make = () => {
             ~refetchQueries=[
               TodosQuery.refetchQueryDescription(),
               // - OR -
-              String("TodosQuery"), // Should rarely be needed?
+              String("TodosQuery"),
             ],
             {text: "Another To-Do"},
           )->ignore}>
@@ -104,3 +115,21 @@ let make = () => {
     </>
   }
 }
+```
+
+## Directly Via the Apollo Client
+
+```reason
+let addTodo = _ =>
+  // This assumes you've set up a Client module as in the Getting Started section
+  Client.instance.mutate(~mutation=module(AddTodoMutation), {text: "Another To-Do"})
+  ->Utils.Promise.then_(result =>
+    Js.Promise.resolve(
+      switch result {
+      | Ok({data}) => Js.log2("mutate result: ", data)
+      | Error(error) => Js.log2("Error: ", error)
+      },
+    )
+  )
+  ->Utils.Promise.ignore
+```

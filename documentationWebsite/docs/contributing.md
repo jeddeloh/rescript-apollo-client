@@ -1,6 +1,6 @@
 ---
 id: contributing
-title: Contributing 
+title: Contributing
 ---
 
 ## Core Philosopies
@@ -10,9 +10,7 @@ title: Contributing
 - Avoid partial types or bindings if possible
 - Encourage incremental contribution from the community rather than biting off more than one person can chew
 
-### The power of numbers and OSS
-
-There's nothing fancy about this library. It tends to view the problem of bindings as a people problem (how can we leverage the power of numbers) rather than a programming problem (automatic conversion from typescript—would be amazing!). As such, a lot of detail is paid to consistency and clarity with the hope of maximizing human ability to both add and verify that bindings are correct. As such, the long-term success or failure of this library is intended to be dependent on active community contribution rather than the efforts of a few individuals. Will it work? That's up to you, dear reader ❤️
+There's nothing fancy about this library. It tends to view the problem of bindings as a people problem (how can we leverage the power of numbers) rather than a programming problem (automatic conversion from typescript—would be amazing!). As such, a lot of detail is paid to consistency and clarity with the hope of maximizing human ability to both add and verify that bindings are correct. The long-term success or failure of this library is intended to be dependent on active community contribution rather than the efforts of a few individuals. Will it work? That's up to you, dear reader ❤️
 
 ### Following a Consistent Pattern
 

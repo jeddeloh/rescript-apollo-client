@@ -29,8 +29,12 @@ module.exports = {
           activeBasePath: "docs",
           position: "left",
         },
-        { label: "Changelog", to: "docs/changelog", position: "left" },
-        { label: "Examples", to: "docs/examples", position: "left" },
+        {
+          label: "Changelog",
+          to:
+            "https://github.com/reasonml-community/rescript-apollo-client/releases/",
+          position: "left",
+        },
         { label: "Contributing", to: "docs/contributing", position: "right" },
         {
           label: "GitHub",

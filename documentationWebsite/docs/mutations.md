@@ -2,7 +2,6 @@
 id: mutations
 title: Mutations
 sidebar_label: Mutations
-slug: /mutations
 ---
 
 ## Using React Hooks
@@ -122,7 +121,7 @@ let make = () => {
 ```reason
 let addTodo = _ =>
   // This assumes you've set up a Client module as in the Getting Started section
-  Client.instance.mutate(~mutation=module(AddTodoMutation), {text: "Another To-Do"})
+  Apollo.client.mutate(~mutation=module(AddTodoMutation), {text: "Another To-Do"})
   ->Utils.Promise.then_(result =>
     Js.Promise.resolve(
       switch result {

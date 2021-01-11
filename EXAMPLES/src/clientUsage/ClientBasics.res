@@ -1,16 +1,19 @@
 module ApolloQueryResult = ApolloClient.Types.ApolloQueryResult
 module ObservableQuery = ApolloClient.Types.ObservableQuery
 
-module AddTodoMutation = %graphql(`
+module AddTodoMutation = %graphql(
+  `
     mutation AddTodo($text: String!) {
       todo: addTodoSimple(text: $text) {
         id
         text
       }
     }
-  `)
+  `
+)
 
-module TodosQuery = %graphql(`
+module TodosQuery = %graphql(
+  `
     query TodosQuery {
       todos: allTodos {
         id
@@ -18,22 +21,21 @@ module TodosQuery = %graphql(`
         completed
       }
     }
-  `)
+  `
+)
 
 let logTodos = _ =>
-  Client.instance.query(~query=module(TodosQuery), ())
-  ->Utils.Promise.then_(result =>
+  Apollo.client.query(~query=module(TodosQuery), ())->Utils.Promise.then_(result =>
     Js.Promise.resolve(
       switch result {
       | Ok({data: {todos}}) => Js.log2("query To-Dos: ", todos)
       | Error(error) => Js.log2("Error: ", error)
       },
     )
-  )
-  ->Utils.Promise.ignore
+  )->Utils.Promise.ignore
 
 let addTodo = _ =>
-  Client.instance.mutate(~mutation=module(AddTodoMutation), {text: "Another To-Do"})
+  Apollo.client.mutate(~mutation=module(AddTodoMutation), {text: "Another To-Do"})
   ->Utils.Promise.then_(result =>
     Js.Promise.resolve(
       switch result {
@@ -44,7 +46,7 @@ let addTodo = _ =>
   )
   ->Utils.Promise.ignore
 
-let observableQuery = Client.instance.watchQuery(~query=module(TodosQuery), ())
+let observableQuery = Apollo.client.watchQuery(~query=module(TodosQuery), ())
 
 let watchQuerySubscription = observableQuery.subscribe(~onNext=result =>
   switch result {

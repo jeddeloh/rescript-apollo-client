@@ -1,4 +1,4 @@
-@@text(`{1 Creating a client}`)
+// Creating a client
 type t = ApolloClient__ApolloClient.t
 let make = ApolloClient__ApolloClient.make
 
@@ -7,7 +7,7 @@ module DefaultQueryOptions = ApolloClient__ApolloClient.DefaultQueryOptions
 module DefaultMutateOptions = ApolloClient__ApolloClient.DefaultMutateOptions
 module DefaultOptions = ApolloClient__ApolloClient.DefaultOptions
 
-@@text(`{1 Fetching data }`)
+// Fetching data
 module React = {
   module ApolloProvider = ApolloClient__React_Context_ApolloProvider
   let useApolloClient = ApolloClient__React_Hooks_UseApolloClient.useApolloClient
@@ -19,7 +19,7 @@ module React = {
   let useSubscription = ApolloClient__React_Hooks_UseSubscription.useSubscription
 }
 
-@@text(`{1 Caching }`)
+// Caching
 module Cache = {
   type t<'serialized> = ApolloClient__Cache_Core_Cache.ApolloCache.t<'serialized>
   // Creating
@@ -28,7 +28,7 @@ module Cache = {
   let makeVar = ApolloClient__Cache_InMemory_ReactiveVars.makeVar
 }
 
-@@text(`{1 Customize Apollo Client's data flow }`)
+// Customize Apollo Client's data flow
 module Link = {
   module ContextLink = ApolloClient__Link_Context.ContextLink
   module ErrorLink = ApolloClient__Link_Error.ErrorLink
@@ -43,11 +43,11 @@ module Link = {
   let split = ApolloClient__Link_Core_ApolloLink.Static.split
 }
 
-@@text(`{1 Helpers and utility functions}`)
+// Helpers and utility functions
 module Utilities = ApolloClient__Utilities
 
-@@text(`{1 Reason Extras}`)
-@ocaml.doc(" 1:1 Javascript package structure ")
+// Rescript Extras
+// 1:1 Javascript package structure
 module Bindings = {
   module Client = ApolloClient__Client
   module Graphql = ApolloClient__Graphql
@@ -55,7 +55,7 @@ module Bindings = {
   module ZenObservable = ApolloClient__ZenObservable
 }
 
-@ocaml.doc(" \"¿ãP h@@∞¿çP ")
+// These are extension functors used by graphql-ppx
 module GraphQL_PPX = {
   module ExtendMutation = ApolloClient__React_Hooks_UseMutation.Extend
   module ExtendQuery = ApolloClient__React_Hooks_UseQuery.Extend
@@ -63,7 +63,7 @@ module GraphQL_PPX = {
   type templateTagReturnType = ApolloClient__Graphql.documentNode
 }
 
-@ocaml.doc(" Convenient access to all types and the methods for working with those types ")
+// Convenient access to all types and the methods for working with those types
 module Types = {
   module ApolloError = ApolloClient__Errors_ApolloError
   module ApolloQueryResult = ApolloClient__Core_Types.ApolloQueryResult

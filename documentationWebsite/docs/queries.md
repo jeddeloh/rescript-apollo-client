@@ -2,7 +2,6 @@
 id: queries
 title: Queries
 sidebar_label: Queries
-slug: /queries
 ---
 
 ## Using React Hooks
@@ -120,7 +119,7 @@ There are many instances where you might want to query outside the context of Re
 ```reason
 let addTodo = _ =>
   // This assumes you've set up a Client module as in the Getting Started section
-  Client.instance.mutate(~mutation=module(AddTodoMutation), {text: "Another To-Do"})
+  Apollo.client.mutate(~mutation=module(AddTodoMutation), {text: "Another To-Do"})
   ->Utils.Promise.then_(result =>
     Js.Promise.resolve(
       switch result {
@@ -135,7 +134,7 @@ let addTodo = _ =>
 If you need to react to changes in some data, not just a one-off fetch, you can use the `watchQuery` method.
 
 ```reason
-let observableQuery = Client.instance.watchQuery(~query=module(TodosQuery), ())
+let observableQuery = Apollo.client.watchQuery(~query=module(TodosQuery), ())
 
 let watchQuerySubscription = observableQuery.subscribe(~onNext=result =>
   switch result {

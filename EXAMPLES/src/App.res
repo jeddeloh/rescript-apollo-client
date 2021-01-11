@@ -1,6 +1,6 @@
 @react.component
 let make = () =>
-  <ApolloClient.React.ApolloProvider client=Client.instance>
+  <ApolloClient.React.ApolloProvider client=Apollo.client>
     <h2> {"Fetching Data with Hooks"->React.string} </h2>
     <h4> {"Simple Query"->React.string} </h4>
     <Query_OverlySimple />

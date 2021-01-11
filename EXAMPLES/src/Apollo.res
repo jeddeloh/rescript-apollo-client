@@ -29,7 +29,7 @@ let terminatingLink = ApolloClient.Link.split(~test=({query}) => {
   }
 }, ~whenTrue=wsLink, ~whenFalse=httpLink)
 
-let instance = {
+let client = {
   open ApolloClient
   make(
     ~cache=Cache.InMemoryCache.make(),

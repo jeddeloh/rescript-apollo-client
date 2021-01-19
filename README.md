@@ -28,7 +28,7 @@
 
 ### 1. `graphql-ppx`
 
-We rely on Graphql-ppx for typesafe GraphQL operations and fragments in ReScript. [Go to the official documentation](https://beta.graphql-ppx.com) for installation instructions.
+We rely on Graphql-ppx for typesafe GraphQL operations and fragments in ReScript. [Go to the official documentation](https://graphql-ppx.com) for installation instructions.
 
 You should now have a `graphql_schema.json` in your project somewhere. Make sure it's always up-to-date!
 

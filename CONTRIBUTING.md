@@ -32,7 +32,7 @@ Each directory should have a corresponding Reason module
 should become
 
 ```
-reason-react-hooks/src/react/hooks/ApolloClient__React_Hooks_UseQuery.re
+rescript-apollo-client/src/@apollo/client/react/hooks/ApolloClient__React_Hooks_UseQuery.re
 ```
 
 in reason.
@@ -47,7 +47,7 @@ in reason.
 ## Types
 
 - Please use the same naming as typescript where possible
-- Every type goes in its own module with a `type t` (exception: see SubStypes)
+- Every type goes in its own module with a `type t` (exception: see SubTypes)
 - Every type module should contain a `type t`, a `Js_` module with a `type t`, and a `toJs` or `fromJs` conversion function. `t => Js_.t` or `Js_.t => t`
 - Paste the type definition from the `.d.ts` file above the `type t` in the `Js_` module
 - If data requires parsing/serializing create a new record even if the shape is the same. This ensures you don't forget to parse somewhere.

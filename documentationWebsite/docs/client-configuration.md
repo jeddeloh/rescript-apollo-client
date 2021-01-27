@@ -21,6 +21,20 @@ let client = {
 }
 ```
 
+Now connect the client to React.
+
+```reason
+module App = {
+  <ApolloClient.React.ApolloProvider client=Apollo.client>
+    <div>
+      <h2>My first Apollo app 🚀</h2>
+    </div>
+  </ApolloClient.React.ApolloProvider>
+}
+
+ReactDOMRe.renderToElementWithId(<App />, "root")
+```
+
 That's it! Our client is ready to start fetching data.
 
 ### Advanced (Typical) Configuration

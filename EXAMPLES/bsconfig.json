@@ -30,7 +30,7 @@
   "bs-dependencies": [
     "rescript-apollo-client",
     "@reasonml-community/graphql-ppx",
-    "reason-promise",
+    "@ryyppy/rescript-promise",
     "reason-react"
   ]
 }

@@ -5,29 +5,29 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="generator" content="Docusaurus v2.0.0-alpha.66">
 <title data-react-helmet="true">gotchas | ReScript Apollo Client</title><meta data-react-helmet="true" name="twitter:card" content="summary_large_image"><meta data-react-helmet="true" name="docusaurus_language" content="en"><meta data-react-helmet="true" name="docusaurus_version" content="current"><meta data-react-helmet="true" name="docusaurus_tag" content="docs-default-current"><meta data-react-helmet="true" property="og:title" content="gotchas | ReScript Apollo Client"><meta data-react-helmet="true" property="og:url" content="https://reasonml-community.github.io/rescript-apollo-client/rescript-apollo-client/docs/gotchas"><link data-react-helmet="true" rel="shortcut icon" href="/rescript-apollo-client/img/favicon.ico"><link data-react-helmet="true" rel="canonical" href="https://reasonml-community.github.io/rescript-apollo-client/rescript-apollo-client/docs/gotchas"><link rel="stylesheet" href="/rescript-apollo-client/styles.eb460e67.css">
-<link rel="preload" href="/rescript-apollo-client/styles.86bbd652.js" as="script">
-<link rel="preload" href="/rescript-apollo-client/runtime~main.0f4e79ee.js" as="script">
-<link rel="preload" href="/rescript-apollo-client/main.1506da47.js" as="script">
-<link rel="preload" href="/rescript-apollo-client/1.843a682c.js" as="script">
-<link rel="preload" href="/rescript-apollo-client/2.4e49bd23.js" as="script">
-<link rel="preload" href="/rescript-apollo-client/17.d741fff5.js" as="script">
-<link rel="preload" href="/rescript-apollo-client/18.9b3ca7d2.js" as="script">
-<link rel="preload" href="/rescript-apollo-client/935f2afb.e09d3470.js" as="script">
-<link rel="preload" href="/rescript-apollo-client/17896441.de5327c6.js" as="script">
-<link rel="preload" href="/rescript-apollo-client/b2dbe049.c7192f4d.js" as="script">
+<link rel="preload" href="/rescript-apollo-client/styles.4f26d451.js" as="script">
+<link rel="preload" href="/rescript-apollo-client/runtime~main.4eb533cf.js" as="script">
+<link rel="preload" href="/rescript-apollo-client/main.3497dc83.js" as="script">
+<link rel="preload" href="/rescript-apollo-client/1.890b6a27.js" as="script">
+<link rel="preload" href="/rescript-apollo-client/2.ceeba443.js" as="script">
+<link rel="preload" href="/rescript-apollo-client/16.a0feb1ec.js" as="script">
+<link rel="preload" href="/rescript-apollo-client/17.194727ce.js" as="script">
+<link rel="preload" href="/rescript-apollo-client/935f2afb.4fd836bc.js" as="script">
+<link rel="preload" href="/rescript-apollo-client/17896441.70f001b2.js" as="script">
+<link rel="preload" href="/rescript-apollo-client/b2dbe049.f0970352.js" as="script">
 </head>
 <body>
 <script>!function(){function t(t){document.documentElement.setAttribute("data-theme",t)}var e=function(){var t=null;try{t=localStorage.getItem("theme")}catch(t){}return t}();t(null!==e?e:"light")}()</script><div id="__docusaurus">
 <nav class="navbar navbar--fixed-top"><div class="navbar__inner"><div class="navbar__items"><div aria-label="Navigation bar toggle" class="navbar__toggle" role="button" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" role="img" focusable="false"><title>Menu</title><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></div><a class="navbar__brand" href="/rescript-apollo-client/"><img class="navbar__logo" src="/rescript-apollo-client/img/small_logo.png" alt="ReScript Apollo Client Logo"><strong class="navbar__title">ReScript Apollo Client</strong></a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/rescript-apollo-client/docs/">Docs</a><a href="https://github.com/reasonml-community/rescript-apollo-client/releases/" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Changelog</a></div><div class="navbar__items navbar__items--right"><a class="navbar__item navbar__link" href="/rescript-apollo-client/docs/contributing">Contributing</a><a href="https://github.com/reasonml-community/rescript-apollo-client" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div><div class="navbar-sidebar"><div class="navbar-sidebar__brand"><a class="navbar__brand" href="/rescript-apollo-client/"><img class="navbar__logo" src="/rescript-apollo-client/img/small_logo.png" alt="ReScript Apollo Client Logo"><strong class="navbar__title">ReScript Apollo Client</strong></a></div><div class="navbar-sidebar__items"><div class="menu"><ul class="menu__list"><li class="menu__list-item"><a aria-current="page" class="menu__link navbar__link--active" href="/rescript-apollo-client/docs/">Docs</a></li><li class="menu__list-item"><a href="https://github.com/reasonml-community/rescript-apollo-client/releases/" target="_blank" rel="noopener noreferrer" class="menu__link">Changelog</a></li><li class="menu__list-item"><a class="menu__link" href="/rescript-apollo-client/docs/contributing">Contributing</a></li><li class="menu__list-item"><a href="https://github.com/reasonml-community/rescript-apollo-client" target="_blank" rel="noopener noreferrer" class="menu__link">GitHub</a></li></ul></div></div></div></nav><div class="main-wrapper"><div class="docPage_2gpo"><main class="docMainContainer_3EyW"><div class="container padding-vert--lg docItemWrapper_1EkI"><div class="row"><div class="col docItemCol_2ASc"><div class="docItemContainer_3QWW"><article><header><h1 class="docTitle_1Lrw">gotchas</h1></header><div class="markdown"></div></article><div class="margin-vert--xl"><div class="row"><div class="col"><a href="https://github.com/reasonml-community/rescript-apollo-client/edit/master/documentation/docs/gotchas.md" target="_blank" rel="noreferrer noopener"><svg fill="currentColor" height="1.2em" width="1.2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 40 40" style="margin-right:0.3em;vertical-align:sub"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div></div></div><div class="margin-vert--lg"><nav class="pagination-nav" aria-label="Blog list page navigation"><div class="pagination-nav__item"></div><div class="pagination-nav__item pagination-nav__item--next"></div></nav></div></div></div><div class="col col--3"><div class="tableOfContents_3SO_"></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container"><div class="text--center"><div>Built with Docusaurus.</div></div></div></footer></div>
-<script src="/rescript-apollo-client/styles.86bbd652.js"></script>
-<script src="/rescript-apollo-client/runtime~main.0f4e79ee.js"></script>
-<script src="/rescript-apollo-client/main.1506da47.js"></script>
-<script src="/rescript-apollo-client/1.843a682c.js"></script>
-<script src="/rescript-apollo-client/2.4e49bd23.js"></script>
-<script src="/rescript-apollo-client/17.d741fff5.js"></script>
-<script src="/rescript-apollo-client/18.9b3ca7d2.js"></script>
-<script src="/rescript-apollo-client/935f2afb.e09d3470.js"></script>
-<script src="/rescript-apollo-client/17896441.de5327c6.js"></script>
-<script src="/rescript-apollo-client/b2dbe049.c7192f4d.js"></script>
+<script src="/rescript-apollo-client/styles.4f26d451.js"></script>
+<script src="/rescript-apollo-client/runtime~main.4eb533cf.js"></script>
+<script src="/rescript-apollo-client/main.3497dc83.js"></script>
+<script src="/rescript-apollo-client/1.890b6a27.js"></script>
+<script src="/rescript-apollo-client/2.ceeba443.js"></script>
+<script src="/rescript-apollo-client/16.a0feb1ec.js"></script>
+<script src="/rescript-apollo-client/17.194727ce.js"></script>
+<script src="/rescript-apollo-client/935f2afb.4fd836bc.js"></script>
+<script src="/rescript-apollo-client/17896441.70f001b2.js"></script>
+<script src="/rescript-apollo-client/b2dbe049.f0970352.js"></script>
 </body>
 </html>

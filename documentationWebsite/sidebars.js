@@ -1,12 +1,7 @@
 module.exports = {
   docs: [
     {
-      "Getting Started  ": [
-        "overview",
-        "installation",
-        "quick-start",
-        "client-configuration",
-      ],
+      "Getting Started  ": ["overview", "installation", "client-configuration"],
     },
     {
       Fetching: ["queries", "mutations"],

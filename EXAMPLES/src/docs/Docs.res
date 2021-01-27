@@ -50,9 +50,7 @@ module Typical = {
             {React.string("There are " ++ (todos->Belt.Array.length->string_of_int ++ " To-Dos"))}
           </p>
           <p>
-            <button onClick={_ => fetchMore()->Utils.Promise.ignore}>
-              {"Fetch More!"->React.string}
-            </button>
+            <button onClick={_ => fetchMore()->ignore}> {"Fetch More!"->React.string} </button>
           </p>
         </div>
       | {loading: false, data: None} => <p> {"Error loading data"->React.string} </p>

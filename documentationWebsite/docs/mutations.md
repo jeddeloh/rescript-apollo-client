@@ -122,13 +122,11 @@ let make = () => {
 let addTodo = _ =>
   // This assumes you've set up a Client module as in the Getting Started section
   Apollo.client.mutate(~mutation=module(AddTodoMutation), {text: "Another To-Do"})
-  ->Utils.Promise.then_(result =>
-    Js.Promise.resolve(
-      switch result {
-      | Ok({data}) => Js.log2("mutate result: ", data)
-      | Error(error) => Js.log2("Error: ", error)
-      },
-    )
+  ->Promise.map(result =>
+    switch result {
+    | Ok({data}) => Js.log2("mutate result: ", data)
+    | Error(error) => Js.log2("Error: ", error)
+    }
   )
-  ->Utils.Promise.ignore
+  ->ignore
 ```

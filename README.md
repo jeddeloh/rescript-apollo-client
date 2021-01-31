@@ -19,6 +19,6 @@
   <a href="https://reasonml-community.github.io/rescript-apollo-client/docs/contributing">Contributing</a>
 </p>
 
-ReScript Apollo Client provides rescript bindings to `@apollo/client` leveraging the amazing [Graphql-ppx](https://graphql-ppx.com) for completely typesafe GraphQL operations and fragments in Rescript!
+ReScript Apollo Client provides rescript bindings to `@apollo/client` that leverage the amazing [Graphql-ppx](https://graphql-ppx.com) for completely typesafe GraphQL operations and fragments in Rescript!
 
 Please check out the [official documentation](https://reasonml-community.github.io/rescript-apollo-client/)

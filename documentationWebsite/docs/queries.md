@@ -24,7 +24,7 @@ module TodosQuery = %graphql(`
 `)
 ```
 
-Call the `use` hook in a component
+To execute the query, just call the `use` hook in a component like so.
 
 ```reason
 @react.component
@@ -37,7 +37,7 @@ let make = () =>
       {"There are "->React.string} {todos->Belt.Array.length->React.int} {" To-Dos"->React.string}
     </div>
   | {data: None, error: None, loading: false} =>
-    "You might think this is impossibl, but depending on the situation it might not be!"->React.string
+    "You might think this is impossible, but depending on the situation it might not be!"->React.string
   }
 ```
 
@@ -120,20 +120,19 @@ There are many instances where you might want to query outside the context of Re
 let addTodo = _ =>
   // This assumes you've set up a Client module as in the Getting Started section
   Apollo.client.mutate(~mutation=module(AddTodoMutation), {text: "Another To-Do"})
-  ->Utils.Promise.then_(result =>
-    Js.Promise.resolve(
-      switch result {
-      | Ok({data}) => Js.log2("mutate result: ", data)
-      | Error(error) => Js.log2("Error: ", error)
-      },
-    )
+  ->Promise.map(result =>
+    switch result {
+    | Ok({data}) => Js.log2("mutate result: ", data)
+    | Error(error) => Js.log2("Error: ", error)
+    },
   )
-  ->Utils.Promise.ignore
+  ->ignore
 ```
 
-If you need to react to changes in some data, not just a one-off fetch, you can use the `watchQuery` method.
+If you need to react to changes in some data in the cache, not just a one-off fetch, you can use the `watchQuery` method.
 
 ```reason
+// This assumes you've set up a Client module as in the Getting Started section
 let observableQuery = Apollo.client.watchQuery(~query=module(TodosQuery), ())
 
 let watchQuerySubscription = observableQuery.subscribe(~onNext=result =>

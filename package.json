@@ -6,8 +6,6 @@
     "Apollo",
     "BuckleScript",
     "GraphQL",
-    "Reason",
-    "ReasonML",
     "ReScript"
   ],
   "license": "MIT",
@@ -35,7 +33,7 @@
   "peerDependencies": {
     "@apollo/client": "^3.0.0",
     "@reasonml-community/graphql-ppx": "^1.0.0",
-    "bs-platform": "^7.3.0 || ^8.0.0",
+    "bs-platform": "^8.2.0",
     "reason-react": "^0.8.0 || ^0.9.0"
   }
 }

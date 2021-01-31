@@ -24,27 +24,22 @@ module TodosQuery = %graphql(
   `
 )
 
-let logTodos = _ =>
-  Apollo.client.query(~query=module(TodosQuery), ())->Utils.Promise.then_(result =>
-    Js.Promise.resolve(
-      switch result {
-      | Ok({data: {todos}}) => Js.log2("query To-Dos: ", todos)
-      | Error(error) => Js.log2("Error: ", error)
-      },
-    )
-  )->Utils.Promise.ignore
+let logTodos = _ => Apollo.client.query(~query=module(TodosQuery), ())->Promise.map(result =>
+    switch result {
+    | Ok({data: {todos}}) => Js.log2("query To-Dos: ", todos)
+    | Error(error) => Js.log2("Error: ", error)
+    }
+  )->ignore
 
 let addTodo = _ =>
   Apollo.client.mutate(~mutation=module(AddTodoMutation), {text: "Another To-Do"})
-  ->Utils.Promise.then_(result =>
-    Js.Promise.resolve(
-      switch result {
-      | Ok({data}) => Js.log2("mutate result: ", data)
-      | Error(error) => Js.log2("Error: ", error)
-      },
-    )
+  ->Promise.map(result =>
+    switch result {
+    | Ok({data}) => Js.log2("mutate result: ", data)
+    | Error(error) => Js.log2("Error: ", error)
+    }
   )
-  ->Utils.Promise.ignore
+  ->ignore
 
 let observableQuery = Apollo.client.watchQuery(~query=module(TodosQuery), ())
 

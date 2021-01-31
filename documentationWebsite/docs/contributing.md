@@ -3,6 +3,8 @@ id: contributing
 title: Contributing
 ---
 
+Lets work to make the Apollo experience in ReScript the best experience out there!
+
 ## Core Philosopies
 
 - Provide 1:1 mapping to Javascript _then_ use those as building blocks for more "reasonable" ergonomics
@@ -10,11 +12,11 @@ title: Contributing
 - Avoid partial types or bindings if possible
 - Encourage incremental contribution from the community rather than biting off more than one person can chew
 
-There's nothing fancy about this library. It tends to view the problem of bindings as a people problem (how can we leverage the power of numbers) rather than a programming problem (automatic conversion from typescript—would be amazing!). As such, a lot of detail is paid to consistency and clarity with the hope of maximizing human ability to both add and verify that bindings are correct. The long-term success or failure of this library is intended to be dependent on active community contribution rather than the efforts of a few individuals. Will it work? That's up to you, dear reader ❤️
+There's nothing fancy about this library. It tends to view the problem of bindings as a people problem rather than a programming problem (all the hard work has already been done for us by Graphql-ppx) As such, a lot of detail is paid to consistency and clarity with the hope of maximizing human ability to both add and verify that bindings are correct. The long-term success or failure of this library is will likely be dependent on active community contribution rather than the efforts of a few individuals.
 
 ### Following a Consistent Pattern
 
-At the file level, bindings to Javascript packages should mirror the directory structure in the JS package. No thinking required! This has the side benefit of being able to navigate to any import you see in the javascript docs via filepath pattern, but it's primary purpose is consistency. It should be easy for anyone else to see exactly what you're binding to and encourages consistent naming rules.
+At the file level, bindings to Javascript packages should mirror the directory structure in the JS package. This is critically important! It should be easy for anyone else to see exactly what is being bound and if anything is missing or incorrect. This has the side benefit of being able to navigate to any import you see in the javascript docs via filepath pattern, but it's primary purpose is consistency.
 
 At the code level, all JS bindings should go in a `Js_` module of some sort. At first it seems ridiculous, but it pays off at scale. (See **Reasoning Behind `Js_` modules**)
 
@@ -26,7 +28,7 @@ Please type something as completely as possible when you come across it or leave
 
 ### Directory Structure and Module Naming
 
-Each directory should have a corresponding Reason module
+Each directory should have a corresponding Reason module.
 
 ```
 @apollo/client/react/hooks/useQuery.js
@@ -35,14 +37,12 @@ Each directory should have a corresponding Reason module
 should become
 
 ```
-reason-react-hooks/src/react/hooks/ApolloClient__React_Hooks_UseQuery.re
+src/react/hooks/ApolloClient__React_Hooks_UseQuery.res
 ```
-
-in reason.
 
 #### Breaking it down: `/[1]/[2]__[3]_[4]`
 
-1. Reason files should be located in the same directory structure as the js counterpart (usually there is a `.d.ts` for every `.js` file so we can think of them interchangeably)
+1. ReScript files should be located in the same directory structure as the js counterpart (usually there is a `.d.ts` for every `.js` file so we can think of them interchangeably)
 1. All module names should be prefixed with `ApolloClient__` "namespace"
 1. File names reflect the directory structure
 1. Files should be named the same as the js counterpart
@@ -66,7 +66,7 @@ module Js_ = {
   // #3 - add the `.js` representation of type t = ...
 }
 
-// #4  - add the Reason representation of type t
+// #4  - add the ReScript representation of type t
 // #4a - you can use `type t = Js_.t` if they are _exactly_ the same
 // #4b - if they are the exact same _shape_ but requires parsing or serializing, *define a new record of the same shape* so we can leverage the fact that records are nominally typed to prevent someone forgetting to convert somewhere
 
@@ -75,7 +75,7 @@ module Js_ = {
 
 #### SubTypes
 
-Sometimes multiple types were required to represent a single type in TypeScript. In order to help make it clear what is a binding to an actual type and what is just needed by Reason, we take a similar naming approach to the modules (prefixing with the parent). For instance, `Apollo_Client__React_Types.QueryResult.Raw` has a `type t` that uses `t_fetchMoreOptions` which in turn uses `t_fetchMoreOptions_updateQueryOptions`.
+Sometimes multiple types were required to represent a single type in TypeScript. In order to help make it clear what is a binding to an actual type and what is just needed by ReScript, we take a similar naming approach to the modules (prefixing with the parent). For instance, `Apollo_Client__React_Types.QueryResult.Raw` has a `type t` that uses `t_fetchMoreOptions` which in turn uses `t_fetchMoreOptions_updateQueryOptions`.
 
 ### Binding to Js Module Exports
 
@@ -91,7 +91,7 @@ Use records
 
 ### Binding to Enums
 
-Prefer standard variants. `jsConverter` works great for ints, but otherwise use manual `toJs` and `fromJs` functions. The reasoning is that Apollo may very well be an entry point into ReasonML and we don't want to _immediately_ expose users to polymorphic variants.
+Prefer standard variants. `jsConverter` works great for ints, but otherwise use manual `toJs` and `fromJs` functions. Standard variants are just nicer to consume in other places and this keeps consistency
 
 ### General
 
@@ -113,7 +113,7 @@ module TypeName = {
 };
 ```
 
-Stupid, right? But bear with me it pays off in the big picture. What if we need to parse/serialize some data which happens a lot in this library?
+Not much point yet, but bear with me, it pays off in the big picture. What if we need to parse/serialize some data which happens a lot in this library?
 
 ```diff
 module TypeName = {
@@ -270,5 +270,3 @@ module TypeName = {
     );
 };
 ```
-
-Regarding the actual module naming, I tried `JS`, but I would accidentally type `Js` all the time and not see it. I found adding the `_` helped it stick out. :shrug:

@@ -354,6 +354,12 @@ module Js_ = {
   // setLink(newLink: ApolloLink): void;
   @bs.send external setLink: (t, ApolloLink.Js_.t) => unit = "setLink"
 
+  // subscribe<T = any, TVariables = OperationVariables>(options: SubscriptionOptions<TVariables>): Observable<FetchResult<T>>;
+
+  @bs.send
+  external subscribe: (t, SubscriptionOptions.Js_.t) => Observable.Js_.t<FetchResult.Js_.t> =
+    "subscribe"
+
   // <T = any, TVariables = OperationVariables>(options: WatchQueryOptions<TVariables>): ObservableQuery<T, TVariables>;
   @bs.send
   external watchQuery: (

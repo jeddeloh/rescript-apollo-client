@@ -227,6 +227,7 @@ module QueryResult = {
     // export interface QueryResult<TData = any, TVariables = OperationVariables> extends ObservableQueryFields<TData, TVariables> {
     //     client: ApolloClient<any>;
     //     data: TData | undefined;
+    //     previousData?: TData;
     //     error?: ApolloError;
     //     loading: boolean;
     //     networkStatus: NetworkStatus;
@@ -236,6 +237,7 @@ module QueryResult = {
       called: bool,
       client: ApolloClient.t,
       data: option<'jsData>,
+      previousData: option<'jsData>,
       error: option<ApolloError.Js_.t>,
       loading: bool,
       networkStatus: NetworkStatus.Js_.t,
@@ -307,6 +309,7 @@ module QueryResult = {
     called: bool,
     client: ApolloClient.t,
     data: option<'data>,
+    previousData: option<Types.parseResult<'data>>,
     error: option<ApolloError.t>,
     loading: bool,
     networkStatus: NetworkStatus.t,
@@ -361,6 +364,9 @@ module QueryResult = {
       ~apolloError=?js.error->Belt.Option.map(ApolloError.fromJs),
       safeParse,
     )
+
+    let previousData = js.previousData->Belt.Option.map(safeParse)
+
     let fetchMore = (
       ~context=?,
       ~mapJsVariables=Utils.identity,
@@ -501,6 +507,7 @@ module QueryResult = {
       called: js.called,
       client: js.client,
       data: data,
+      previousData: previousData,
       error: error,
       loading: js.loading,
       networkStatus: js.networkStatus->NetworkStatus.fromJs,

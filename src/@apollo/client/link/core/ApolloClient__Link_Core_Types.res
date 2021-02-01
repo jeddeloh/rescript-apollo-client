@@ -158,11 +158,11 @@ module FetchResult = {
 module NextLink = {
   module Js_ = {
     // export declare type NextLink = (operation: Operation) => Observable<FetchResult>;
-    type t = Operation.Js_.t => Observable.t<FetchResult.Js_.t<Js.Json.t>>
+    type t = Operation.Js_.t => Observable.t<FetchResult.Js_.t<Js.Json.t>, Js.Exn.t>
   }
 
   // These are intentionally Js_.t because we can't know what to parse
-  type t = Operation.t => Observable.t<FetchResult.Js_.t<Js.Json.t>>
+  type t = Operation.t => Observable.t<FetchResult.Js_.t<Js.Json.t>, Js.Exn.t>
 }
 
 module RequestHandler = {
@@ -171,11 +171,14 @@ module RequestHandler = {
     type t = (
       . Operation.Js_.t,
       NextLink.Js_.t,
-    ) => Js.Null.t<Observable.t<FetchResult.Js_.t<Js.Json.t>>>
+    ) => Js.Null.t<Observable.t<FetchResult.Js_.t<Js.Json.t>, Js.Exn.t>>
   }
 
   // These are intentionally Js_.t because we can't know what to parse
-  type t = (Operation.Js_.t, NextLink.Js_.t) => option<Observable.t<FetchResult.Js_.t<Js.Json.t>>>
+  type t = (
+    Operation.Js_.t,
+    NextLink.Js_.t,
+  ) => option<Observable.t<FetchResult.Js_.t<Js.Json.t>, Js.Exn.t>>
 
   let toJs: t => Js_.t = (t, . operation, forward) => t(operation, forward)->Js.Null.fromOption
 }

@@ -23,7 +23,7 @@ let createHttpLink = ApolloClient__Link_Http_CreateHttpLink.createHttpLink
 // export { HttpLink } from './link/http/HttpLink.js';
 module HttpLink = ApolloClient__Link_Http_HttpLink
 // export { ApolloClient } from './ApolloClient.js';
-module ApolloClient = ApolloClient__ApolloClient
+module ApolloClient = ApolloClient__Core_ApolloClient
 // export { ApolloCache } from './cache/core/cache.js';
 module ApolloCache = ApolloClient__Cache_Core_Cache.ApolloCache
 // export { Cache } from './cache/core/types/Cache.js';

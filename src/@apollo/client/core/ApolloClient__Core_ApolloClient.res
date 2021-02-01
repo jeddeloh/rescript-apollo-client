@@ -12,13 +12,15 @@ module Graphql = ApolloClient__Graphql
 module MutationOptions = ApolloClient__Core_WatchQueryOptions.MutationOptions
 module MutationQueryReducersMap = ApolloClient__Core_WatchQueryOptions.MutationQueryReducersMap
 module MutationUpdaterFn = ApolloClient__Core_WatchQueryOptions.MutationUpdaterFn
+module Observable = ApolloClient__ZenObservable.Observable
 module ObservableQuery = ApolloClient__Core_ObservableQuery.ObservableQuery
 module QueryOptions = ApolloClient__Core_WatchQueryOptions.QueryOptions
 module PureQueryOptions = ApolloClient__Core_Types.PureQueryOptions
 module RefetchQueryDescription = ApolloClient__Core_WatchQueryOptions.RefetchQueryDescription
 module Resolvers = ApolloClient__Core_Types.Resolvers
-module UriFunction = ApolloClient__Link_Http_SelectHttpOptionsAndBody.UriFunction
+module SubscriptionOptions = ApolloClient__Core_WatchQueryOptions.SubscriptionOptions
 module Types = ApolloClient__Types
+module UriFunction = ApolloClient__Link_Http_SelectHttpOptionsAndBody.UriFunction
 module Utils = ApolloClient__Utils
 module WatchQueryFetchPolicy = ApolloClient__Core_WatchQueryOptions.WatchQueryFetchPolicy
 module WatchQueryOptions = ApolloClient__Core_WatchQueryOptions.WatchQueryOptions
@@ -274,12 +276,12 @@ module Js_ = {
   //     private localState;
   //     constructor(options: ApolloClientOptions<TCacheShape>);
   //     stop(): void;
-  //     watchQuery<T = any, TVariables = OperationVariables>(options: WatchQueryOptions<TVariables>): ObservableQuery<T, TVariables>;
-  //     query<T = any, TVariables = OperationVariables>(options: QueryOptions<TVariables>): Promise<ApolloQueryResult<T>>;
+  //     watchQuery<T = any, TVariables = OperationVariables>(options: WatchQueryOptions<TVariables, T>): ObservableQuery<T, TVariables>;
+  //     query<T = any, TVariables = OperationVariables>(options: QueryOptions<TVariables, T>): Promise<ApolloQueryResult<T>>;
   //     mutate<T = any, TVariables = OperationVariables>(options: MutationOptions<T, TVariables>): Promise<FetchResult<T>>;
-  //     subscribe<T = any, TVariables = OperationVariables>(options: SubscriptionOptions<TVariables>): Observable<FetchResult<T>>;
-  //     readQuery<T = any, TVariables = OperationVariables>(options: DataProxy.Query<TVariables>, optimistic?: boolean): T | null;
-  //     readFragment<T = any, TVariables = OperationVariables>(options: DataProxy.Fragment<TVariables>, optimistic?: boolean): T | null;
+  //     subscribe<T = any, TVariables = OperationVariables>(options: SubscriptionOptions<TVariables, T>): Observable<FetchResult<T>>;
+  //     readQuery<T = any, TVariables = OperationVariables>(options: DataProxy.Query<TVariables, T>, optimistic?: boolean): T | null;
+  //     readFragment<T = any, TVariables = OperationVariables>(options: DataProxy.Fragment<TVariables, T>, optimistic?: boolean): T | null;
   //     writeQuery<TData = any, TVariables = OperationVariables>(options: DataProxy.WriteQueryOptions<TData, TVariables>): void;
   //     writeFragment<TData = any, TVariables = OperationVariables>(options: DataProxy.WriteFragmentOptions<TData, TVariables>): void;
   //     __actionHookForDevTools(cb: () => any): void;
@@ -357,8 +359,10 @@ module Js_ = {
   // subscribe<T = any, TVariables = OperationVariables>(options: SubscriptionOptions<TVariables>): Observable<FetchResult<T>>;
 
   @bs.send
-  external subscribe: (t, SubscriptionOptions.Js_.t) => Observable.Js_.t<FetchResult.Js_.t> =
-    "subscribe"
+  external subscribe: (
+    t,
+    ~options: SubscriptionOptions.Js_.t<'jsVariables>,
+  ) => Observable.Js_.t<FetchResult.Js_.t<'jsData>, 'error> = "subscribe"
 
   // <T = any, TVariables = OperationVariables>(options: WatchQueryOptions<TVariables>): ObservableQuery<T, TVariables>;
   @bs.send
@@ -411,11 +415,10 @@ type t = {
   @bs.as("rescript_onResetStore")
   onResetStore: (~cb: unit => Js.Promise.t<unit>, unit) => unit,
   @bs.as("rescript_query")
-  query: 'data 'jsData 'variables 'jsVariables. (
+  query: 'data 'variables 'jsVariables. (
     ~query: module(Operation with
       type t = 'data
       and type t_variables = 'variables
-      and type Raw.t = 'jsData
       and type Raw.t_variables = 'jsVariables
     ),
     ~context: Js.Json.t=?,
@@ -452,6 +455,19 @@ type t = {
   restore: (~serializedState: Js.Json.t) => ApolloCache.t<Js.Json.t>,
   @bs.as("rescript_setLink")
   setLink: ApolloLink.t => unit,
+  @bs.as("rescript_subscribe")
+  subscribe: 'data 'variables 'jsVariables. (
+    ~subscription: module(Operation with
+      type t = 'data
+      and type t_variables = 'variables
+      and type Raw.t_variables = 'jsVariables
+    ),
+    ~context: Js.Json.t=?,
+    ~errorPolicy: ErrorPolicy.t=?,
+    ~fetchPolicy: FetchPolicy.t=?,
+    ~mapJsVariables: 'jsVariables => 'jsVariables=?,
+    'variables,
+  ) => Observable.t<FetchResult.t__ok<'data>, ApolloError.t>,
   @bs.as("rescript_watchQuery")
   watchQuery: 'data 'variables 'jsVariables. (
     ~query: module(Operation with
@@ -625,11 +641,10 @@ let make: (
   let onResetStore = (~cb) => jsClient->Js_.onResetStore(~cb)
 
   let query = (
-    type data jsData variables jsVariables,
+    type data variables jsVariables,
     ~query as module(Operation: Operation with
       type t = data
       and type t_variables = variables
-      and type Raw.t = jsData
       and type Raw.t_variables = jsVariables
     ),
     ~context=?,
@@ -736,6 +751,60 @@ let make: (
 
   let setLink = link => jsClient->Js_.setLink(link)
 
+  let subscribe = (
+    type data variables jsVariables,
+    ~subscription as module(Operation: Operation with
+      type t = data
+      and type t_variables = variables
+      and type Raw.t_variables = jsVariables
+    ),
+    ~context=?,
+    ~errorPolicy=?,
+    ~fetchPolicy=?,
+    ~mapJsVariables=Utils.identity,
+    variables,
+  ) => {
+    let safeParse = Utils.safeParse(Operation.parse)
+
+    let jsObservable = Js_.subscribe(
+      jsClient,
+      ~options=SubscriptionOptions.toJs(
+        {
+          fetchPolicy: fetchPolicy,
+          query: Operation.query,
+          variables: variables,
+          errorPolicy: errorPolicy,
+          context: context,
+        },
+        ~mapJsVariables,
+        ~serializeVariables=Operation.serializeVariables,
+      ),
+    )
+
+    {
+      Observable.subscribe: (~onNext, ~onError=?, ~onComplete=?, ()) => {
+        let onNext' = jsFetchResult =>
+          switch jsFetchResult->FetchResult.fromJs(~safeParse)->FetchResult.toResult {
+          | Ok(ok) => onNext(ok)
+          | Error(error) =>
+            switch onError {
+            | Some(onError) => onError(error)
+            | None => ()
+            }
+          }
+
+        let onError' = onError->Belt.Option.map(onError => {
+          let return = unknown =>
+            Obj.magic(unknown)->ApolloError.Js_.ensureApolloError->ApolloError.fromJs->onError
+          return
+        })
+
+        let observable = jsObservable->Observable.fromJs
+        observable.subscribe(~onNext=onNext', ~onError=?onError', ~onComplete?, ())
+      },
+    }
+  }
+
   let watchQuery = (
     type data variables jsVariables,
     ~query as module(Operation: Operation with
@@ -825,6 +894,7 @@ let make: (
       resetStore: resetStore,
       restore: restore,
       setLink: setLink,
+      subscribe: subscribe,
       watchQuery: watchQuery,
       writeFragment: writeFragment,
       writeQuery: writeQuery,

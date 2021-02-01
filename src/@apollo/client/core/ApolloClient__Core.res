@@ -1,3 +1,4 @@
+module ApolloClient = ApolloClient__Core_ApolloClient
 module LocalState = ApolloClient__Core_LocalState
 module NetworkStatus = ApolloClient__Core_NetworkStatus.NetworkStatus
 module ObservableQuery = ApolloClient__Core_ObservableQuery

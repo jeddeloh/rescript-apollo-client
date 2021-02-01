@@ -4,6 +4,29 @@ module ServerError = ApolloClient__Link_Utils_ThrowServerError.ServerError
 module ServerParseError = ApolloClient__Link_Http_ParseAndCheckHttpResponse.ServerParseError
 module Types = ApolloClient__Types
 
+@unboxed
+type rec any = Any('a): any
+
+let ensureError: any => Js.Exn.t = %bs.raw(`
+  function (unknown) {
+    if (unknown instanceof Error) {
+      return unknown;
+    } else {
+      unknown = unknown || {};
+      const message = unknown.message;
+      const errorMessage = unknown.errorMessage;
+      const keys = Object.keys(unknown);
+      const error = new Error(message || errorMessage || "[Non-error exception with keys: " + keys.join(", ") + "]");
+
+      keys.forEach(function(key) {
+        error[key] = unknown[key];
+      });
+
+      return error;
+    }
+  }
+  `)
+
 module Js_ = {
   module NetworkErrorUnion: {
     type t
@@ -74,19 +97,21 @@ module Js_ = {
   @bs.module("@apollo/client") @bs.new
   external make: make_args => t = "ApolloError"
 
+  // This is not an exhaustive check. It is intended to address the most common subscription error issues only
+  // See: https://github.com/apollographql/apollo-client/pull/6894
   let ensureApolloError: t => t = error =>
     %bs.raw(`
           function (error, makeApolloError) {
-            // This is not an exhaustive check. It is intended to address the most common subscription error issues only
-            // See: https://github.com/apollographql/apollo-client/pull/6894
+            var error = error || {};
             if (Array.isArray(error.graphQLErrors)) {
               return error;
             } else if (error && typeof error.message === "string" && error.extensions) {
               return makeApolloError({graphQLErrors: [error]});
+            } else {
+              return makeApolloError({networkError: ensureError(error)}) 
             }
           }
-        `)(error, make) // This is not an exhaustive check. It is intended to address the most common subscription error issues only
-    // See: https://github.com/apollographql/apollo-client/pull/6894
+        `)(error, make, ensureError)
 }
 
 type t_networkError =

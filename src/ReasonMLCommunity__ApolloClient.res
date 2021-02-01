@@ -1,11 +1,11 @@
 // Creating a client
-type t = ApolloClient__ApolloClient.t
-let make = ApolloClient__ApolloClient.make
+type t = ApolloClient__Core_ApolloClient.t
+let make = ApolloClient__Core_ApolloClient.make
 
-module DefaultWatchQueryOptions = ApolloClient__ApolloClient.DefaultWatchQueryOptions
-module DefaultQueryOptions = ApolloClient__ApolloClient.DefaultQueryOptions
-module DefaultMutateOptions = ApolloClient__ApolloClient.DefaultMutateOptions
-module DefaultOptions = ApolloClient__ApolloClient.DefaultOptions
+module DefaultWatchQueryOptions = ApolloClient__Core_ApolloClient.DefaultWatchQueryOptions
+module DefaultQueryOptions = ApolloClient__Core_ApolloClient.DefaultQueryOptions
+module DefaultMutateOptions = ApolloClient__Core_ApolloClient.DefaultMutateOptions
+module DefaultOptions = ApolloClient__Core_ApolloClient.DefaultOptions
 
 // Fetching data
 module React = {
@@ -110,6 +110,7 @@ module Types = {
   module RequestHandler = ApolloClient__Link_Core_Types.RequestHandler
   module Resolvers = ApolloClient__Core_Types.Resolvers
   module SubscriptionHookOptions = ApolloClient__React_Types.SubscriptionHookOptions
+  module SubscriptionOptions = ApolloClient__Core_WatchQueryOptions.SubscriptionOptions
   module TypePolicies = ApolloClient__Cache_InMemory_Policies.TypePolicies
   module TypePolicy = ApolloClient__Cache_InMemory_Policies.TypePolicy
   module UriFunction = ApolloClient__Link_Http_SelectHttpOptionsAndBody.UriFunction

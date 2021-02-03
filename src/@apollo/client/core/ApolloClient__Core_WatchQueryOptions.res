@@ -270,6 +270,46 @@ module SubscribeToMoreOptions = {
   }
 }
 
+module SubscriptionOptions = {
+  module Js_ = {
+    // export interface SubscriptionOptions<TVariables = OperationVariables, TData = any> {
+    //     query: DocumentNode | TypedDocumentNode<TData, TVariables>;
+    //     variables?: TVariables;
+    //     fetchPolicy?: FetchPolicy;
+    //     errorPolicy?: ErrorPolicy;
+    //     context?: Record<string, any>;
+    // }
+    type t<'jsVariables> = {
+      query: Graphql.documentNode,
+      // We don't allow optional variables because it's not typesafe
+      variables: 'jsVariables,
+      fetchPolicy: option<FetchPolicy.Js_.t>,
+      errorPolicy: option<ErrorPolicy.Js_.t>,
+      context: option<Js.Json.t>,
+    }
+  }
+
+  type t<'variables> = {
+    query: Graphql.documentNode,
+    variables: 'variables,
+    fetchPolicy: option<FetchPolicy.t>,
+    errorPolicy: option<ErrorPolicy.t>,
+    context: option<Js.Json.t>,
+  }
+
+  let toJs: (
+    t<'variables>,
+    ~mapJsVariables: 'jsVariables => 'jsVariables,
+    ~serializeVariables: 'varibles => 'jsVariables,
+  ) => Js_.t<'jsVariables> = (t, ~mapJsVariables, ~serializeVariables) => {
+    query: t.query,
+    variables: t.variables->serializeVariables->mapJsVariables,
+    fetchPolicy: t.fetchPolicy->Belt.Option.map(FetchPolicy.toJs),
+    errorPolicy: t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
+    context: t.context,
+  }
+}
+
 module MutationUpdaterFn = {
   module Js_ = {
     type t<'jsData> = (. ApolloCache.t<Js.Json.t>, FetchResult.Js_.t<'jsData>) => unit // Non-Js_ cache is correct here

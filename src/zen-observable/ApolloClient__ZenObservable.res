@@ -76,25 +76,38 @@ module Observable = {
     //     static from<R>(observable: Observable<R> | ZenObservable.ObservableLike<R> | ArrayLike<R>): Observable<R>;
     //     static of<R>(...items: R[]): Observable<R>;
     // }
-    type t<'t>
+    type t<'t, 'error>
 
     // <R>(callback: (value: T) => R): Observable<R>;
-    @bs.send external map: (t<'t>, 't => 'r) => t<'r> = "map"
+    @bs.send external map: (t<'t, 'error>, 't => 'r) => t<'r, 'error> = "map"
 
     // (onNext: (value: T) => void, onError?: (error: any) => void, onComplete?: () => void): ZenObservable.Subscription;
     @bs.send
     external subscribe: (
-      t<'t>,
+      t<'t, 'error>,
       ~onNext: 't => unit,
-      ~onError: Js.Json.t => unit=?,
+      ~onError: 'error => unit=?,
       ~onComplete: unit => unit=?,
       unit,
-    ) => Subscription.t = "subscribe"
+    ) => Subscription.Js_.t = "subscribe"
 
     // (observer: ZenObservable.Observer<T>): ZenObservable.Subscription;
     @bs.send
-    external subscribeWithObserver: (t<'t>, Observer.t<'t>) => Subscription.t = "subscribe"
+    external subscribeWithObserver: (t<'t, 'error>, Observer.t<'t>) => Subscription.Js_.t =
+      "subscribe"
   }
 
-  include Js_
+  type t<'t, 'error> = {
+    subscribe: (
+      ~onNext: 't => unit,
+      ~onError: 'error => unit=?,
+      ~onComplete: unit => unit=?,
+      unit,
+    ) => Subscription.t,
+  }
+
+  let fromJs: Js_.t<'t, 'error> => t<'t, 'error> = t => {
+    subscribe: (~onNext, ~onError=?, ~onComplete=?, ()) =>
+      t->Js_.subscribe(~onNext, ~onError?, ~onComplete?, ())->Subscription.fromJs,
+  }
 }

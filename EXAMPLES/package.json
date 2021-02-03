@@ -19,7 +19,7 @@
     "webpack-dev-server": "3.11.0"
   },
   "dependencies": {
-    "@apollo/client": "3.2.4",
+    "@apollo/client": "3.3.7",
     "@ryyppy/rescript-promise": "0.0.2",
     "graphql": "15.3.0",
     "react": "16.13.1",

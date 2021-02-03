@@ -1,4 +1,4 @@
-module ApolloClient = ApolloClient__ApolloClient
+module ApolloClient = ApolloClient__Core_ApolloClient
 
 // export interface ApolloProviderProps<TCache> {
 //     client: ApolloClient<TCache>;

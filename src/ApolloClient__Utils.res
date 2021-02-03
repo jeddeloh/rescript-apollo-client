@@ -4,28 +4,7 @@ module Types = ApolloClient__Types
 
 @bs.new external makeError: string => Js.Exn.t = "Error"
 
-@unboxed
-type rec any = Any('a): any
-
-let ensureError: any => Js.Exn.t = %bs.raw(`
-  function (unknown) {
-    if (unknown instanceof Error) {
-      return unknown;
-    } else {
-      unknown = unknown || {};
-      const message = unknown.message;
-      const errorMessage = unknown.errorMessage;
-      const keys = Object.keys(unknown);
-      const error = new Error(message || errorMessage || "[Non-error exception with keys: " + keys.join(", ") + "]");
-
-      keys.forEach(function(key) {
-        error[key] = unknown[key];
-      });
-
-      return error;
-    }
-  }
-  `)
+let ensureError = ApolloError.ensureError
 
 external asJson: 'any => Js.Json.t = "%identity"
 

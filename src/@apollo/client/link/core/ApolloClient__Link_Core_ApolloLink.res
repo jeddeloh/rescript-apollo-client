@@ -32,8 +32,10 @@ module Js_ = {
     external split: (~test: Operation.Js_.t => bool, ~whenTrue: t, ~whenFalse: t) => t = "split"
     // static execute(link: ApolloLink, operation: GraphQLRequest): Observable<FetchResult>;
     @bs.module("@apollo/client") @bs.scope("ApolloLink")
-    external execute: (t, GraphQLRequest.t) => Observable.t<FetchResult.Js_.t<Js.Json.t>> =
-      "execute"
+    external execute: (
+      t,
+      GraphQLRequest.t,
+    ) => Observable.t<FetchResult.Js_.t<Js.Json.t>, Js.Exn.t> = "execute"
     // static concat(first: ApolloLink | RequestHandler, second: ApolloLink | RequestHandler): ApolloLink;
     @bs.module("@apollo/client") @bs.scope("ApolloLink")
     external concat: (t, t) => t = "concat"

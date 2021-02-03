@@ -1,4 +1,4 @@
-module ApolloClient = ApolloClient__ApolloClient
+module ApolloClient = ApolloClient__Core_ApolloClient
 module ApolloError = ApolloClient__Errors_ApolloError
 module ApolloQueryResult = ApolloClient__Core_Types.ApolloQueryResult
 module ErrorPolicy = ApolloClient__Core_WatchQueryOptions.ErrorPolicy

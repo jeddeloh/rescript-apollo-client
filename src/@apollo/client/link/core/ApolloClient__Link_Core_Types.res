@@ -158,11 +158,11 @@ module FetchResult = {
 module NextLink = {
   module Js_ = {
     // export declare type NextLink = (operation: Operation) => Observable<FetchResult>;
-    type t = Operation.Js_.t => Observable.t<FetchResult.Js_.t<Js.Json.t>, Js.Exn.t>
+    type t = Operation.Js_.t => Observable.Js_.t<FetchResult.Js_.t<Js.Json.t>, Js.Exn.t>
   }
 
   // These are intentionally Js_.t because we can't know what to parse
-  type t = Operation.t => Observable.t<FetchResult.Js_.t<Js.Json.t>, Js.Exn.t>
+  type t = Operation.t => Observable.Js_.t<FetchResult.Js_.t<Js.Json.t>, Js.Exn.t>
 }
 
 module RequestHandler = {

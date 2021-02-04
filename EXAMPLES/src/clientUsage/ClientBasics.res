@@ -24,6 +24,16 @@ module TodosQuery = %graphql(
   `
 )
 
+module StatsSubscription = %graphql(
+  `
+    subscription SorryItsNotASubscriptionForTodos {
+      siteStatisticsUpdated {
+        currentVisitorsOnline
+      }
+    }
+  `
+)
+
 let logTodos = _ => Apollo.client.query(~query=module(TodosQuery), ())->Promise.map(result =>
     switch result {
     | Ok({data: {todos}}) => Js.log2("query To-Dos: ", todos)
@@ -51,6 +61,17 @@ let watchQuerySubscription = observableQuery.subscribe(~onNext=result =>
 , ())
 // Unsubscribe like so:
 // watchQuerySubscription.unsubscribe();
+
+let statsSubscription = Apollo.client.subscribe(
+  ~subscription=module(StatsSubscription),
+  (),
+).subscribe(
+  ~onNext=value => Js.log2("new value:", value),
+  ~onError=error => Js.log2("subscription error:", error),
+  (),
+)
+// Unsubscribe like so:
+// statsSubscription.unsubscribe()
 
 @react.component
 let make = () =>

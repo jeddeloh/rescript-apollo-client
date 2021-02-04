@@ -4,7 +4,7 @@ module.exports = {
       "Getting Started  ": ["overview", "installation", "client-configuration"],
     },
     {
-      Fetching: ["queries", "mutations"],
+      Fetching: ["queries", "mutations", "subscriptions"],
     },
   ],
 };

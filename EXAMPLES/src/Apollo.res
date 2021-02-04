@@ -35,9 +35,7 @@ let client = {
     ~cache=Cache.InMemoryCache.make(),
     ~connectToDevTools=true,
     ~defaultOptions=DefaultOptions.make(
-      ~mutate=DefaultMutateOptions.make(~awaitRefetchQueries=true, ~errorPolicy=All, ()),
-      ~query=DefaultQueryOptions.make(~fetchPolicy=NetworkOnly, ~errorPolicy=All, ()),
-      ~watchQuery=DefaultWatchQueryOptions.make(~fetchPolicy=NetworkOnly, ~errorPolicy=All, ()),
+      ~mutate=DefaultMutateOptions.make(~awaitRefetchQueries=true, ()),
       (),
     ),
     ~link=terminatingLink,

@@ -97,6 +97,7 @@ module Observable = {
       "subscribe"
   }
 
+  // It's important that the rescript-wrapped version statisfy the Js_.t interface since they'll be used internally by Apollo
   type t<'t, 'error> = {
     subscribe: (
       ~onNext: 't => unit,
@@ -106,6 +107,7 @@ module Observable = {
     ) => Subscription.t,
   }
 
+  // This fromJs feels more like some kind of map over multiple callbacks
   let fromJs: Js_.t<'t, 'error> => t<'t, 'error> = t => {
     subscribe: (~onNext, ~onError=?, ~onComplete=?, ()) =>
       t->Js_.subscribe(~onNext, ~onError?, ~onComplete?, ())->Subscription.fromJs,

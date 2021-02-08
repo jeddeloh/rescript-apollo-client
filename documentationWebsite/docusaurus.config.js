@@ -56,7 +56,7 @@ module.exports = {
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
           editUrl:
-            "https://github.com/reasonml-community/rescript-apollo-client/edit/master/documentation",
+            "https://github.com/reasonml-community/rescript-apollo-client/edit/master/documentationWebsite",
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),

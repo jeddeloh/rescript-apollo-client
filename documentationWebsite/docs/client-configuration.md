@@ -15,7 +15,7 @@ let client = {
     ~cache=Cache.InMemoryCache.make(),
     // I would turn this off in production
     ~connectToDevTools=true,
-    ~uri="https://graphql.org/swapi-graphql",
+    ~uri=_ => "https://graphql.org/swapi-graphql",
     (),
   )
 }

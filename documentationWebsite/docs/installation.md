@@ -42,3 +42,16 @@ Add the following under `bs-dependencies` and `graphql`, in your `bsconfig.json`
 - `"apolloMode"` automaticaly sprinkles `__typename` throughout our operation and fragment definitions
 - `"templateTag*"` is how we tell `graphql-ppx` to wrap every operation with `gql`
 - `"extend*"` allows `rescript-apollo-client` to automatically decorate the generated modules with Apollo-specific things like the correct hook for that operation!
+
+If you have configured ReScript compiler to output ES6 modules you need to add one more piece of configuration
+
+```diff
+{
+  "graphql": {
++   "templateTagIsFunction": true,
+  ...
+  }
+}
+
+This is probably temporary. See [this graphql-ppx issue](https://github.com/reasonml-community/rescript-apollo-client/issues/70)
+```

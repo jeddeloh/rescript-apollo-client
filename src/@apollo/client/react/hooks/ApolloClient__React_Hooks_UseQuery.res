@@ -88,14 +88,10 @@ let useQuery:
       ),
     )
 
-    Utils.useGuaranteedMemo1(
-      () =>
-        jsQueryResult->QueryResult.fromJs(
-          ~safeParse,
-          ~serialize=Operation.serialize,
-          ~serializeVariables=Operation.serializeVariables,
-        ),
-      jsQueryResult,
+    jsQueryResult->QueryResult.useFromJs(
+      ~safeParse,
+      ~serialize=Operation.serialize,
+      ~serializeVariables=Operation.serializeVariables,
     )
   }
 

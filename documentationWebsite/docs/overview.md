@@ -67,7 +67,7 @@ This library leverages records heavily which allows for very similar syntax to w
 
 ### Use a T-First promise library
 
-Type inference for records is very handy, so we highly recommend using a T-First promise library. A great choice is [rescript-promise](https://github.com/ryyppy/rescript-promise#common-mistakes) that will soon be part of core. This is what will be assumed in all examples.
+Type inference for records is very handy, so we highly recommend using a T-First promise library. A great barebones choice is [rescript-promise](https://github.com/ryyppy/rescript-promise#common-mistakes) that will soon be part of core. This is what will be assumed in all examples. [bs-future](https://github.com/RationalJS/future), [prometo](https://github.com/yawaramin/prometo), and [reason-promise](https://github.com/aantron/promise) are all good alternatives.
 
 ## Module Organization
 

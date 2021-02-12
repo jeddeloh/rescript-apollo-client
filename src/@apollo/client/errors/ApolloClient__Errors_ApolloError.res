@@ -101,7 +101,7 @@ module Js_ = {
   // See: https://github.com/apollographql/apollo-client/pull/6894
   let ensureApolloError: t => t = error =>
     %bs.raw(`
-          function (error, makeApolloError) {
+          function (error, makeApolloError, ensureError) {
             var error = error || {};
             if (Array.isArray(error.graphQLErrors)) {
               return error;

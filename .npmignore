@@ -10,10 +10,12 @@ CONTRIBUTING.md
 CODE_OF_CONDUCT.md
 documentation/
 documentationWebsite/
+docs/
 EXAMPLES/
 lib/
 node_modules/
 package-lock.json
+README.md
 TODO
 yarn.lock
 yarn-error.log

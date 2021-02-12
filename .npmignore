@@ -15,6 +15,7 @@ EXAMPLES/
 lib/
 node_modules/
 package-lock.json
+README.md
 TODO
 yarn.lock
 yarn-error.log

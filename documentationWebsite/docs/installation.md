@@ -43,7 +43,7 @@ Add the following under `bs-dependencies` and `graphql`, in your `bsconfig.json`
 - `"templateTag*"` is how we tell `graphql-ppx` to wrap every operation with `gql`
 - `"extend*"` allows `rescript-apollo-client` to automatically decorate the generated modules with Apollo-specific things like the correct hook for that operation!
 
-If you have configured ReScript compiler to output ES6 modules you need to add one more piece of configuration
+If you use a bundler that does not support `require` statements (eg: `esbuild`), you will need to add one more piece of configuration
 
 ```diff
 {
@@ -53,5 +53,6 @@ If you have configured ReScript compiler to output ES6 modules you need to add o
   }
 }
 
-This is probably temporary. See [this graphql-ppx issue](https://github.com/reasonml-community/rescript-apollo-client/issues/70)
+This is probably temporary, until ReScript supports template tags or has some way to output them.
+See [this graphql-ppx issue](https://github.com/reasonml-community/rescript-apollo-client/issues/70)
 ```

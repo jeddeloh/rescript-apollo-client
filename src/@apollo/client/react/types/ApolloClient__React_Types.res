@@ -197,6 +197,7 @@ module QueryLazyOptions = {
 
 module QueryResult = {
   type useMethodFunctionsInThisModuleInstead
+  type unsubscribe = unit => unit
 
   module Js_ = {
     type t_fetchMoreOptions_updateQueryOptions<'jsData, 'jsVariables> = {
@@ -280,7 +281,7 @@ module QueryResult = {
     external subscribeToMore: (
       t<'jsData, 'jsVariables>,
       SubscribeToMoreOptions.Js_.t<'jsData, 'subscriptionVariables, 'jsSubscriptionData>,
-    ) => unit = "subscribeToMore"
+    ) => unsubscribe = "subscribeToMore"
   }
 
   type t_updateQueryOptions<'jsVariables> = Js_.t_updateQueryOptions<'jsVariables>
@@ -339,7 +340,7 @@ module QueryResult = {
       ~onError: t_subscribeToMoreError => unit=?,
       ~context: Js.Json.t=?,
       'subscriptionVariables,
-    ) => unit,
+    ) => unsubscribe,
     updateQuery: ((Types.parseResult<'data>, t_updateQueryOptions<'jsVariables>) => 'data) => unit,
   }
 

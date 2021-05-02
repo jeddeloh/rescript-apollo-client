@@ -31,6 +31,6 @@
     "rescript-apollo-client",
     "@reasonml-community/graphql-ppx",
     "@ryyppy/rescript-promise",
-    "reason-react"
+    "@rescript/react"
   ]
 }

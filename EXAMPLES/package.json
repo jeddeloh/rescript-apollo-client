@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@reasonml-community/graphql-ppx": "1.0.0",
-    "bs-platform": "8.2.0",
+    "bs-platform": "9.0.0",
     "graphql-client-example-server": "1.2.0",
     "html-webpack-plugin": "4.3.0",
     "webpack": "4.43.0",
@@ -20,13 +20,13 @@
   },
   "dependencies": {
     "@apollo/client": "3.3.7",
+    "@rescript/react": "0.10.1",
     "@ryyppy/rescript-promise": "0.0.2",
     "graphql": "15.3.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "reason-promise": "1.1.1",
-    "reason-react": "0.9.1",
-    "rescript-apollo-client": "1.1.2",
+    "rescript-apollo-client": "2.0.1",
     "subscriptions-transport-ws": "0.9.16"
   }
 }

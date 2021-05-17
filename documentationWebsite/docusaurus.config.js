@@ -4,11 +4,11 @@ const baseUrl =
 module.exports = {
   title: "ReScript Apollo Client",
   tagline: "Rescript bindings for the Apollo Client ecosystem",
-  url: "https://reasonml-community.github.io/rescript-apollo-client",
+  url: "https://jeddeloh.github.io/rescript-apollo-client",
   baseUrl,
   onBrokenLinks: "throw",
   favicon: "img/favicon.ico",
-  organizationName: "reasonml-community", // Usually your GitHub org/user name.
+  organizationName: "jeddeloh", // Usually your GitHub org/user name.
   projectName: "rescript-apollo-client", // Usually your repo name.
   themeConfig: {
     colorMode: {
@@ -31,14 +31,13 @@ module.exports = {
         },
         {
           label: "Changelog",
-          to:
-            "https://github.com/reasonml-community/rescript-apollo-client/releases/",
+          to: "https://github.com/jeddeloh/rescript-apollo-client/releases/",
           position: "left",
         },
         { label: "Contributing", to: "docs/contributing", position: "right" },
         {
           label: "GitHub",
-          href: "https://github.com/reasonml-community/rescript-apollo-client",
+          href: "https://github.com/jeddeloh/rescript-apollo-client",
           position: "right",
         },
       ],
@@ -56,7 +55,7 @@ module.exports = {
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
           editUrl:
-            "https://github.com/reasonml-community/rescript-apollo-client/blob/github-pages/documentationWebsite",
+            "https://github.com/jeddeloh/rescript-apollo-client/edit/master/documentationWebsite",
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),

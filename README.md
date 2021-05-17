@@ -13,8 +13,8 @@
 </p>
 
 <p align="center">
-  <a href="https://reasonml-community.github.io/rescript-apollo-client/docs/">Documentation</a> •
-  <a href="https://reasonml-community.github.io/rescript-apollo-client/docs/installation">Installation</a> •
+  <a href="https://jeddeloh.github.io/rescript-apollo-client/docs/">Documentation</a> •
+  <a href="https://jeddeloh.github.io/rescript-apollo-client/docs/installation">Installation</a> •
   <a href="EXAMPLES/src">Examples</a> •
-  <a href="https://reasonml-community.github.io/rescript-apollo-client/docs/contributing">Contributing</a>
+  <a href="https://jeddeloh.github.io/rescript-apollo-client/docs/contributing">Contributing</a>
 </p>

@@ -20,7 +20,8 @@ module StorageType = {
 
 module FieldFunctionOptions = {
   type unimplemented
-
+  type reference = {__typename: string, id: string}
+  
   module Js_ = {
     // export interface FieldFunctionOptions<TArgs = Record<string, any>, TVars = Record<string, any>> {
     //     args: TArgs | null;
@@ -55,7 +56,7 @@ module FieldFunctionOptions = {
       "canRead"
     @bs.send external readField: t => ReadFieldFunction.Js_.t = "readField"
     @bs.send
-    external toReference: t => ToReferenceFunction.t = "toReference"
+    external toReference: (t, reference) => unit = "toReference"
   }
 
   type t = {
@@ -65,7 +66,7 @@ module FieldFunctionOptions = {
     field: Js.nullable<FieldNode.t>,
     variables: option<Js.Dict.t<Js.Json.t>>,
     isReference: bool,
-    toReference: unimplemented,
+    toReference: reference => unit,
     storage: Js.nullable<StorageType.t>,
     cache: ApolloCache.t<Js.Json.t>,
     readField: unimplemented,
@@ -80,7 +81,9 @@ module FieldFunctionOptions = {
     field: js.field,
     variables: js.variables,
     isReference: js.isReference,
-    toReference: js.toReference,
+    toReference: (reference: reference) => {
+      js->Js_.toReference(reference)
+    },
     storage: js.storage,
     cache: js.cache,
     readField: js.readField,

@@ -66,7 +66,7 @@ module FieldFunctionOptions = {
     field: Js.nullable<FieldNode.t>,
     variables: option<Js.Dict.t<Js.Json.t>>,
     isReference: bool,
-    toReference: reference => unit,
+    toReference: (~typename: string, ~id: string) => unit,
     storage: Js.nullable<StorageType.t>,
     cache: ApolloCache.t<Js.Json.t>,
     readField: unimplemented,
@@ -81,8 +81,8 @@ module FieldFunctionOptions = {
     field: js.field,
     variables: js.variables,
     isReference: js.isReference,
-    toReference: (reference: reference) => {
-      js->Js_.toReference(reference)
+    toReference: (~id, ~typename) => {
+      js->Js_.toReference({id: id, __typename: typename})
     },
     storage: js.storage,
     cache: js.cache,

@@ -56,7 +56,7 @@ module FieldFunctionOptions = {
       "canRead"
     @bs.send external readField: t => ReadFieldFunction.Js_.t = "readField"
     @bs.send
-    external toReference: (t, reference) => unit = "toReference"
+    external toReference: (t, reference) => string = "toReference"
   }
 
   type t = {
@@ -66,7 +66,7 @@ module FieldFunctionOptions = {
     field: Js.nullable<FieldNode.t>,
     variables: option<Js.Dict.t<Js.Json.t>>,
     isReference: bool,
-    toReference: (~typename: string, ~id: string) => unit,
+    toReference: (~typename: string, ~id: string) => string,
     storage: Js.nullable<StorageType.t>,
     cache: ApolloCache.t<Js.Json.t>,
     readField: unimplemented,

@@ -65,7 +65,9 @@ module ErrorResponse = {
       operation: Operation.Js_.t,
     }
 
-    @bs.send external forward: t => NextLink.Js_.t = "forward"
+    @send
+    external forward: (t, Operation.t) => Observable.Js_.t<FetchResult.Js_.t<Js.Json.t>, Js.Exn.t> =
+      "forward"
   }
 
   type t_networkError =
@@ -92,7 +94,7 @@ module ErrorResponse = {
     ),
     response: js.response,
     operation: js.operation->Operation.fromJs,
-    forward: operation => js->Js_.forward(operation->Operation.toJs),
+    forward: operation => js->Js_.forward(operation),
   }
 }
 

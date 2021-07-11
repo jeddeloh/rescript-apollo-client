@@ -111,7 +111,7 @@ module ErrorHandler = {
 
 module Js_ = {
   // export declare function onError(errorHandler: ErrorHandler): ApolloLink;
-  @bs.module("@apollo/client/link/error")
+  @module("@apollo/client/link/error")
   external onError: (
     ErrorResponse.Js_.t => option<Observable.Js_.t<FetchResult.Js_.t<Js.Json.t>, Js.Exn.t>>
   ) => ApolloLink.Js_.t = "onError"

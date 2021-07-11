@@ -15,7 +15,7 @@ module Source = ApolloClient__Graphql_Language_Source.Source
 // }
 
 module TokenKindEnum = {
-  @bs.deriving(jsConverter)
+  @deriving(jsConverter)
   type t = [
     | #SOF
     | #EOF
@@ -46,7 +46,7 @@ module Token = {
   type rec t = {
     kind: TokenKindEnum.t,
     start: int,
-    @bs.as("end")
+    @as("end")
     end_: int,
     line: int,
     column: int,
@@ -59,7 +59,7 @@ module Token = {
 module Location = {
   type t = {
     start: int,
-    @bs.as("end")
+    @as("end")
     end_: int,
     startToken: Token.t,
     endToken: Token.t,
@@ -156,7 +156,7 @@ module VariableDefinitionNode = {
     kind: string,
     loc: option<Location.t>,
     variable: VariableNode.t,
-    // [@bs.as "type"]
+    // [@as "type"]
     // type_: TypeNode.t,
     defaultValue: option<ValueNode.t>,
     directives: option<array<DirectiveNode.t>>,

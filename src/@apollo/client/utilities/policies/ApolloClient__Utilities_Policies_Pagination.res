@@ -16,17 +16,17 @@ module KeyArgs = ApolloClient__Cache_InMemory_Policies_FieldPolicy.FieldPolicy_K
 
 module Js_ = {
   // export declare function concatPagination<T = Reference>(keyArgs?: KeyArgs): FieldPolicy<T[]>;
-  @bs.module("@apollo/client/utilities") @bs.val
+  @module("@apollo/client/utilities") @val
   external concatPagination: (. option<KeyArgs.Js_.t>) => FieldPolicy.Js_.t<'existing> =
     "concatPagination"
 
   // export declare function offsetLimitPagination<T = Reference>(keyArgs?: KeyArgs): FieldPolicy<T[]>;
-  @bs.module("@apollo/client/utilities") @bs.val
+  @module("@apollo/client/utilities") @val
   external offsetLimitPagination: (. option<KeyArgs.Js_.t>) => FieldPolicy.Js_.t<'existing> =
     "offsetLimitPagination"
 
   // export declare function relayStylePagination<TNode = Reference>(keyArgs?: KeyArgs): FieldPolicy<TInternalRelay<TNode>>;
-  @bs.module("@apollo/client/utilities") @bs.val
+  @module("@apollo/client/utilities") @val
   external relayStylePagination: (. option<KeyArgs.Js_.t>) => FieldPolicy.Js_.t<'existing> =
     "relayStylePagination"
 }

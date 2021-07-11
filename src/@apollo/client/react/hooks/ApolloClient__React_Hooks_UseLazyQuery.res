@@ -14,7 +14,7 @@ module type OperationNoRequiredVars = Types.OperationNoRequiredVars
 
 module Js_ = {
   // export declare function useLazyQuery<TData = any, TVariables = OperationVariables>(query: DocumentNode, options?: LazyQueryHookOptions<TData, TVariables>): QueryTuple<TData, TVariables>;
-  @bs.module("@apollo/client")
+  @module("@apollo/client")
   external useLazyQuery: (
     . Graphql.documentNode,
     LazyQueryHookOptions.Js_.t<'jsData, 'jsVariables>,

@@ -36,7 +36,7 @@ module ApolloCache = {
     type reference
 
     // readFragment<FragmentType, TVariables = any>(options: DataProxy.Fragment<TVariables>, optimistic?: boolean): FragmentType | null;
-    @bs.send
+    @send
     external readFragment: (
       t<'tSerialized>,
       ~options: DataProxy.Fragment.Js_.t,
@@ -45,7 +45,7 @@ module ApolloCache = {
     ) => Js.nullable<'jsData> = "readFragment"
 
     // readQuery<QueryType, TVariables = any>(options: DataProxy.Query<TVariables>, optimistic?: boolean): QueryType | null;
-    @bs.send
+    @send
     external readQuery: (
       t<'tSerialized>,
       ~options: DataProxy.Query.Js_.t<'jsVariables>,
@@ -53,14 +53,14 @@ module ApolloCache = {
     ) => Js.nullable<'jsData> = "readQuery"
 
     // writeFragment<TData = any, TVariables = any>(options: Cache.WriteFragmentOptions<TData, TVariables>): Reference | undefined;
-    @bs.send
+    @send
     external writeFragment: (
       t<'tSerialized>,
       ~options: DataProxy.WriteFragmentOptions.Js_.t<'jsData, 'jsVariables>,
     ) => option<reference> = "writeFragment"
 
     // writeQuery<TData = any, TVariables = any>(options: Cache.WriteQueryOptions<TData, TVariables>): Reference | undefined;
-    @bs.send
+    @send
     external writeQuery: (
       t<'tSerialized>,
       ~options: DataProxy.WriteQueryOptions.Js_.t<'jsData, 'jsVariables>,
@@ -70,7 +70,7 @@ module ApolloCache = {
   type reference = Js_.reference
 
   type t<'tSerialized> = {
-    @bs.as("rescript_readFragment")
+    @as("rescript_readFragment")
     readFragment: 'data. (
       ~fragment: module(Fragment with type t = 'data),
       ~id: string,
@@ -78,7 +78,7 @@ module ApolloCache = {
       ~fragmentName: string=?,
       unit,
     ) => option<Types.parseResult<'data>>,
-    @bs.as("rescript_readQuery")
+    @as("rescript_readQuery")
     readQuery: 'data 'variables 'jsVariables. (
       ~query: module(Operation with
         type t = 'data
@@ -90,7 +90,7 @@ module ApolloCache = {
       ~optimistic: bool=?,
       'variables,
     ) => option<Types.parseResult<'data>>,
-    @bs.as("rescript_writeFragment")
+    @as("rescript_writeFragment")
     writeFragment: 'data. (
       ~fragment: module(Fragment with type t = 'data),
       ~data: 'data,
@@ -99,7 +99,7 @@ module ApolloCache = {
       ~fragmentName: string=?,
       unit,
     ) => option<reference>,
-    @bs.as("rescript_writeQuery")
+    @as("rescript_writeQuery")
     writeQuery: 'data 'variables 'jsVariables. (
       ~query: module(Operation with
         type t = 'data
@@ -115,7 +115,7 @@ module ApolloCache = {
   }
 
   let preserveJsPropsAndContext: (Js_.t<'a>, t<'a>) => t<'a> = (js, t) =>
-    %bs.raw(`
+    %raw(`
           function (js, t) {
             return Object.assign(js, t)
           }

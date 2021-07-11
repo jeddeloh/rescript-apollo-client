@@ -5,6 +5,6 @@ module ApolloClient = ApolloClient__Core_ApolloClient
 //     children: React.ReactNode | React.ReactNode[] | null;
 // }
 // export declare const ApolloProvider: React.FC<ApolloProviderProps<any>>;
-@bs.module("@apollo/client") @react.component
+@module("@apollo/client") @react.component
 external make: (~client: ApolloClient.t, ~children: React.element) => React.element =
   "ApolloProvider"

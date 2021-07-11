@@ -45,9 +45,9 @@ module Operation = {
       extensions: Js.Json.t,
     }
 
-    @bs.send external getContext: t => Js.Json.t = "getContext"
+    @send external getContext: t => Js.Json.t = "getContext"
 
-    @bs.send external setContext: (t, Js.Json.t) => Js.Json.t = "setContext"
+    @send external setContext: (t, Js.Json.t) => Js.Json.t = "setContext"
   }
 
   type t = {
@@ -55,13 +55,13 @@ module Operation = {
     variables: Js.Json.t,
     operationName: string,
     extensions: Js.Json.t,
-    @bs.as("rescript_setContext")
+    @as("rescript_setContext")
     setContext: Js.Json.t => Js.Json.t,
-    @bs.as("rescript_getContext")
+    @as("rescript_getContext")
     getContext: unit => Js.Json.t,
   }
 
-  let preserveJsPropsAndContext: (Js_.t, t) => t = %bs.raw(`
+  let preserveJsPropsAndContext: (Js_.t, t) => t = %raw(`
       function (js, t) {
         return Object.assign(js, t)
       }

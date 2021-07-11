@@ -302,33 +302,33 @@ module Js_ = {
   type t
 
   // clearStore(): Promise<any[]>;
-  @bs.send
+  @send
   external clearStore: t => Js.Promise.t<array<Js.Json.t>> = "clearStore"
 
   // mutate<T = any, TVariables = OperationVariables>(options: MutationOptions<T, TVariables>): Promise<FetchResult<T>>;
-  @bs.send
+  @send
   external mutate: (
     t,
     ~options: MutationOptions.Js_.t<'jsData, 'jsVariables>,
   ) => Js.Promise.t<FetchResult.Js_.t<'jsData>> = "mutate"
 
   // onClearStore(cb: () => Promise<any>): () => void;
-  @bs.send
+  @send
   external onClearStore: (t, ~cb: unit => Js.Promise.t<unit>, unit) => unit = "onClearStore"
 
   // onResetStore(cb: () => Promise<any>): () => void;
-  @bs.send
+  @send
   external onResetStore: (t, ~cb: unit => Js.Promise.t<unit>, unit) => unit = "onResetStore"
 
   // query<T = any, TVariables = OperationVariables>(options: QueryOptions<TVariables>): Promise<ApolloQueryResult<T>>;
-  @bs.send
+  @send
   external query: (
     t,
     ~options: QueryOptions.Js_.t<'jsVariables>,
   ) => Js.Promise.t<ApolloQueryResult.Js_.t<'jsData>> = "query"
 
   // readFragment<T = any, TVariables = OperationVariables>(options: DataProxy.Fragment<TVariables>, optimistic?: boolean): T | null;
-  @bs.send
+  @send
   external readFragment: (
     t,
     ~options: DataProxy.Fragment.Js_.t,
@@ -337,7 +337,7 @@ module Js_ = {
   ) => Js.nullable<'jsData> = "readFragment"
 
   // readQuery<T = any, TVariables = OperationVariables>(options: DataProxy.Query<TVariables>, optimistic?: boolean): T | null;
-  @bs.send
+  @send
   external readQuery: (
     t,
     ~options: DataProxy.Query.Js_.t<'jsVariables>,
@@ -345,54 +345,54 @@ module Js_ = {
   ) => Js.nullable<'jsData> = "readQuery"
 
   // resetStore(): Promise<ApolloQueryResult<any>[] | null>;
-  @bs.send
+  @send
   external resetStore: t => Js.Promise.t<Js.nullable<array<ApolloQueryResult.Js_.t<Js.Json.t>>>> =
     "resetStore"
 
   // restore(serializedState: TCacheShape): ApolloCache<TCacheShape>;
-  @bs.send
+  @send
   external restore: (t, Js.Json.t) => ApolloCache.Js_.t<Js.Json.t> = "restore"
 
   // setLink(newLink: ApolloLink): void;
-  @bs.send external setLink: (t, ApolloLink.Js_.t) => unit = "setLink"
+  @send external setLink: (t, ApolloLink.Js_.t) => unit = "setLink"
 
   // subscribe<T = any, TVariables = OperationVariables>(options: SubscriptionOptions<TVariables>): Observable<FetchResult<T>>;
 
-  @bs.send
+  @send
   external subscribe: (
     t,
     ~options: SubscriptionOptions.Js_.t<'jsVariables>,
   ) => Observable.Js_.t<FetchResult.Js_.t<'jsData>, 'error> = "subscribe"
 
   // <T = any, TVariables = OperationVariables>(options: WatchQueryOptions<TVariables>): ObservableQuery<T, TVariables>;
-  @bs.send
+  @send
   external watchQuery: (
     t,
     ~options: WatchQueryOptions.Js_.t<'jsVariables>,
   ) => ObservableQuery.Js_.t<'jsData> = "watchQuery"
 
   // writeFragment<TData = any, TVariables = OperationVariables>(options: DataProxy.WriteFragmentOptions<TData, TVariables>): void;
-  @bs.send
+  @send
   external writeFragment: (
     t,
     ~options: DataProxy.WriteFragmentOptions.Js_.t<'jsData, 'jsVariables>,
   ) => unit = "writeFragment"
 
   // writeQuery<TData = any, TVariables = OperationVariables>(options: DataProxy.WriteQueryOptions<TData, TVariables>): void;
-  @bs.send
+  @send
   external writeQuery: (
     t,
     ~options: DataProxy.WriteQueryOptions.Js_.t<'jsData, 'jsVariables>,
   ) => unit = "writeQuery"
 
-  @bs.module("@apollo/client") @bs.new
+  @module("@apollo/client") @new
   external make: ApolloClientOptions.Js_.t => t = "ApolloClient"
 }
 
 type t = {
-  @bs.as("rescript_clearStore")
+  @as("rescript_clearStore")
   clearStore: unit => Js.Promise.t<Belt.Result.t<array<Js.Json.t>, Js.Exn.t>>,
-  @bs.as("rescript_mutate")
+  @as("rescript_mutate")
   mutate: 'data 'variables 'jsVariables. (
     ~mutation: module(Operation with
       type t = 'data
@@ -410,11 +410,11 @@ type t = {
     ~update: MutationUpdaterFn.t<'data>=?,
     'variables,
   ) => Js.Promise.t<Belt.Result.t<FetchResult.t__ok<'data>, ApolloError.t>>,
-  @bs.as("rescript_onClearStore")
+  @as("rescript_onClearStore")
   onClearStore: (~cb: unit => Js.Promise.t<unit>, unit) => unit,
-  @bs.as("rescript_onResetStore")
+  @as("rescript_onResetStore")
   onResetStore: (~cb: unit => Js.Promise.t<unit>, unit) => unit,
-  @bs.as("rescript_query")
+  @as("rescript_query")
   query: 'data 'variables 'jsVariables. (
     ~query: module(Operation with
       type t = 'data
@@ -427,7 +427,7 @@ type t = {
     ~mapJsVariables: 'jsVariables => 'jsVariables=?,
     'variables,
   ) => Js.Promise.t<Belt.Result.t<ApolloQueryResult.t__ok<'data>, ApolloError.t>>,
-  @bs.as("rescript_readFragment")
+  @as("rescript_readFragment")
   readFragment: 'data. (
     ~fragment: module(Fragment with type t = 'data),
     ~id: string,
@@ -435,7 +435,7 @@ type t = {
     ~fragmentName: string=?,
     unit,
   ) => option<Types.parseResult<'data>>,
-  @bs.as("rescript_readQuery")
+  @as("rescript_readQuery")
   readQuery: 'data 'variables 'jsVariables. (
     ~query: module(Operation with
       type t = 'data
@@ -447,15 +447,15 @@ type t = {
     ~optimistic: bool=?,
     'variables,
   ) => option<Types.parseResult<'data>>,
-  @bs.as("rescript_resetStore")
+  @as("rescript_resetStore")
   resetStore: unit => Js.Promise.t<
     Belt.Result.t<option<array<ApolloQueryResult.Js_.t<Js.Json.t>>>, Js.Exn.t>,
   >,
-  @bs.as("rescript_restore")
+  @as("rescript_restore")
   restore: (~serializedState: Js.Json.t) => ApolloCache.t<Js.Json.t>,
-  @bs.as("rescript_setLink")
+  @as("rescript_setLink")
   setLink: ApolloLink.t => unit,
-  @bs.as("rescript_subscribe")
+  @as("rescript_subscribe")
   subscribe: 'data 'variables 'jsVariables. (
     ~subscription: module(Operation with
       type t = 'data
@@ -468,7 +468,7 @@ type t = {
     ~mapJsVariables: 'jsVariables => 'jsVariables=?,
     'variables,
   ) => Observable.t<FetchResult.t__ok<'data>, ApolloError.t>,
-  @bs.as("rescript_watchQuery")
+  @as("rescript_watchQuery")
   watchQuery: 'data 'variables 'jsVariables. (
     ~query: module(Operation with
       type t = 'data
@@ -481,7 +481,7 @@ type t = {
     ~mapJsVariables: 'jsVariables => 'jsVariables=?,
     'variables,
   ) => ObservableQuery.t<'data>,
-  @bs.as("rescript_writeFragment")
+  @as("rescript_writeFragment")
   writeFragment: 'data 'jsVariables. (
     ~fragment: module(Fragment with type t = 'data),
     ~data: 'data,
@@ -490,7 +490,7 @@ type t = {
     ~fragmentName: string=?,
     unit,
   ) => unit,
-  @bs.as("rescript_writeQuery")
+  @as("rescript_writeQuery")
   writeQuery: 'data 'variables 'jsVariables. (
     ~query: module(Operation with
       type t = 'data
@@ -505,7 +505,7 @@ type t = {
   ) => unit,
 }
 
-let preserveJsPropsAndContext: (Js_.t, t) => t = %bs.raw(`
+let preserveJsPropsAndContext: (Js_.t, t) => t = %raw(`
     function (js, t) {
       return Object.assign(js, t)
     }

@@ -12,18 +12,18 @@ module InMemoryCacheConfig = {
     //     typePolicies?: TypePolicies;
     // }
     // NOTE: Using deriving abstract here because passing properties that are undefined has effects
-    @bs.deriving(abstract)
+    @deriving(abstract)
     type t = {
-      @bs.optional
+      @optional
       resultCaching: bool,
-      @bs.optional
+      @optional
       possibleTypes: PossibleTypesMap.Js_.t,
-      @bs.optional
+      @optional
       typePolicies: TypePolicies.Js_.t,
       // ...extends ApolloReducerConfig
-      @bs.optional
+      @optional
       dataIdFromObject: KeyFieldsFunction.Js_.t,
-      @bs.optional
+      @optional
       addTypename: bool,
     }
   }
@@ -67,7 +67,7 @@ module Js_ = {
   // }
   type t = ApolloCache.Js_.t<Js.Json.t>
 
-  @bs.module("@apollo/client") @bs.new
+  @module("@apollo/client") @new
   external make: InMemoryCacheConfig.Js_.t => t = "InMemoryCache"
 }
 

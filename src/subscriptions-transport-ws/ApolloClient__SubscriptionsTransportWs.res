@@ -89,7 +89,7 @@ module ClientOptions = {
       reconnect: option<bool>,
       reconnectionAttempts: option<int>,
       connectionCallback: option<(~error: array<Js.Exn.t>, ~result: option<Js.Json.t>) => unit>,
-      @bs.as("lazy")
+      @as("lazy")
       lazy_: option<bool>,
       inactivityTimeout: option<int>,
     }
@@ -101,7 +101,7 @@ module ClientOptions = {
     reconnect: option<bool>,
     reconnectionAttempts: option<int>,
     connectionCallback: option<(~error: array<Js.Exn.t>, ~result: option<Js.Json.t>) => unit>,
-    @bs.as("lazy")
+    @as("lazy")
     lazy_: option<bool>,
     inactivityTimeout: option<int>,
   }
@@ -160,7 +160,7 @@ module SubscriptionClient = {
     // }
     type t
 
-    @bs.new @bs.module("subscriptions-transport-ws")
+    @new @module("subscriptions-transport-ws")
     external make: (
       ~url: string,
       ~options: ClientOptions.Js_.t=?,
@@ -169,16 +169,16 @@ module SubscriptionClient = {
       unit,
     ) => t = "SubscriptionClient"
 
-    @bs.send
+    @send
     external close: (t, ~isForced: bool=?, ~closedByUser: bool=?, unit) => unit = "close"
   }
 
   type t = {
-    @bs.as("rescript_close")
+    @as("rescript_close")
     close: (~isForced: bool=?, ~closedByUser: bool=?, unit) => unit,
   }
 
-  let preserveJsPropsAndContext: (Js_.t, t) => t = %bs.raw(`
+  let preserveJsPropsAndContext: (Js_.t, t) => t = %raw(`
       function (js, t) {
         return Object.assign(js, t)
       }

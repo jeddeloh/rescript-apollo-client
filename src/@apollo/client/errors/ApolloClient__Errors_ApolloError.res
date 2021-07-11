@@ -7,7 +7,7 @@ module Types = ApolloClient__Types
 @unboxed
 type rec any = Any('a): any
 
-let ensureError: any => Js.Exn.t = %bs.raw(`
+let ensureError: any => Js.Exn.t = %raw(`
   function (unknown) {
     if (unknown instanceof Error) {
       return unknown;
@@ -94,13 +94,13 @@ module Js_ = {
   //     errorMessage?: string;
   //     extraInfo?: any;
   // });
-  @bs.module("@apollo/client") @bs.new
+  @module("@apollo/client") @new
   external make: make_args => t = "ApolloError"
 
   // This is not an exhaustive check. It is intended to address the most common subscription error issues only
   // See: https://github.com/apollographql/apollo-client/pull/6894
   let ensureApolloError: t => t = error =>
-    %bs.raw(`
+    %raw(`
           function (error, makeApolloError, ensureError) {
             var error = error || {};
             if (Array.isArray(error.graphQLErrors)) {

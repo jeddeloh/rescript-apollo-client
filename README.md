@@ -1,5 +1,3 @@
-> ⚠️ **NOTICE:** This package recently changed and is now published as `rescript-apollo-client`!
-
 <p align="center">
     <img src="assets/logo-mashup.svg" alt="Logo">
   	<br><br>

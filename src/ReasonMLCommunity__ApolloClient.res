@@ -33,6 +33,7 @@ module Link = {
   module ContextLink = ApolloClient__Link_Context.ContextLink
   module ErrorLink = ApolloClient__Link_Error.ErrorLink
   module HttpLink = ApolloClient__Link_Http_HttpLink
+  module RetryLink = ApolloClient__Link_Retry_RetryLink
   module WebSocketLink = ApolloClient__Link_Ws.WebSocketLink
   type t = ApolloClient__Link_Core_ApolloLink.t
   let concat = ApolloClient__Link_Core_ApolloLink.Static.concat

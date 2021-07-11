@@ -11,7 +11,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/reasonml-community/rescript-apollo-client"
+    "url": "https://github.com/jeddeloh/rescript-apollo-client"
   },
   "scripts": {
     "build": "bsb -make-world",

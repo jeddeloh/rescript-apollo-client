@@ -34,6 +34,7 @@ module QueryHookOptions = {
       context: option<Js.Json.t>, // ACTUAL: Record<string, any>
       errorPolicy: option<string>,
       fetchPolicy: option<string>,
+      nextFetchPolicy: option<string>,
       notifyOnNetworkStatusChange: option<bool>,
       partialRefetch: option<bool>,
       pollInterval: option<int>,
@@ -57,6 +58,7 @@ module QueryHookOptions = {
     context: option<Js.Json.t>,
     errorPolicy: option<ErrorPolicy.t>,
     fetchPolicy: option<WatchQueryFetchPolicy.t>,
+    nextFetchPolicy: option<WatchQueryFetchPolicy.t>,
     notifyOnNetworkStatusChange: option<bool>,
     partialRefetch: option<bool>,
     pollInterval: option<int>,
@@ -83,6 +85,7 @@ module QueryHookOptions = {
       onError(ApolloError.fromJs(jsApolloError))
     ),
     fetchPolicy: t.fetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
+    nextFetchPolicy: t.nextFetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
     notifyOnNetworkStatusChange: t.notifyOnNetworkStatusChange,
     query: t.query,
     pollInterval: t.pollInterval,
@@ -119,6 +122,8 @@ module LazyQueryHookOptions = {
       @bs.optional
       fetchPolicy: string,
       @bs.optional
+      nextFetchPolicy: string,
+      @bs.optional
       notifyOnNetworkStatusChange: bool,
       @bs.optional
       partialRefetch: bool,
@@ -145,6 +150,7 @@ module LazyQueryHookOptions = {
     context: option<Js.Json.t>,
     errorPolicy: option<ErrorPolicy.t>,
     fetchPolicy: option<WatchQueryFetchPolicy.t>,
+    nextFetchPolicy: option<WatchQueryFetchPolicy.t>,
     notifyOnNetworkStatusChange: option<bool>,
     partialRefetch: option<bool>,
     pollInterval: option<int>,

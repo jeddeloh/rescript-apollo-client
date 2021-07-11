@@ -101,39 +101,39 @@ module LazyQueryHookOptions = {
     // export interface LazyQueryHookOptions<TData = any, TVariables = OperationVariables> extends Omit<QueryFunctionOptions<TData, TVariables>, 'skip'> {
     //     query?: DocumentNode;
     // }
-    @bs.deriving(abstract)
+    @deriving(abstract)
     type t<'jsData, 'jsVariables> = {
-      @bs.optional
+      @optional
       query: Graphql.documentNode,
       // ...extends QueryFunctionOptions
-      @bs.optional
+      @optional
       displayName: string,
-      @bs.optional
+      @optional
       onCompleted: 'jsData => unit,
-      @bs.optional
+      @optional
       onError: (. ApolloError.Js_.t) => unit,
       // ..extends BaseQueryOptions
-      @bs.optional
+      @optional
       client: ApolloClient.t,
-      @bs.optional
+      @optional
       context: Js.Json.t, // ACTUAL: Record<string, any>
-      @bs.optional
+      @optional
       errorPolicy: string,
-      @bs.optional
+      @optional
       fetchPolicy: string,
-      @bs.optional
+      @optional
       nextFetchPolicy: string,
-      @bs.optional
+      @optional
       notifyOnNetworkStatusChange: bool,
-      @bs.optional
+      @optional
       partialRefetch: bool,
-      @bs.optional
+      @optional
       pollInterval: int,
       // INTENTIONALLY IGNORED (but now with safeParse and result unwrapping, maybe it shouldn't be?)
       // returnPartialData: option(bool),
-      @bs.optional
+      @optional
       ssr: bool,
-      @bs.optional
+      @optional
       variables: 'jsVariables,
     }
     let make = t
@@ -212,17 +212,17 @@ module QueryResult = {
     }
 
     // We use abstract because Apollo is looking at query key, not just value
-    @bs.deriving(abstract)
+    @deriving(abstract)
     type t_fetchMoreOptions<'jsData, 'jsVariables> = {
-      @bs.optional
+      @optional
       query: Graphql.Language.documentNode,
       // ...extends FetchMoreQueryOptions
-      @bs.optional
+      @optional
       variables: 'jsVariables,
-      @bs.optional
+      @optional
       context: Js.Json.t,
       // ...extends FetchMoreOptions
-      @bs.optional
+      @optional
       updateQuery: (
         . 'jsData,
         t_fetchMoreOptions_updateQueryOptions<'jsData, 'jsVariables>,
@@ -258,32 +258,32 @@ module QueryResult = {
       variables: 'jsVariables,
     }
 
-    @bs.send
+    @send
     external fetchMore: (
       t<'jsData, 'jsVariables>,
       t_fetchMoreOptions<'jsData, 'jsVariables>,
     ) => Js.Promise.t<ApolloQueryResult.Js_.t<'jsData>> = "fetchMore"
 
-    @bs.send
+    @send
     external refetch: (
       t<'jsData, 'jsVariables>,
       option<'jsVariables>,
     ) => Js.Promise.t<ApolloQueryResult.Js_.t<'jsData>> = "refetch"
 
-    @bs.send
+    @send
     external startPolling: (t<'jsData, 'jsVariables>, int) => unit = "startPolling"
 
-    @bs.send
+    @send
     external stopPolling: t<'jsData, 'jsVariables> => unit = "stopPolling"
 
-    @bs.send
+    @send
     external updateQuery: (
       t<'jsData, 'jsVariables>,
       ('jsData, t_updateQueryOptions<'jsVariables>) => 'jsData,
     ) => unit = "updateQuery"
 
     // subscribeToMore<TSubscriptionData = TData, TSubscriptionVariables = TVariables>(options: SubscribeToMoreOptions<TData, TSubscriptionVariables, TSubscriptionData>): () => void;
-    @bs.send
+    @send
     external subscribeToMore: (
       t<'jsData, 'jsVariables>,
       SubscribeToMoreOptions.Js_.t<'jsData, 'subscriptionVariables, 'jsSubscriptionData>,
@@ -734,34 +734,34 @@ module MutationHookOptions = {
      * but still needs to be optional since a user has the option of providing
      * the variables to the results of the hook rather than the hook itself
      ")
-    @bs.deriving(abstract)
+    @deriving(abstract)
     type t<'jsData, 'jsVariables> = {
-      @bs.optional
+      @optional
       mutation: Graphql.documentNode,
       // ...extends BaseMutationOptions
-      @bs.optional
+      @optional
       awaitRefetchQueries: bool,
-      @bs.optional
+      @optional
       client: ApolloClient.t, // Non-Js_ client is appropriate here
-      @bs.optional
+      @optional
       context: Js.Json.t, // actual: option(Context)
-      @bs.optional
+      @optional
       errorPolicy: ErrorPolicy.Js_.t,
-      @bs.optional
+      @optional
       fetchPolicy: FetchPolicy__noCacheExtracted.Js_.t,
-      @bs.optional
+      @optional
       ignoreResults: bool,
-      @bs.optional
+      @optional
       notifyOnNetworkStatusChange: bool,
-      @bs.optional
+      @optional
       onError: (. ApolloError.Js_.t) => unit,
-      @bs.optional
+      @optional
       optimisticResponse: 'jsVariables => 'jsData,
-      @bs.optional
+      @optional
       refetchQueries: RefetchQueryDescription.Js_.t,
-      @bs.optional
+      @optional
       update: MutationUpdaterFn.Js_.t<'jsData>,
-      @bs.optional
+      @optional
       variables: 'jsVariables,
     }
     let make = t

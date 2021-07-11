@@ -25,7 +25,7 @@ module Js_ = {
   //     data?: TData | undefined;
   //     error?: import("../..").ApolloError | undefined;
   // };
-  @bs.module("@apollo/client")
+  @module("@apollo/client")
   external useSubscription: (
     . Graphql.Language.documentNode,
     SubscriptionHookOptions.Js_.t<'jsData, 'jsVariables>,

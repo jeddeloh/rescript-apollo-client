@@ -20,7 +20,7 @@ module Subscription = {
     // }
     type t = {closed: bool}
 
-    @bs.send external unsubscribe: t => unit = "unsubscribe"
+    @send external unsubscribe: t => unit = "unsubscribe"
   }
 
   type t = {
@@ -79,10 +79,10 @@ module Observable = {
     type t<'t, 'error>
 
     // <R>(callback: (value: T) => R): Observable<R>;
-    @bs.send external map: (t<'t, 'error>, 't => 'r) => t<'r, 'error> = "map"
+    @send external map: (t<'t, 'error>, 't => 'r) => t<'r, 'error> = "map"
 
     // (onNext: (value: T) => void, onError?: (error: any) => void, onComplete?: () => void): ZenObservable.Subscription;
-    @bs.send
+    @send
     external subscribe: (
       t<'t, 'error>,
       ~onNext: 't => unit,
@@ -92,7 +92,7 @@ module Observable = {
     ) => Subscription.Js_.t = "subscribe"
 
     // (observer: ZenObservable.Observer<T>): ZenObservable.Subscription;
-    @bs.send
+    @send
     external subscribeWithObserver: (t<'t, 'error>, Observer.t<'t>) => Subscription.Js_.t =
       "subscribe"
   }

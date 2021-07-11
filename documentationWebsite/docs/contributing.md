@@ -83,7 +83,7 @@ Sometimes multiple types were required to represent a single type in TypeScript.
 
 ### Binding to Methods
 
-Prefer T-first with `[@bs.send]`. Again, `externals` go under a `Js_` module with a `type t` and any types they reference should be `Js_.t` versions.
+Prefer T-first with `[@send]`. Again, `externals` go under a `Js_` module with a `type t` and any types they reference should be `Js_.t` versions.
 
 ### Binding to Objects
 
@@ -97,7 +97,7 @@ Prefer standard variants. `jsConverter` works great for ints, but otherwise use 
 
 - Prefer T-first because that's the Reason community default
 - Hooks are T-last because that makes sense given their usage
-- ApolloClient methods are a Frankenstein T-first _and_ T-last because they want to maintain similarity with hooks api, but are also T-first due to [@bs.send] and T-first preference
+- ApolloClient methods are a Frankenstein T-first _and_ T-last because they want to maintain similarity with hooks api, but are also T-first due to [@send] and T-first preference
 
 ### Reasoning behind `Js_` modules
 
@@ -152,7 +152,7 @@ module TypeName = {
 +     optionalProp: option(bool),
 +   }
 
-+   [@bs.new] [@bs.module "someModule"]
++   [@new] [@module "someModule"]
 +   external make = (make_options('jsData)) => t = "someClass";
   }
 
@@ -193,7 +193,7 @@ module TypeName = {
       optionalProp: option(bool),
 +     reusedType: ReusedType.Js_.t
     }
-    [@bs.new] [@bs.module "someModule"]
+    [@new] [@module "someModule"]
     external make = (make_options('jsData)) => t = "someClass";
   }
 
@@ -239,7 +239,7 @@ module TypeName = {
       optionalProp: option(bool),
       reusedType: ReusedType.Js_.t
     }
-    [@bs.new] [@bs.module "someModule"]
+    [@new] [@module "someModule"]
     external make = (make_options('jsData)) => t = "someClass";
   }
 

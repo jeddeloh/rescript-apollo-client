@@ -2,7 +2,7 @@ module ApolloError = ApolloClient__Errors_ApolloError
 module Graphql = ApolloClient__Graphql
 module Types = ApolloClient__Types
 
-@bs.new external makeError: string => Js.Exn.t = "Error"
+@new external makeError: string => Js.Exn.t = "Error"
 
 let ensureError = ApolloError.ensureError
 

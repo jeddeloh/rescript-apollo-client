@@ -17,7 +17,7 @@ module type OperationNoRequiredVars = Types.OperationNoRequiredVars
 
 module Js_ = {
   // export declare function useMutation<TData = any, TVariables = OperationVariables>(mutation: DocumentNode, options?: MutationHookOptions<TData, TVariables>): MutationTuple<TData, TVariables>;
-  @bs.module("@apollo/client")
+  @module("@apollo/client")
   external useMutation: (
     . Graphql.documentNode,
     MutationHookOptions.Js_.t<'jsData, 'jsVariables>,

@@ -51,7 +51,7 @@ module ObservableQuery = {
 
     // ...extends Observable<ApolloQueryResult<TData>>
     // <R>(callback: (value: T) => R): Observable<R>;
-    @bs.send external map: (t<'t>, 't => 'r) => t<'r> = "map"
+    @send external map: (t<'t>, 't => 'r) => t<'r> = "map"
     let fakeMap: (t<'t>, ('t, Js.Exn.t => unit) => option<'r>) => t<'r> = (js, fn) =>
       @ocaml.doc("
           * We should be able to just map, but it's broken:
@@ -78,7 +78,7 @@ module ObservableQuery = {
 
     // ...extends Observable<ApolloQueryResult<TData>>
     // (onNext: (value: T) => void, onError?: (error: any) => void, onComplete?: () => void): ZenObservable.Subscription;
-    @bs.send
+    @send
     external subscribe: (
       t<'jsData>,
       ~onNext: ApolloQueryResult.Js_.t<'jsData> => unit,
@@ -89,7 +89,7 @@ module ObservableQuery = {
   }
 
   type t<'data> = {
-    @bs.as("rescript_subscribe")
+    @as("rescript_subscribe")
     subscribe: (
       ~onNext: ApolloQueryResult.t<'data> => unit,
       ~onError: Js.Json.t => unit=?,
@@ -103,7 +103,7 @@ module ObservableQuery = {
   external castToJs: t<'data> => Js_.t<'data> = "%identity"
 
   let preserveJsPropsAndContext: (Js_.t<'jsData>, t<'data>) => t<'data> = (js, t) =>
-    %bs.raw(`
+    %raw(`
           function (js, t) {
             return Object.assign(js, t)
           }

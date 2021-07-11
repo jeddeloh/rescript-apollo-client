@@ -7,7 +7,7 @@ module ReactiveVar = {
 }
 
 module Js_ = {
-  @bs.module("@apollo/client")
+  @module("@apollo/client")
   external makeVar: 'value => ReactiveVar.Js_.t<'value> = "makeVar"
 }
 

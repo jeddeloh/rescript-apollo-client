@@ -49,12 +49,12 @@ module FieldFunctionOptions = {
       storage: Js.nullable<StorageType.Js_.t>,
       cache: ApolloCache.t<Js.Json.t>, // Non-Js_ ApolloCache is correct here
     }
-    @bs.send external canRead: t => CanReadFunction.Js_.t = "canRead"
-    @bs.send
+    @send external canRead: t => CanReadFunction.Js_.t = "canRead"
+    @send
     external mergeObjects: (t, ~existing: Js.Json.t, ~incoming: Js.Json.t) => option<Js.Json.t> =
       "canRead"
-    @bs.send external readField: t => ReadFieldFunction.Js_.t = "readField"
-    @bs.send
+    @send external readField: t => ReadFieldFunction.Js_.t = "readField"
+    @send
     external toReference: t => ToReferenceFunction.t = "toReference"
   }
 

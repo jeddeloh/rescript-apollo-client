@@ -14,7 +14,7 @@ module type OperationNoRequiredVars = Types.OperationNoRequiredVars
 
 module Js_ = {
   // export declare function useQuery<TData = any, TVariables = OperationVariables>(query: DocumentNode, options?: QueryHookOptions<TData, TVariables>): QueryResult<TData, TVariables>;
-  @bs.module("@apollo/client")
+  @module("@apollo/client")
   external useQuery: (
     . Graphql.documentNode,
     QueryHookOptions.Js_.t<'jsData, 'jsVariables>,

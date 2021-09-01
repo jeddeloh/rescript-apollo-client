@@ -478,6 +478,7 @@ type t = {
     ~context: Js.Json.t=?,
     ~errorPolicy: ErrorPolicy.t=?,
     ~fetchPolicy: WatchQueryFetchPolicy.t=?,
+    ~nextFetchPolicy: WatchQueryFetchPolicy.t=?,
     ~mapJsVariables: 'jsVariables => 'jsVariables=?,
     'variables,
   ) => ObservableQuery.t<'data>,
@@ -815,6 +816,7 @@ let make: (
     ~context=?,
     ~errorPolicy=?,
     ~fetchPolicy=?,
+    ~nextFetchPolicy=?,
     ~mapJsVariables=Utils.identity,
     variables,
   ) => {
@@ -825,6 +827,7 @@ let make: (
       ~options=WatchQueryOptions.toJs(
         {
           fetchPolicy: fetchPolicy,
+          nextFetchPolicy: nextFetchPolicy,
           query: Operation.query,
           variables: variables,
           errorPolicy: errorPolicy,

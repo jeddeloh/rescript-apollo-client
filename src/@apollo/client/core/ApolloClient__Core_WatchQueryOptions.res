@@ -123,6 +123,7 @@ module WatchQueryOptions = {
   module Js_ = {
     type t<'jsVariables> = {
       fetchPolicy: option<WatchQueryFetchPolicy.Js_.t>,
+      nextFetchPolicy: option<WatchQueryFetchPolicy.Js_.t>,
       // ...extends QueryBaseOptions
       query: Graphql.documentNode,
       // We don't allow optional variables because it's not typesafe
@@ -134,6 +135,7 @@ module WatchQueryOptions = {
 
   type t<'jsVariables> = {
     fetchPolicy: option<WatchQueryFetchPolicy.t>,
+    nextFetchPolicy: option<WatchQueryFetchPolicy.t>,
     query: Graphql.documentNode,
     variables: 'jsVariables,
     errorPolicy: option<ErrorPolicy.t>,
@@ -146,6 +148,7 @@ module WatchQueryOptions = {
     ~serializeVariables: 'variables => 'jsVariables,
   ) => Js_.t<'jsVariables> = (t, ~mapJsVariables, ~serializeVariables) => {
     fetchPolicy: t.fetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
+    nextFetchPolicy: t.nextFetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
     query: t.query,
     variables: t.variables->serializeVariables->mapJsVariables,
     errorPolicy: t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),

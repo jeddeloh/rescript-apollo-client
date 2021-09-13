@@ -700,6 +700,7 @@ module BaseMutationOptions = {
       ignoreResults: option<bool>,
       notifyOnNetworkStatusChange: option<bool>,
       onError: option<ApolloError.Js_.t => unit>,
+      onCompleted: 'jsData => unit,
       optimisticResponse: option<'jsVariables => 'jsData>,
       refetchQueries: option<RefetchQueryDescription.Js_.t>,
       update: option<MutationUpdaterFn.Js_.t<'jsData>>,
@@ -756,6 +757,8 @@ module MutationHookOptions = {
       @optional
       onError: (. ApolloError.Js_.t) => unit,
       @optional
+      onCompleted: 'jsData => unit,
+      @optional
       optimisticResponse: 'jsVariables => 'jsData,
       @optional
       refetchQueries: RefetchQueryDescription.Js_.t,
@@ -777,7 +780,7 @@ module MutationHookOptions = {
     ignoreResults: option<bool>,
     notifyOnNetworkStatusChange: option<bool>,
     onError: option<ApolloError.t => unit>,
-    onCompleted: option<'data => unit>,
+    onCompleted: option<Types.parseResult<'data> => unit>,
     optimisticResponse: option<'jsVariables => 'data>,
     refetchQueries: option<RefetchQueryDescription.t>,
     update: option<MutationUpdaterFn.t<'data>>,
@@ -809,6 +812,9 @@ module MutationHookOptions = {
       ~onError=?t.onError->Belt.Option.map((onError, . jsApolloError) =>
         onError(ApolloError.fromJs(jsApolloError))
       ),
+      ~onCompleted=?t.onCompleted->Belt.Option.map((onCompleted, jsData) =>
+      onCompleted(jsData->safeParse)
+    ),
       ~optimisticResponse=?t.optimisticResponse->Belt.Option.map((optimisticResponse, variables) =>
         optimisticResponse(variables)->serialize
       ),

@@ -305,6 +305,11 @@ module Js_ = {
   @send
   external clearStore: t => Js.Promise.t<array<Js.Json.t>> = "clearStore"
 
+
+  // extract(optimistic?: boolean): TCacheShape;
+  @send
+  external extract: (t, ~optimistic: bool=?, unit) => Js.Json.t = "extract"
+
   // mutate<T = any, TVariables = OperationVariables>(options: MutationOptions<T, TVariables>): Promise<FetchResult<T>>;
   @send
   external mutate: (
@@ -392,6 +397,8 @@ module Js_ = {
 type t = {
   @as("rescript_clearStore")
   clearStore: unit => Js.Promise.t<Belt.Result.t<array<Js.Json.t>, Js.Exn.t>>,
+  @as("rescript_extract")
+  extract: (~optimistic: bool=?, unit) => Js.Json.t,
   @as("rescript_mutate")
   mutate: 'data 'variables 'jsVariables. (
     ~mutation: module(Operation with
@@ -575,6 +582,8 @@ let make: (
     ->Js_.clearStore
     ->Js.Promise.then_(value => Js.Promise.resolve(Ok(value)), _)
     ->Js.Promise.catch(e => Js.Promise.resolve(Error(Utils.ensureError(Any(e)))), _)
+
+  let extract = (~optimistic=?, ()) => jsClient->Js_.extract(~optimistic=?optimistic, ())
 
   let mutate = (
     type data variables jsVariables,
@@ -888,6 +897,7 @@ let make: (
     jsClient,
     {
       clearStore: clearStore,
+      extract: extract,
       mutate: mutate,
       onClearStore: onClearStore,
       onResetStore: onResetStore,

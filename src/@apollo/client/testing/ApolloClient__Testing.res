@@ -1,5 +1,6 @@
 module Graphql = ApolloClient__Graphql
 module ApolloError = ApolloClient__Errors_ApolloError
+module InMemoryCache = ApolloClient__Cache_InMemory_InMemoryCache
 
 type rec request<'jsVariables> = {
   query: Graphql.documentNode,
@@ -38,4 +39,12 @@ let makeResult = (
   mockResult(queryResult)
 }
 
-module MockedProvider = ApolloClient__MockedProvider
+module MockedProvider = {
+  @react.component @module("@apollo/client/testing")
+  external make: (
+    ~mocks: array<mock<'jsVariables>>,
+    ~addTypeName: bool=?,
+    ~cache: InMemoryCache.t=?,
+    ~children: React.element,
+  ) => React.element = "MockedProvider"
+}

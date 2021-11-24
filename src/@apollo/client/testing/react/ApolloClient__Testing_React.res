@@ -1,0 +1,1 @@
+module MockedProvider = ApolloClient__Testing_React_MockedProvider

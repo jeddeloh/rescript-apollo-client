@@ -14,6 +14,11 @@ module Types = ApolloClient__Testing_Types
 //   children?: any;
 //   link?: ApolloLink;
 // }
+
+/* Then making an ApolloClient in Rescript, additional wrapper methods (e.g. `rescript_query`)
+ * are created for the underlying javascript methods. So for the client to be set up correctly,
+ * we need to do so by calling the rescript method.
+ */
 @react.component
 let make = (
   ~addTypename=true,

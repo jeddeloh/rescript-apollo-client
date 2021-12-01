@@ -64,6 +64,11 @@ module GraphQL_PPX = {
   type templateTagReturnType = ApolloClient__Graphql.documentNode
 }
 
+module Testing = {
+  module MockedProvider = ApolloClient__Testing.MockedProvider
+  let makeResult = ApolloClient__Testing_Types.makeResult
+}
+
 // Convenient access to all types and the methods for working with those types
 module Types = {
   module ApolloError = ApolloClient__Errors_ApolloError

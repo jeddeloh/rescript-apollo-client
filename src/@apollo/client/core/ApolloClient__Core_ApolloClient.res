@@ -305,7 +305,6 @@ module Js_ = {
   @send
   external clearStore: t => Js.Promise.t<array<Js.Json.t>> = "clearStore"
 
-
   // extract(optimistic?: boolean): TCacheShape;
   @send
   external extract: (t, ~optimistic: bool=?, unit) => Js.Json.t = "extract"
@@ -360,6 +359,9 @@ module Js_ = {
 
   // setLink(newLink: ApolloLink): void;
   @send external setLink: (t, ApolloLink.Js_.t) => unit = "setLink"
+
+  // stop(): void;
+  @send external stop: (t, unit) => unit = "stop"
 
   // subscribe<T = any, TVariables = OperationVariables>(options: SubscriptionOptions<TVariables>): Observable<FetchResult<T>>;
 
@@ -462,6 +464,7 @@ type t = {
   restore: (~serializedState: Js.Json.t) => ApolloCache.t<Js.Json.t>,
   @as("rescript_setLink")
   setLink: ApolloLink.t => unit,
+  stop: unit => unit,
   @as("rescript_subscribe")
   subscribe: 'data 'variables 'jsVariables. (
     ~subscription: module(Operation with
@@ -583,7 +586,7 @@ let make: (
     ->Js.Promise.then_(value => Js.Promise.resolve(Ok(value)), _)
     ->Js.Promise.catch(e => Js.Promise.resolve(Error(Utils.ensureError(Any(e)))), _)
 
-  let extract = (~optimistic=?, ()) => jsClient->Js_.extract(~optimistic=?optimistic, ())
+  let extract = (~optimistic=?, ()) => jsClient->Js_.extract(~optimistic?, ())
 
   let mutate = (
     type data variables jsVariables,
@@ -761,6 +764,8 @@ let make: (
 
   let setLink = link => jsClient->Js_.setLink(link)
 
+  let stop = () => jsClient->Js_.stop()
+
   let subscribe = (
     type data variables jsVariables,
     ~subscription as module(Operation: Operation with
@@ -907,6 +912,7 @@ let make: (
       resetStore: resetStore,
       restore: restore,
       setLink: setLink,
+      stop: stop,
       subscribe: subscribe,
       watchQuery: watchQuery,
       writeFragment: writeFragment,

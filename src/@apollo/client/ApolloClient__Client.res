@@ -66,3 +66,4 @@ module Errors = ApolloClient__Errors
 module Link = ApolloClient__Link
 module React = ApolloClient__React
 module Utilities = ApolloClient__Utilities
+module Testing = ApolloClient__Testing

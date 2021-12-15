@@ -490,6 +490,7 @@ type t = {
     ~fetchPolicy: WatchQueryFetchPolicy.t=?,
     ~nextFetchPolicy: WatchQueryFetchPolicy.t=?,
     ~mapJsVariables: 'jsVariables => 'jsVariables=?,
+    ~pollInterval: int=?,
     'variables,
   ) => ObservableQuery.t<'data>,
   @as("rescript_writeFragment")
@@ -832,6 +833,7 @@ let make: (
     ~fetchPolicy=?,
     ~nextFetchPolicy=?,
     ~mapJsVariables=Utils.identity,
+    ~pollInterval=?,
     variables,
   ) => {
     let safeParse = Utils.safeParse(Operation.parse)
@@ -846,6 +848,7 @@ let make: (
           variables: variables,
           errorPolicy: errorPolicy,
           context: context,
+          pollInterval: pollInterval,
         },
         ~mapJsVariables,
         ~serializeVariables=Operation.serializeVariables,

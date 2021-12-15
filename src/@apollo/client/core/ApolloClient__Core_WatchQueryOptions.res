@@ -130,6 +130,7 @@ module WatchQueryOptions = {
       variables: 'jsVariables,
       errorPolicy: option<ErrorPolicy.Js_.t>,
       context: option<Js.Json.t>,
+      pollInterval: option<int>,
     }
   }
 
@@ -140,6 +141,7 @@ module WatchQueryOptions = {
     variables: 'jsVariables,
     errorPolicy: option<ErrorPolicy.t>,
     context: option<Js.Json.t>,
+    pollInterval: option<int>,
   }
 
   let toJs: (
@@ -153,6 +155,7 @@ module WatchQueryOptions = {
     variables: t.variables->serializeVariables->mapJsVariables,
     errorPolicy: t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
     context: t.context,
+    pollInterval: t.pollInterval,
   }
 }
 

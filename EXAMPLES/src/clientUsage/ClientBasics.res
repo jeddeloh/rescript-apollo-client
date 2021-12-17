@@ -51,7 +51,7 @@ let addTodo = _ =>
   )
   ->ignore
 
-let observableQuery = Apollo.client.watchQuery(~query=module(TodosQuery), ())
+let observableQuery = Apollo.client.watchQuery(~query=module(TodosQuery), ~pollInterval=1000, ())
 
 let watchQuerySubscription = observableQuery.subscribe(~onNext=result =>
   switch result {

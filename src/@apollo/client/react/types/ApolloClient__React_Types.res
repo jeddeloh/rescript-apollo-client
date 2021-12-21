@@ -24,6 +24,7 @@ module QueryHookOptions = {
     // }
     type t<'jsData, 'jsVariables>
 
+    // NOTE: We are using @obj here because passing properties that are defined with a value of undefined has effects
     @obj
     external make: (
       ~query: Graphql.documentNode=?,
@@ -110,6 +111,7 @@ module LazyQueryHookOptions = {
 
     type t<'jsData, 'jsVariables>
 
+    // NOTE: We are using @obj here because passing properties that are defined with a value of undefined has effects
     @obj
     external make: (
       ~query: Graphql.documentNode=?,
@@ -727,6 +729,7 @@ module MutationHookOptions = {
     // }
     type t<'jsData, 'jsVariables>
 
+    // NOTE: We are using @obj here because passing properties that are defined with a value of undefined has effects
     @obj
     external make: (
       ~mutation: Graphql.documentNode=?,
@@ -859,10 +862,6 @@ module MutationFunctionOptions = {
     //     context?: Context;
     //     fetchPolicy?: WatchQueryFetchPolicy;
     // }
-    @ocaml.doc("
-     * We use deriving abstract here because this is used in a context where passing in explicit
-     * properties could override one already passed in
-     ")
     type t<'jsData, 'jsVariables> = {
       // We don't allow optional variables because it's not typesafe
       variables: 'jsVariables,
@@ -1183,6 +1182,7 @@ module SubscriptionHookOptions = {
     // }
     type t<'jsData, 'jsVariables>
 
+    // NOTE: We are using @obj here because passing properties that are defined with a value of undefined has effects
     @obj
     external make: (
       ~subscription: Graphql.documentNode=?,

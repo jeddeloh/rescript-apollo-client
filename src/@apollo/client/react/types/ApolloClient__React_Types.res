@@ -119,7 +119,7 @@ module LazyQueryHookOptions = {
       ~onError: (. ApolloError.Js_.t) => unit=?,
       // ..extends BaseQueryOptions
       ~client: ApolloClient.t=?,
-      ~context: Js.Json.t=?, // ACTUAL: Record<string, any=?,
+      ~context: Js.Json.t=?, // ACTUAL: Record<string, any>,
       ~errorPolicy: string=?,
       ~fetchPolicy: string=?,
       ~nextFetchPolicy: string=?,
@@ -726,6 +726,7 @@ module MutationHookOptions = {
     //   mutation?: DocumentNode;
     // }
     type t<'jsData, 'jsVariables>
+
     @obj
     external make: (
       ~mutation: Graphql.documentNode=?,

@@ -172,7 +172,7 @@ module OperationDefinitionNode = {
   type t = {
     kind: string,
     loc: option<Location.t>,
-    name: NameNode.t,
+    name: option<NameNode.t>,
     operation: OperationTypeNode.t,
     variableDefinitions: option<array<VariableDefinitionNode.t>>,
     directives: option<array<DirectiveNode.t>>,

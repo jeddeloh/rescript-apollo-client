@@ -26,7 +26,7 @@ let make = () => {
    * Sorry, this example is nonsensical given the current schema, but I'm gonna proceed anyway
    ")
   React.useEffect0(() => {
-    queryResult.subscribeToMore(
+    let _unsubscribe = queryResult.subscribeToMore(
       ~subscription=module(SorryItsNotASubscriptionForTodos),
       ~updateQuery=(previous, {subscriptionData: {data: {siteStatisticsUpdated}}}) => {
         let count =

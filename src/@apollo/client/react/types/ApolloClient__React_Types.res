@@ -22,28 +22,33 @@ module QueryHookOptions = {
     // export interface QueryHookOptions<TData = any, TVariables = OperationVariables> extends QueryFunctionOptions<TData, TVariables> {
     //     query?: DocumentNode;
     // }
-    type t<'jsData, 'jsVariables> = {
-      query: option<Graphql.documentNode>,
+    type t<'jsData, 'jsVariables>
+
+    // NOTE: We are using @obj here because passing properties that are defined with a value of undefined has effects
+    @obj
+    external make: (
+      ~query: Graphql.documentNode=?,
       // ...extends QueryFunctionOptions
-      displayName: option<string>,
-      skip: option<bool>,
-      onCompleted: option<'jsData => unit>,
-      onError: option<(. ApolloError.Js_.t) => unit>,
+      ~displayName: string=?,
+      ~skip: bool=?,
+      ~onCompleted: 'jsData => unit=?,
+      ~onError: (. ApolloError.Js_.t) => unit=?,
       // ..extends BaseQueryOptions
-      client: option<ApolloClient.t>,
-      context: option<Js.Json.t>, // ACTUAL: Record<string, any>
-      errorPolicy: option<string>,
-      fetchPolicy: option<string>,
-      nextFetchPolicy: option<string>,
-      notifyOnNetworkStatusChange: option<bool>,
-      partialRefetch: option<bool>,
-      pollInterval: option<int>,
+      ~client: ApolloClient.t=?,
+      ~context: Js.Json.t=?, // ACTUAL: Record<string, any=?>
+      ~errorPolicy: string=?,
+      ~fetchPolicy: string=?,
+      ~nextFetchPolicy: string=?,
+      ~notifyOnNetworkStatusChange: bool=?,
+      ~partialRefetch: bool=?,
+      ~pollInterval: int=?,
       // INTENTIONALLY IGNORED (but now with safeParse and result unwrapping, maybe it shouldn't be?)
-      // returnPartialData: option(bool),
-      ssr: option<bool>,
+      // ~returnPartialData: bool=?,
+      ~ssr: bool=?,
       // We don't allow optional variables because it's not typesafe
-      variables: 'jsVariables,
-    }
+      ~variables: 'jsVariables,
+      unit,
+    ) => t<'jsData, 'jsVariables> = ""
   }
 
   type t<'data, 'variables> = {
@@ -73,27 +78,29 @@ module QueryHookOptions = {
     ~mapJsVariables: 'jsVariables => 'jsVariables,
     ~safeParse: Types.safeParse<'data, 'jsData>,
     ~serializeVariables: 'variables => 'jsVariables,
-  ): Js_.t<'jsData, 'jsVariables> => {
-    client: t.client,
-    context: t.context,
-    displayName: t.displayName,
-    errorPolicy: t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
-    onCompleted: t.onCompleted->Belt.Option.map((onCompleted, jsData) =>
-      onCompleted(jsData->safeParse)
-    ),
-    onError: t.onError->Belt.Option.map((onError, . jsApolloError) =>
-      onError(ApolloError.fromJs(jsApolloError))
-    ),
-    fetchPolicy: t.fetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
-    nextFetchPolicy: t.nextFetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
-    notifyOnNetworkStatusChange: t.notifyOnNetworkStatusChange,
-    query: t.query,
-    pollInterval: t.pollInterval,
-    partialRefetch: t.partialRefetch,
-    skip: t.skip,
-    ssr: t.ssr,
-    variables: t.variables->serializeVariables->mapJsVariables,
-  }
+  ): Js_.t<'jsData, 'jsVariables> =>
+    Js_.make(
+      ~client=?t.client,
+      ~context=?t.context,
+      ~displayName=?t.displayName,
+      ~errorPolicy=?t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
+      ~onCompleted=?t.onCompleted->Belt.Option.map((onCompleted, jsData) =>
+        onCompleted(jsData->safeParse)
+      ),
+      ~onError=?t.onError->Belt.Option.map((onError, . jsApolloError) =>
+        onError(ApolloError.fromJs(jsApolloError))
+      ),
+      ~fetchPolicy=?t.fetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
+      ~nextFetchPolicy=?t.nextFetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
+      ~notifyOnNetworkStatusChange=?t.notifyOnNetworkStatusChange,
+      ~query=?t.query,
+      ~pollInterval=?t.pollInterval,
+      ~partialRefetch=?t.partialRefetch,
+      ~skip=?t.skip,
+      ~ssr=?t.ssr,
+      ~variables=t.variables->serializeVariables->mapJsVariables,
+      (),
+    )
 }
 
 module LazyQueryHookOptions = {
@@ -101,42 +108,32 @@ module LazyQueryHookOptions = {
     // export interface LazyQueryHookOptions<TData = any, TVariables = OperationVariables> extends Omit<QueryFunctionOptions<TData, TVariables>, 'skip'> {
     //     query?: DocumentNode;
     // }
-    @deriving(abstract)
-    type t<'jsData, 'jsVariables> = {
-      @optional
-      query: Graphql.documentNode,
+
+    type t<'jsData, 'jsVariables>
+
+    // NOTE: We are using @obj here because passing properties that are defined with a value of undefined has effects
+    @obj
+    external make: (
+      ~query: Graphql.documentNode=?,
       // ...extends QueryFunctionOptions
-      @optional
-      displayName: string,
-      @optional
-      onCompleted: 'jsData => unit,
-      @optional
-      onError: (. ApolloError.Js_.t) => unit,
+      ~displayName: string=?,
+      ~onCompleted: 'jsData => unit=?,
+      ~onError: (. ApolloError.Js_.t) => unit=?,
       // ..extends BaseQueryOptions
-      @optional
-      client: ApolloClient.t,
-      @optional
-      context: Js.Json.t, // ACTUAL: Record<string, any>
-      @optional
-      errorPolicy: string,
-      @optional
-      fetchPolicy: string,
-      @optional
-      nextFetchPolicy: string,
-      @optional
-      notifyOnNetworkStatusChange: bool,
-      @optional
-      partialRefetch: bool,
-      @optional
-      pollInterval: int,
+      ~client: ApolloClient.t=?,
+      ~context: Js.Json.t=?, // ACTUAL: Record<string, any>,
+      ~errorPolicy: string=?,
+      ~fetchPolicy: string=?,
+      ~nextFetchPolicy: string=?,
+      ~notifyOnNetworkStatusChange: bool=?,
+      ~partialRefetch: bool=?,
+      ~pollInterval: int=?,
       // INTENTIONALLY IGNORED (but now with safeParse and result unwrapping, maybe it shouldn't be?)
-      // returnPartialData: option(bool),
-      @optional
-      ssr: bool,
-      @optional
-      variables: 'jsVariables,
-    }
-    let make = t
+      // ~returnPartialData:bool=?,
+      ~ssr: bool=?,
+      ~variables: 'jsVariables=?,
+      unit,
+    ) => t<'jsData, 'jsVariables> = ""
   }
 
   type t<'data, 'variables> = {
@@ -730,44 +727,28 @@ module MutationHookOptions = {
     // export interface MutationHookOptions<TData = any, TVariables = OperationVariables> extends BaseMutationOptions<TData, TVariables> {
     //   mutation?: DocumentNode;
     // }
-    @ocaml.doc("
-     * We use deriving abstract here because option('jsVariables) is not typesafe,
-     * but still needs to be optional since a user has the option of providing
-     * the variables to the results of the hook rather than the hook itself
-     ")
-    @deriving(abstract)
-    type t<'jsData, 'jsVariables> = {
-      @optional
-      mutation: Graphql.documentNode,
+    type t<'jsData, 'jsVariables>
+
+    // NOTE: We are using @obj here because passing properties that are defined with a value of undefined has effects
+    @obj
+    external make: (
+      ~mutation: Graphql.documentNode=?,
       // ...extends BaseMutationOptions
-      @optional
-      awaitRefetchQueries: bool,
-      @optional
-      client: ApolloClient.t, // Non-Js_ client is appropriate here
-      @optional
-      context: Js.Json.t, // actual: option(Context)
-      @optional
-      errorPolicy: ErrorPolicy.Js_.t,
-      @optional
-      fetchPolicy: FetchPolicy__noCacheExtracted.Js_.t,
-      @optional
-      ignoreResults: bool,
-      @optional
-      notifyOnNetworkStatusChange: bool,
-      @optional
-      onError: (. ApolloError.Js_.t) => unit,
-      @optional
-      onCompleted: 'jsData => unit,
-      @optional
-      optimisticResponse: 'jsVariables => 'jsData,
-      @optional
-      refetchQueries: RefetchQueryDescription.Js_.t,
-      @optional
-      update: MutationUpdaterFn.Js_.t<'jsData>,
-      @optional
-      variables: 'jsVariables,
-    }
-    let make = t
+      ~awaitRefetchQueries: bool=?,
+      ~client: ApolloClient.t=?, // Non-Js_ client is appropriate here
+      ~context: Js.Json.t=?, // actual: option(Context)
+      ~errorPolicy: ErrorPolicy.Js_.t=?,
+      ~fetchPolicy: FetchPolicy__noCacheExtracted.Js_.t=?,
+      ~ignoreResults: bool=?,
+      ~notifyOnNetworkStatusChange: bool=?,
+      ~onError: (. ApolloError.Js_.t) => unit=?,
+      ~onCompleted: 'jsData => unit=?,
+      ~optimisticResponse: 'jsVariables => 'jsData=?,
+      ~refetchQueries: RefetchQueryDescription.Js_.t=?,
+      ~update: MutationUpdaterFn.Js_.t<'jsData>=?,
+      ~variables: 'jsVariables=?,
+      unit,
+    ) => t<'jsData, 'jsVariables> = ""
   }
 
   type t<'data, 'variables, 'jsVariables> = {
@@ -813,8 +794,8 @@ module MutationHookOptions = {
         onError(ApolloError.fromJs(jsApolloError))
       ),
       ~onCompleted=?t.onCompleted->Belt.Option.map((onCompleted, jsData) =>
-      onCompleted(jsData->safeParse)
-    ),
+        onCompleted(jsData->safeParse)
+      ),
       ~optimisticResponse=?t.optimisticResponse->Belt.Option.map((optimisticResponse, variables) =>
         optimisticResponse(variables)->serialize
       ),
@@ -881,10 +862,6 @@ module MutationFunctionOptions = {
     //     context?: Context;
     //     fetchPolicy?: WatchQueryFetchPolicy;
     // }
-    @ocaml.doc("
-     * We use deriving abstract here because this is used in a context where passing in explicit
-     * properties could override one already passed in
-     ")
     type t<'jsData, 'jsVariables> = {
       // We don't allow optional variables because it's not typesafe
       variables: 'jsVariables,
@@ -1203,18 +1180,23 @@ module SubscriptionHookOptions = {
     // export interface SubscriptionHookOptions<TData = any, TVariables = OperationVariables> extends BaseSubscriptionOptions<TData, TVariables> {
     //     subscription?: DocumentNode;
     // }
-    type t<'jsData, 'jsVariables> = {
-      subscription: option<Graphql.documentNode>,
+    type t<'jsData, 'jsVariables>
+
+    // NOTE: We are using @obj here because passing properties that are defined with a value of undefined has effects
+    @obj
+    external make: (
+      ~subscription: Graphql.documentNode=?,
       // ...extends BaseSubscriptionOptions
       // Intentionally restricted to not be non-optional. `option(unit)` does not compile cleanly to `undefined`
-      variables: 'jsVariables,
-      fetchPolicy: option<FetchPolicy.t>,
-      shouldResubscribe: option<(. BaseSubscriptionOptions.Js_.t<'jsData, 'jsVariables>) => bool>,
-      client: option<ApolloClient.t>,
-      skip: option<bool>,
-      onSubscriptionData: option<(. OnSubscriptionDataOptions.Js_.t<'jsData>) => unit>,
-      onSubscriptionComplete: option<unit => unit>,
-    }
+      ~variables: 'jsVariables,
+      ~fetchPolicy: FetchPolicy.t=?,
+      ~shouldResubscribe: (. BaseSubscriptionOptions.Js_.t<'jsData, 'jsVariables>) => bool=?,
+      ~client: ApolloClient.t=?,
+      ~skip: bool=?,
+      ~onSubscriptionData: (. OnSubscriptionDataOptions.Js_.t<'jsData>) => unit=?,
+      ~onSubscriptionComplete: unit => unit=?,
+      unit,
+    ) => t<'jsData, 'jsVariables> = ""
   }
 
   type t<'data, 'variables, 'jsVariables> = {
@@ -1233,22 +1215,26 @@ module SubscriptionHookOptions = {
     ~mapJsVariables: 'jsVariables => 'jsVariables,
     ~safeParse: Types.safeParse<'data, 'jsData>,
     ~serializeVariables: 'variables => 'jsVariables,
-  ) => Js_.t<'jsData, 'jsVariables> = (t, ~mapJsVariables, ~safeParse, ~serializeVariables) => {
-    subscription: t.subscription,
-    variables: t.variables->serializeVariables->mapJsVariables,
-    fetchPolicy: t.fetchPolicy,
-    shouldResubscribe: t.shouldResubscribe->Belt.Option.map((
-      shouldResubscribe,
-      . jsBaseSubscriptionOptions,
-    ) => shouldResubscribe(jsBaseSubscriptionOptions->BaseSubscriptionOptions.fromJs)),
-    client: t.client,
-    skip: t.skip,
-    onSubscriptionData: t.onSubscriptionData->Belt.Option.map((
-      onSubscriptionData,
-      . jsOnSubscriptionDataOptions,
-    ) =>
-      onSubscriptionData(jsOnSubscriptionDataOptions->OnSubscriptionDataOptions.fromJs(~safeParse))
-    ),
-    onSubscriptionComplete: t.onSubscriptionComplete,
-  }
+  ) => Js_.t<'jsData, 'jsVariables> = (t, ~mapJsVariables, ~safeParse, ~serializeVariables) =>
+    Js_.make(
+      ~subscription=?t.subscription,
+      ~variables=t.variables->serializeVariables->mapJsVariables,
+      ~fetchPolicy=?t.fetchPolicy,
+      ~shouldResubscribe=?t.shouldResubscribe->Belt.Option.map((
+        shouldResubscribe,
+        . jsBaseSubscriptionOptions,
+      ) => shouldResubscribe(jsBaseSubscriptionOptions->BaseSubscriptionOptions.fromJs)),
+      ~client=?t.client,
+      ~skip=?t.skip,
+      ~onSubscriptionData=?t.onSubscriptionData->Belt.Option.map((
+        onSubscriptionData,
+        . jsOnSubscriptionDataOptions,
+      ) =>
+        onSubscriptionData(
+          jsOnSubscriptionDataOptions->OnSubscriptionDataOptions.fromJs(~safeParse),
+        )
+      ),
+      ~onSubscriptionComplete=?t.onSubscriptionComplete,
+      (),
+    )
 }

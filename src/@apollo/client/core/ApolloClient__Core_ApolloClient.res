@@ -383,14 +383,14 @@ module Js_ = {
   external writeFragment: (
     t,
     ~options: DataProxy.WriteFragmentOptions.Js_.t<'jsData, 'jsVariables>,
-  ) => unit = "writeFragment"
+  ) => option<ApolloCache.reference> = "writeFragment"
 
   // writeQuery<TData = any, TVariables = OperationVariables>(options: DataProxy.WriteQueryOptions<TData, TVariables>): void;
   @send
   external writeQuery: (
     t,
     ~options: DataProxy.WriteQueryOptions.Js_.t<'jsData, 'jsVariables>,
-  ) => unit = "writeQuery"
+  ) => option<ApolloCache.reference> = "writeQuery"
 
   @module("@apollo/client") @new
   external make: ApolloClientOptions.Js_.t => t = "ApolloClient"
@@ -504,7 +504,7 @@ type t = {
     ~id: string,
     ~fragmentName: string=?,
     unit,
-  ) => unit,
+  ) => option<ApolloCache.reference>,
   @as("rescript_writeQuery")
   writeQuery: 'data 'variables 'jsVariables. (
     ~query: module(Operation with
@@ -518,7 +518,7 @@ type t = {
     ~id: string=?,
     ~mapJsVariables: 'jsVariables => 'jsVariables=?,
     'variables,
-  ) => unit,
+  ) => option<ApolloCache.reference>,
 }
 
 let preserveJsPropsAndContext: (Js_.t, t) => t = %raw(`

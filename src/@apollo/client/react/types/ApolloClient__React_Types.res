@@ -605,15 +605,15 @@ module LazyQueryResult = {
 
 module QueryTuple = {
   module Js_ = {
-    // export declare type QueryTuple<TData, TVariables> = [(options?: QueryLazyOptions<TVariables>) => void, LazyQueryResult<TData, TVariables>];
+    // export declare type QueryTuple<TData, TVariables> = [(options?: QueryLazyOptions<TVariables>) => LazyQueryResult<TData, TVariables>, LazyQueryResult<TData, TVariables>];
     type t<'jsData, 'jsVariables> = (
-      QueryLazyOptions.Js_.t<'jsVariables> => unit,
+      QueryLazyOptions.Js_.t<'jsVariables> => Js.Promise.t<QueryResult.Js_.t<'jsData, 'jsVariables>>,
       LazyQueryResult.Js_.t<'jsData, 'jsVariables>,
     )
   }
 
   type t<'data, 'jsData, 'variables, 'jsVariables> = (
-    (~context: Js.Json.t=?, ~mapJsVariables: 'jsVariables => 'jsVariables=?, 'variables) => unit,
+    (~context: Js.Json.t=?, ~mapJsVariables: 'jsVariables => 'jsVariables=?, 'variables) => Js.Promise.t<QueryResult.t<'data, 'jsData, 'variables, 'jsVariables>>,
     LazyQueryResult.t<'data, 'jsData, 'variables, 'jsVariables>,
   )
 
@@ -632,7 +632,7 @@ module QueryTuple = {
       jsExecuteQuery({
         context: context,
         variables: variables->serializeVariables->mapJsVariables,
-      }),
+      }) |> Js.Promise.then_(jsResult => QueryResult.fromJs(jsResult, ~safeParse, ~serialize, ~serializeVariables) |> Js.Promise.resolve),
     jsLazyQueryResult->LazyQueryResult.fromJs(~safeParse, ~serialize, ~serializeVariables),
   )
 }
@@ -643,7 +643,7 @@ module QueryTuple__noVariables = {
   }
 
   type t<'data, 'jsData, 'variables, 'jsVariables> = (
-    (~context: Js.Json.t=?, unit) => unit,
+    (~context: Js.Json.t=?, unit) => Js.Promise.t<QueryResult.t<'data, 'jsData, 'variables, 'jsVariables>>,
     LazyQueryResult.t<'data, 'jsData, 'variables, 'jsVariables>,
   )
 
@@ -666,7 +666,7 @@ module QueryTuple__noVariables = {
       jsExecuteQuery({
         context: context,
         variables: variables->serializeVariables->mapJsVariables,
-      }),
+      })|> Js.Promise.then_(jsResult => QueryResult.fromJs(jsResult, ~safeParse, ~serialize, ~serializeVariables) |> Js.Promise.resolve),
     jsLazyQueryResult->LazyQueryResult.fromJs(~safeParse, ~serialize, ~serializeVariables),
   )
 }

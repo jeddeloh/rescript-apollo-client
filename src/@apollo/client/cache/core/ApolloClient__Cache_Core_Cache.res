@@ -25,9 +25,9 @@ module ApolloCache = {
     //     gc(): string[];
     //     modify(options: Cache.ModifyOptions): boolean;
     //     transformForLink(document: DocumentNode): DocumentNode;
-    //     readQuery<QueryType, TVariables = any>(options: DataProxy.Query<TVariables>, optimistic?: boolean): QueryType | null;
+    //     readQuery<QueryType, TVariables = any>(options: Cache.ReadQueryOptions<TVariables>, optimistic?: boolean): QueryType | null;
     //     private getFragmentDoc;
-    //     readFragment<FragmentType, TVariables = any>(options: DataProxy.Fragment<TVariables>, optimistic?: boolean): FragmentType | null;
+    //     readFragment<FragmentType, TVariables = any>(options: Cache.ReadFragmentOptions<TVariables>, optimistic?: boolean): FragmentType | null;
     //     writeQuery<TData = any, TVariables = any>(options: Cache.WriteQueryOptions<TData, TVariables>): Reference | undefined;
     //     writeFragment<TData = any, TVariables = any>(options: Cache.WriteFragmentOptions<TData, TVariables>): Reference | undefined;
     // }
@@ -35,21 +35,21 @@ module ApolloCache = {
 
     type reference
 
-    // readFragment<FragmentType, TVariables = any>(options: DataProxy.Fragment<TVariables>, optimistic?: boolean): FragmentType | null;
+    // readFragment<FragmentType, TVariables = any>(options: DataProxy.ReadFragmentOptions<TVariables>, optimistic?: boolean): FragmentType | null;
     @send
     external readFragment: (
       t<'tSerialized>,
-      ~options: DataProxy.Fragment.Js_.t,
+      ~options: DataProxy.ReadFragmentOptions.Js_.t,
       ~optimistic: bool=?,
       unit,
     ) => Js.nullable<'jsData> = "readFragment"
 
-    // readQuery<QueryType, TVariables = any>(options: DataProxy.Query<TVariables>, optimistic?: boolean): QueryType | null;
+    // readQuery<QueryType, TVariables = any>(options: DataProxy.ReadQueryOptions<TVariables>, optimistic?: boolean): QueryType | null;
     @send
     external readQuery: (
       t<'tSerialized>,
-      ~options: DataProxy.Query.Js_.t<'jsVariables>,
-      ~optimistic: option<bool>,
+      ~options: DataProxy.ReadQueryOptions.Js_.t<'jsVariables>,
+      ~optimistic: option<bool>=?,
     ) => Js.nullable<'jsData> = "readQuery"
 
     // writeFragment<TData = any, TVariables = any>(options: Cache.WriteFragmentOptions<TData, TVariables>): Reference | undefined;
@@ -75,6 +75,7 @@ module ApolloCache = {
       ~fragment: module(Fragment with type t = 'data),
       ~id: string,
       ~optimistic: bool=?,
+      ~canonizeResults: bool=?,
       ~fragmentName: string=?,
       unit,
     ) => option<Types.parseResult<'data>>,
@@ -88,6 +89,7 @@ module ApolloCache = {
       ~id: string=?,
       ~mapJsVariables: 'jsVariables => 'jsVariables=?,
       ~optimistic: bool=?,
+      ~canonizeResults: bool=?,
       'variables,
     ) => option<Types.parseResult<'data>>,
     @as("rescript_writeFragment")
@@ -95,6 +97,7 @@ module ApolloCache = {
       ~fragment: module(Fragment with type t = 'data),
       ~data: 'data,
       ~broadcast: bool=?,
+      ~overwrite: bool=?,
       ~id: string,
       ~fragmentName: string=?,
       unit,
@@ -107,6 +110,7 @@ module ApolloCache = {
         and type Raw.t_variables = 'jsVariables
       ),
       ~broadcast: bool=?,
+      ~overwrite: bool=?,
       ~data: 'data,
       ~id: string=?,
       ~mapJsVariables: 'jsVariables => 'jsVariables=?,
@@ -127,6 +131,7 @@ module ApolloCache = {
       ~fragment as module(Fragment: Fragment with type t = data),
       ~id,
       ~optimistic=?,
+      ~canonizeResults=?,
       ~fragmentName=?,
       (),
     ) => {
@@ -134,7 +139,13 @@ module ApolloCache = {
 
       js
       ->Js_.readFragment(
-        ~options={id: id, fragment: Fragment.query, fragmentName: fragmentName},
+        ~options={
+          id: id,
+          fragment: Fragment.query,
+          fragmentName: fragmentName,
+          optimistic: optimistic,
+          canonizeResults: canonizeResults,
+        },
         ~optimistic?,
         (),
       )
@@ -152,14 +163,21 @@ module ApolloCache = {
       ~id=?,
       ~mapJsVariables=Utils.identity,
       ~optimistic=?,
+      ~canonizeResults=?,
       variables,
     ) => {
       let safeParse = Utils.safeParse(Operation.parse)
 
       js
       ->Js_.readQuery(
-        ~options=DataProxy.Query.toJs(
-          {id: id, query: Operation.query, variables: variables},
+        ~options=DataProxy.ReadQueryOptions.toJs(
+          {
+            id: id,
+            query: Operation.query,
+            variables: variables,
+            optimistic: optimistic,
+            canonizeResults: canonizeResults,
+          },
           ~mapJsVariables,
           ~serializeVariables=Operation.serializeVariables,
         ),
@@ -174,6 +192,7 @@ module ApolloCache = {
       ~fragment as module(Fragment: Fragment with type t = data),
       ~data: data,
       ~broadcast=?,
+      ~overwrite=?,
       ~id,
       ~fragmentName=?,
       // variables,
@@ -187,6 +206,7 @@ module ApolloCache = {
             id: id,
             fragment: Fragment.query,
             fragmentName: fragmentName,
+            overwrite: overwrite,
           },
           ~serialize=Fragment.serialize,
         ),
@@ -200,6 +220,7 @@ module ApolloCache = {
         and type Raw.t_variables = jsVariables
       ),
       ~broadcast=?,
+      ~overwrite=?,
       ~data,
       ~id=?,
       ~mapJsVariables=Utils.identity,
@@ -207,7 +228,14 @@ module ApolloCache = {
     ) =>
       js->Js_.writeQuery(
         ~options=DataProxy.WriteQueryOptions.toJs(
-          {broadcast: broadcast, data: data, id: id, query: Operation.query, variables: variables},
+          {
+            broadcast: broadcast,
+            data: data,
+            id: id,
+            query: Operation.query,
+            variables: variables,
+            overwrite: overwrite,
+          },
           ~mapJsVariables,
           ~serialize=Operation.serialize,
           ~serializeVariables=Operation.serializeVariables,

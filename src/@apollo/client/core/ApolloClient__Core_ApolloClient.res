@@ -392,6 +392,22 @@ module Js_ = {
     ~options: DataProxy.WriteQueryOptions.Js_.t<'jsData, 'jsVariables>,
   ) => option<ApolloCache.reference> = "writeQuery"
 
+  // updateQuery<TData = any, TVariables = any>(options: Cache.UpdateQueryOptions<TData, TVariables>, update: (data: TData | null) => TData | null | void): TData | null
+  @send
+  external updateQuery: (
+    t,
+    ~options: DataProxy.UpdateQueryOptions.Js_.t<'jsVariables>,
+    ~update: Js.null<'jsData> => Js.nullable<'jsData>,
+  ) => Js.nullable<'jsData> = "updateQuery"
+
+  // updateFragment<TData = any, TVariables = any>(options: Cache.UpdateFragmentOptions<TData, TVariables>, update: (data: TData | null) => TData | null | void): TData | null
+  @send
+  external updateFragment: (
+    t,
+    ~options: DataProxy.UpdateFragmentOptions.Js_.t<'jsVariables>,
+    ~update: Js.null<'jsData> => Js.nullable<'jsData>,
+  ) => Js.nullable<'jsData> = "updateFragment"
+
   @module("@apollo/client") @new
   external make: ApolloClientOptions.Js_.t => t = "ApolloClient"
 }
@@ -519,6 +535,34 @@ type t = {
     ~mapJsVariables: 'jsVariables => 'jsVariables=?,
     'variables,
   ) => option<ApolloCache.reference>,
+  @as("rescript_updateFragment")
+  updateFragment: 'data. (
+    ~fragment: module(Fragment with type t = 'data),
+    ~fragmentName: string=?,
+    ~optimistic: bool=?,
+    ~canonizeResults: bool=?,
+    ~broadcast: bool=?,
+    ~overwrite: bool=?,
+    ~id: string,
+    ~update: option<'data> => option<'data>,
+    unit,
+  ) => option<Utils.Types.parseResult<'data>>,
+  @as("rescript_updateQuery")
+  updateQuery: 'data 'variables 'jsVariables. (
+    ~query: module(Operation with
+      type t = 'data
+      and type t_variables = 'variables
+      and type Raw.t_variables = 'jsVariables
+    ),
+    ~optimistic: bool=?,
+    ~canonizeResults: bool=?,
+    ~broadcast: bool=?,
+    ~overwrite: bool=?,
+    ~id: string=?,
+    ~mapJsVariables: 'jsVariables => 'jsVariables=?,
+    ~update: option<'data> => option<'data>,
+    'variables,
+  ) => option<Utils.Types.parseResult<'data>>,
 }
 
 let preserveJsPropsAndContext: (Js_.t, t) => t = %raw(`
@@ -929,6 +973,84 @@ let make: (
       ),
     )
 
+  let updateQuery = (
+    type data variables jsVariables,
+    ~query as module(Operation: Operation with
+      type t = data
+      and type t_variables = variables
+      and type Raw.t_variables = jsVariables
+    ),
+    ~optimistic=?,
+    ~canonizeResults=?,
+    ~broadcast=?,
+    ~overwrite=?,
+    ~id=?,
+    ~mapJsVariables=Utils.identity,
+    ~update,
+    variables,
+  ) => {
+    let safeParse = Utils.safeParse(Operation.parse)
+
+    jsClient
+    ->Js_.updateQuery(~options=DataProxy.UpdateQueryOptions.toJs(
+      {
+        optimistic: optimistic,
+        canonizeResults: canonizeResults,
+        broadcast: broadcast,
+        id: id,
+        query: Operation.query,
+        variables: variables,
+        overwrite: overwrite,
+      },
+      ~mapJsVariables,
+      ~serializeVariables=Operation.serializeVariables,
+    ), ~update=jsData =>
+      jsData
+      ->Js.nullToOption
+      ->Belt.Option.map(Operation.parse)
+      ->update
+      ->Belt.Option.map(Operation.serialize)
+      ->Js.Nullable.fromOption
+    )
+    ->Js.toOption
+    ->Belt.Option.map(safeParse)
+  }
+
+  let updateFragment = (
+    type data,
+    ~fragment as module(Fragment: Fragment with type t = data),
+    ~fragmentName=?,
+    ~optimistic=?,
+    ~canonizeResults=?,
+    ~broadcast=?,
+    ~overwrite=?,
+    ~id,
+    ~update,
+    (),
+  ) => {
+    let safeParse = Utils.safeParse(Fragment.parse)
+
+    jsClient
+    ->Js_.updateFragment(~options=DataProxy.UpdateFragmentOptions.toJs({
+      optimistic: optimistic,
+      canonizeResults: canonizeResults,
+      broadcast: broadcast,
+      id: id,
+      fragment: Fragment.query,
+      fragmentName: fragmentName,
+      overwrite: overwrite,
+    }), ~update=jsData =>
+      jsData
+      ->Js.nullToOption
+      ->Belt.Option.map(Fragment.parse)
+      ->update
+      ->Belt.Option.map(Fragment.serialize)
+      ->Js.Nullable.fromOption
+    )
+    ->Js.toOption
+    ->Belt.Option.map(safeParse)
+  }
+
   preserveJsPropsAndContext(
     jsClient,
     {
@@ -948,6 +1070,8 @@ let make: (
       watchQuery: watchQuery,
       writeFragment: writeFragment,
       writeQuery: writeQuery,
+      updateQuery: updateQuery,
+      updateFragment: updateFragment,
     },
   )
 }

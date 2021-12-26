@@ -25,6 +25,7 @@ module type Operation = {
   type t_variables
 
   let parse: Raw.t => t
+  let parseVariables: Raw.t_variables => t_variables
   let serialize: t => Raw.t
   let serializeVariables: t_variables => Raw.t_variables
 }

@@ -42,7 +42,7 @@ let useMutation:
     ~onCompleted: Types.parseResult<data> => unit=?,
     ~optimisticResponse: jsVariables => data=?,
     ~refetchQueries: RefetchQueryDescription.t=?,
-    ~update: MutationUpdaterFn.t<data>=?,
+    ~update: MutationUpdaterFn.t<data, variables>=?,
     unit,
   ) => MutationTuple.t<data, variables, jsVariables> =
   (
@@ -86,6 +86,7 @@ let useMutation:
         ~safeParse,
         ~serialize=Operation.serialize,
         ~serializeVariables=Operation.serializeVariables,
+        ~parseVariables=Operation.parseVariables,
       ),
     )
 
@@ -95,6 +96,7 @@ let useMutation:
           ~safeParse,
           ~serialize=Operation.serialize,
           ~serializeVariables=Operation.serializeVariables,
+          ~parseVariables=Operation.parseVariables,
         ),
       jsMutationTuple,
     )
@@ -119,9 +121,9 @@ let useMutationWithVariables:
     ~onCompleted: Types.parseResult<data> => unit=?,
     ~optimisticResponse: jsVariables => data=?,
     ~refetchQueries: RefetchQueryDescription.t=?,
-    ~update: MutationUpdaterFn.t<data>=?,
+    ~update: MutationUpdaterFn.t<data, variables>=?,
     variables,
-  ) => MutationTuple__noVariables.t<data, jsVariables> =
+  ) => MutationTuple__noVariables.t<data, variables, jsVariables> =
   (
     ~mutation as module(Operation),
     ~awaitRefetchQueries=?,
@@ -164,6 +166,7 @@ let useMutationWithVariables:
         ~safeParse,
         ~serialize=Operation.serialize,
         ~serializeVariables=Operation.serializeVariables,
+        ~parseVariables=Operation.parseVariables,
       ),
     )
 
@@ -174,6 +177,7 @@ let useMutationWithVariables:
           ~safeParse,
           ~serialize=Operation.serialize,
           ~serializeVariables=Operation.serializeVariables,
+          ~parseVariables=Operation.parseVariables,
           ~variables,
         )
       (mutate, mutationResult)

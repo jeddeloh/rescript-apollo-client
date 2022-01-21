@@ -280,8 +280,8 @@ module Js_ = {
   //     query<T = any, TVariables = OperationVariables>(options: QueryOptions<TVariables, T>): Promise<ApolloQueryResult<T>>;
   //     mutate<T = any, TVariables = OperationVariables>(options: MutationOptions<T, TVariables>): Promise<FetchResult<T>>;
   //     subscribe<T = any, TVariables = OperationVariables>(options: SubscriptionOptions<TVariables, T>): Observable<FetchResult<T>>;
-  //     readQuery<T = any, TVariables = OperationVariables>(options: DataProxy.Query<TVariables, T>, optimistic?: boolean): T | null;
-  //     readFragment<T = any, TVariables = OperationVariables>(options: DataProxy.Fragment<TVariables, T>, optimistic?: boolean): T | null;
+  //     readQuery<T = any, TVariables = OperationVariables>(options: DataProxy.ReadQueryOptions<TVariables, T>, optimistic?: boolean): T | null;
+  //     readFragment<T = any, TVariables = OperationVariables>(options: DataProxy.ReadFragmentOptions<TVariables, T>, optimistic?: boolean): T | null;
   //     writeQuery<TData = any, TVariables = OperationVariables>(options: DataProxy.WriteQueryOptions<TData, TVariables>): void;
   //     writeFragment<TData = any, TVariables = OperationVariables>(options: DataProxy.WriteFragmentOptions<TData, TVariables>): void;
   //     __actionHookForDevTools(cb: () => any): void;
@@ -331,20 +331,20 @@ module Js_ = {
     ~options: QueryOptions.Js_.t<'jsVariables>,
   ) => Js.Promise.t<ApolloQueryResult.Js_.t<'jsData>> = "query"
 
-  // readFragment<T = any, TVariables = OperationVariables>(options: DataProxy.Fragment<TVariables>, optimistic?: boolean): T | null;
+  // readFragment<T = any, TVariables = OperationVariables>(options: DataProxy.ReadFragmentOptions<TVariables>, optimistic?: boolean): T | null;
   @send
   external readFragment: (
     t,
-    ~options: DataProxy.Fragment.Js_.t,
+    ~options: DataProxy.ReadFragmentOptions.Js_.t,
     ~optimistic: bool=?,
     unit,
   ) => Js.nullable<'jsData> = "readFragment"
 
-  // readQuery<T = any, TVariables = OperationVariables>(options: DataProxy.Query<TVariables>, optimistic?: boolean): T | null;
+  // readQuery<T = any, TVariables = OperationVariables>(options: DataProxy.ReadQueryOptions<TVariables>, optimistic?: boolean): T | null;
   @send
   external readQuery: (
     t,
-    ~options: DataProxy.Query.Js_.t<'jsVariables>,
+    ~options: DataProxy.ReadQueryOptions.Js_.t<'jsVariables>,
     ~optimistic: option<bool>,
   ) => Js.nullable<'jsData> = "readQuery"
 
@@ -383,14 +383,30 @@ module Js_ = {
   external writeFragment: (
     t,
     ~options: DataProxy.WriteFragmentOptions.Js_.t<'jsData, 'jsVariables>,
-  ) => unit = "writeFragment"
+  ) => option<ApolloCache.reference> = "writeFragment"
 
   // writeQuery<TData = any, TVariables = OperationVariables>(options: DataProxy.WriteQueryOptions<TData, TVariables>): void;
   @send
   external writeQuery: (
     t,
     ~options: DataProxy.WriteQueryOptions.Js_.t<'jsData, 'jsVariables>,
-  ) => unit = "writeQuery"
+  ) => option<ApolloCache.reference> = "writeQuery"
+
+  // updateQuery<TData = any, TVariables = any>(options: Cache.UpdateQueryOptions<TData, TVariables>, update: (data: TData | null) => TData | null | void): TData | null
+  @send
+  external updateQuery: (
+    t,
+    ~options: DataProxy.UpdateQueryOptions.Js_.t<'jsVariables>,
+    ~update: Js.null<'jsData> => Js.nullable<'jsData>,
+  ) => Js.nullable<'jsData> = "updateQuery"
+
+  // updateFragment<TData = any, TVariables = any>(options: Cache.UpdateFragmentOptions<TData, TVariables>, update: (data: TData | null) => TData | null | void): TData | null
+  @send
+  external updateFragment: (
+    t,
+    ~options: DataProxy.UpdateFragmentOptions.Js_.t<'jsVariables>,
+    ~update: Js.null<'jsData> => Js.nullable<'jsData>,
+  ) => Js.nullable<'jsData> = "updateFragment"
 
   @module("@apollo/client") @new
   external make: ApolloClientOptions.Js_.t => t = "ApolloClient"
@@ -441,6 +457,7 @@ type t = {
     ~fragment: module(Fragment with type t = 'data),
     ~id: string,
     ~optimistic: bool=?,
+    ~canonizeResults: bool=?,
     ~fragmentName: string=?,
     unit,
   ) => option<Types.parseResult<'data>>,
@@ -454,6 +471,7 @@ type t = {
     ~id: string=?,
     ~mapJsVariables: 'jsVariables => 'jsVariables=?,
     ~optimistic: bool=?,
+    ~canonizeResults: bool=?,
     'variables,
   ) => option<Types.parseResult<'data>>,
   @as("rescript_resetStore")
@@ -498,10 +516,11 @@ type t = {
     ~fragment: module(Fragment with type t = 'data),
     ~data: 'data,
     ~broadcast: bool=?,
+    ~overwrite: bool=?,
     ~id: string,
     ~fragmentName: string=?,
     unit,
-  ) => unit,
+  ) => option<ApolloCache.reference>,
   @as("rescript_writeQuery")
   writeQuery: 'data 'variables 'jsVariables. (
     ~query: module(Operation with
@@ -510,11 +529,40 @@ type t = {
       and type Raw.t_variables = 'jsVariables
     ),
     ~broadcast: bool=?,
+    ~overwrite: bool=?,
     ~data: 'data,
     ~id: string=?,
     ~mapJsVariables: 'jsVariables => 'jsVariables=?,
     'variables,
-  ) => unit,
+  ) => option<ApolloCache.reference>,
+  @as("rescript_updateFragment")
+  updateFragment: 'data. (
+    ~fragment: module(Fragment with type t = 'data),
+    ~fragmentName: string=?,
+    ~optimistic: bool=?,
+    ~canonizeResults: bool=?,
+    ~broadcast: bool=?,
+    ~overwrite: bool=?,
+    ~id: string,
+    ~update: option<'data> => option<'data>,
+    unit,
+  ) => option<Utils.Types.parseResult<'data>>,
+  @as("rescript_updateQuery")
+  updateQuery: 'data 'variables 'jsVariables. (
+    ~query: module(Operation with
+      type t = 'data
+      and type t_variables = 'variables
+      and type Raw.t_variables = 'jsVariables
+    ),
+    ~optimistic: bool=?,
+    ~canonizeResults: bool=?,
+    ~broadcast: bool=?,
+    ~overwrite: bool=?,
+    ~id: string=?,
+    ~mapJsVariables: 'jsVariables => 'jsVariables=?,
+    ~update: option<'data> => option<'data>,
+    'variables,
+  ) => option<Utils.Types.parseResult<'data>>,
 }
 
 let preserveJsPropsAndContext: (Js_.t, t) => t = %raw(`
@@ -710,6 +758,7 @@ let make: (
     ~fragment as module(Fragment: Fragment with type t = data),
     ~id,
     ~optimistic=?,
+    ~canonizeResults=?,
     ~fragmentName=?,
     (),
   ) => {
@@ -717,7 +766,13 @@ let make: (
 
     jsClient
     ->Js_.readFragment(
-      ~options={id: id, fragment: Fragment.query, fragmentName: fragmentName},
+      ~options={
+        id: id,
+        fragment: Fragment.query,
+        fragmentName: fragmentName,
+        optimistic: optimistic,
+        canonizeResults: canonizeResults,
+      },
       ~optimistic?,
       (),
     )
@@ -735,14 +790,21 @@ let make: (
     ~id=?,
     ~mapJsVariables=Utils.identity,
     ~optimistic=?,
+    ~canonizeResults=?,
     variables,
   ) => {
     let safeParse = Utils.safeParse(Operation.parse)
 
     Js_.readQuery(
       jsClient,
-      ~options=DataProxy.Query.toJs(
-        {id: id, query: Operation.query, variables: variables},
+      ~options=DataProxy.ReadQueryOptions.toJs(
+        {
+          id: id,
+          query: Operation.query,
+          variables: variables,
+          optimistic: optimistic,
+          canonizeResults: canonizeResults,
+        },
         ~mapJsVariables,
         ~serializeVariables=Operation.serializeVariables,
       ),
@@ -862,6 +924,7 @@ let make: (
     ~fragment as module(Fragment: Fragment with type t = data),
     ~data: data,
     ~broadcast=?,
+    ~overwrite=?,
     ~id,
     ~fragmentName=?,
     (),
@@ -874,6 +937,7 @@ let make: (
           id: id,
           fragment: Fragment.query,
           fragmentName: fragmentName,
+          overwrite: overwrite,
         },
         ~serialize=Fragment.serialize,
       ),
@@ -887,6 +951,7 @@ let make: (
       and type Raw.t_variables = jsVariables
     ),
     ~broadcast=?,
+    ~overwrite=?,
     ~data,
     ~id=?,
     ~mapJsVariables=Utils.identity,
@@ -894,12 +959,97 @@ let make: (
   ) =>
     jsClient->Js_.writeQuery(
       ~options=DataProxy.WriteQueryOptions.toJs(
-        {broadcast: broadcast, data: data, id: id, query: Operation.query, variables: variables},
+        {
+          broadcast: broadcast,
+          data: data,
+          id: id,
+          query: Operation.query,
+          variables: variables,
+          overwrite: overwrite,
+        },
         ~mapJsVariables,
         ~serialize=Operation.serialize,
         ~serializeVariables=Operation.serializeVariables,
       ),
     )
+
+  let updateQuery = (
+    type data variables jsVariables,
+    ~query as module(Operation: Operation with
+      type t = data
+      and type t_variables = variables
+      and type Raw.t_variables = jsVariables
+    ),
+    ~optimistic=?,
+    ~canonizeResults=?,
+    ~broadcast=?,
+    ~overwrite=?,
+    ~id=?,
+    ~mapJsVariables=Utils.identity,
+    ~update,
+    variables,
+  ) => {
+    let safeParse = Utils.safeParse(Operation.parse)
+
+    jsClient
+    ->Js_.updateQuery(~options=DataProxy.UpdateQueryOptions.toJs(
+      {
+        optimistic: optimistic,
+        canonizeResults: canonizeResults,
+        broadcast: broadcast,
+        id: id,
+        query: Operation.query,
+        variables: variables,
+        overwrite: overwrite,
+      },
+      ~mapJsVariables,
+      ~serializeVariables=Operation.serializeVariables,
+    ), ~update=jsData =>
+      jsData
+      ->Js.nullToOption
+      ->Belt.Option.map(Operation.parse)
+      ->update
+      ->Belt.Option.map(Operation.serialize)
+      ->Js.Nullable.fromOption
+    )
+    ->Js.toOption
+    ->Belt.Option.map(safeParse)
+  }
+
+  let updateFragment = (
+    type data,
+    ~fragment as module(Fragment: Fragment with type t = data),
+    ~fragmentName=?,
+    ~optimistic=?,
+    ~canonizeResults=?,
+    ~broadcast=?,
+    ~overwrite=?,
+    ~id,
+    ~update,
+    (),
+  ) => {
+    let safeParse = Utils.safeParse(Fragment.parse)
+
+    jsClient
+    ->Js_.updateFragment(~options=DataProxy.UpdateFragmentOptions.toJs({
+      optimistic: optimistic,
+      canonizeResults: canonizeResults,
+      broadcast: broadcast,
+      id: id,
+      fragment: Fragment.query,
+      fragmentName: fragmentName,
+      overwrite: overwrite,
+    }), ~update=jsData =>
+      jsData
+      ->Js.nullToOption
+      ->Belt.Option.map(Fragment.parse)
+      ->update
+      ->Belt.Option.map(Fragment.serialize)
+      ->Js.Nullable.fromOption
+    )
+    ->Js.toOption
+    ->Belt.Option.map(safeParse)
+  }
 
   preserveJsPropsAndContext(
     jsClient,
@@ -920,6 +1070,8 @@ let make: (
       watchQuery: watchQuery,
       writeFragment: writeFragment,
       writeQuery: writeQuery,
+      updateQuery: updateQuery,
+      updateFragment: updateFragment,
     },
   )
 }

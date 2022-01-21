@@ -605,15 +605,21 @@ module LazyQueryResult = {
 
 module QueryTuple = {
   module Js_ = {
-    // export declare type QueryTuple<TData, TVariables> = [(options?: QueryLazyOptions<TVariables>) => void, LazyQueryResult<TData, TVariables>];
+    // export declare type QueryTuple<TData, TVariables> = [(options?: QueryLazyOptions<TVariables>) => LazyQueryResult<TData, TVariables>, LazyQueryResult<TData, TVariables>];
     type t<'jsData, 'jsVariables> = (
-      QueryLazyOptions.Js_.t<'jsVariables> => unit,
+      QueryLazyOptions.Js_.t<'jsVariables> => Js.Promise.t<
+        QueryResult.Js_.t<'jsData, 'jsVariables>,
+      >,
       LazyQueryResult.Js_.t<'jsData, 'jsVariables>,
     )
   }
 
   type t<'data, 'jsData, 'variables, 'jsVariables> = (
-    (~context: Js.Json.t=?, ~mapJsVariables: 'jsVariables => 'jsVariables=?, 'variables) => unit,
+    (
+      ~context: Js.Json.t=?,
+      ~mapJsVariables: 'jsVariables => 'jsVariables=?,
+      'variables,
+    ) => Js.Promise.t<QueryResult.t<'data, 'jsData, 'variables, 'jsVariables>>,
     LazyQueryResult.t<'data, 'jsData, 'variables, 'jsVariables>,
   )
 
@@ -632,7 +638,14 @@ module QueryTuple = {
       jsExecuteQuery({
         context: context,
         variables: variables->serializeVariables->mapJsVariables,
-      }),
+      }) |> Js.Promise.then_(jsResult =>
+        QueryResult.fromJs(
+          jsResult,
+          ~safeParse,
+          ~serialize,
+          ~serializeVariables,
+        ) |> Js.Promise.resolve
+      ),
     jsLazyQueryResult->LazyQueryResult.fromJs(~safeParse, ~serialize, ~serializeVariables),
   )
 }
@@ -643,7 +656,10 @@ module QueryTuple__noVariables = {
   }
 
   type t<'data, 'jsData, 'variables, 'jsVariables> = (
-    (~context: Js.Json.t=?, unit) => unit,
+    (
+      ~context: Js.Json.t=?,
+      unit,
+    ) => Js.Promise.t<QueryResult.t<'data, 'jsData, 'variables, 'jsVariables>>,
     LazyQueryResult.t<'data, 'jsData, 'variables, 'jsVariables>,
   )
 
@@ -666,7 +682,14 @@ module QueryTuple__noVariables = {
       jsExecuteQuery({
         context: context,
         variables: variables->serializeVariables->mapJsVariables,
-      }),
+      }) |> Js.Promise.then_(jsResult =>
+        QueryResult.fromJs(
+          jsResult,
+          ~safeParse,
+          ~serialize,
+          ~serializeVariables,
+        ) |> Js.Promise.resolve
+      ),
     jsLazyQueryResult->LazyQueryResult.fromJs(~safeParse, ~serialize, ~serializeVariables),
   )
 }
@@ -814,6 +837,7 @@ module MutationResult = {
     //     loading: boolean;
     //     called: boolean;
     //     client?: ApolloClient<object>;
+    //     reset(): void;
     // }
     type t<'jsData> = {
       data: Js.nullable<'jsData>,
@@ -821,6 +845,7 @@ module MutationResult = {
       loading: bool,
       called: bool,
       client: option<ApolloClient.t>, // Non-Js_ client is appropriate here
+      reset: unit => unit,
     }
   }
 
@@ -830,6 +855,7 @@ module MutationResult = {
     loading: bool,
     called: bool,
     client: option<ApolloClient.t>,
+    reset: unit => unit,
   }
 
   let fromJs: (Js_.t<'jsData>, ~safeParse: Types.safeParse<'data, 'jsData>) => t<'data> = (
@@ -847,6 +873,7 @@ module MutationResult = {
       loading: js.loading,
       called: js.called,
       client: js.client,
+      reset: js.reset,
     }
   }
 }

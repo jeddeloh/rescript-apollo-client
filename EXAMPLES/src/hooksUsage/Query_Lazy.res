@@ -15,7 +15,9 @@ let make = () => {
     {switch queryResult {
     | Unexecuted(_) => <>
         {"Waiting to be executed... "->React.string}
-        <button onClick={_ => executeQuery()} value="execute"> {"Execute"->React.string} </button>
+        <button onClick={_ => executeQuery()->Ignore.promise} value="execute">
+          {"Execute"->React.string}
+        </button>
       </>
     | Executed({loading: true, data: None}) => <p> {"Loading"->React.string} </p>
     | Executed({loading, data: Some({todos}), error}) => <>

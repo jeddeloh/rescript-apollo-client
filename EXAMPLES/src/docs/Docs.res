@@ -2,8 +2,7 @@
  This file used for formatting/typechecking of code snippets on the documentation website
  */
 
-module TodosQuery = %graphql(
-  `
+module TodosQuery = %graphql(`
     query TodosQuery {
       todos: allTodos {
         id
@@ -11,8 +10,7 @@ module TodosQuery = %graphql(
         completed
       }
     }
-  `
-)
+  `)
 
 module Basics = {
   @react.component
@@ -67,7 +65,9 @@ module Lazy = {
       {switch queryResult {
       | Unexecuted(_) => <>
           {"Waiting to be executed... "->React.string}
-          <button onClick={_ => executeQuery()} value="execute"> {"Execute"->React.string} </button>
+          <button onClick={_ => executeQuery()->Ignore.promise} value="execute">
+            {"Execute"->React.string}
+          </button>
         </>
       | Executed({loading: true, data: None}) => <p> {"Loading"->React.string} </p>
       | Executed({loading, data: Some({todos}), error}) => <>
@@ -88,8 +88,7 @@ module Lazy = {
   }
 }
 
-module AddTodoMutation = %graphql(
-  `
+module AddTodoMutation = %graphql(`
     mutation AddTodo($text: String!) {
       todo: addTodoSimple(text: $text) {
         id
@@ -97,8 +96,7 @@ module AddTodoMutation = %graphql(
         text
       }
     }
-  `
-)
+  `)
 
 module MutationBasics = {
   @react.component
@@ -185,15 +183,13 @@ module MutationTypical = {
   }
 }
 
-module StatsSubscription = %graphql(
-  `
+module StatsSubscription = %graphql(`
   subscription SorryItsNotASubscriptionForTodos {
     siteStatisticsUpdated {
       currentVisitorsOnline
     }
   }
-  `
-)
+  `)
 
 module Subscription = {
   @react.component

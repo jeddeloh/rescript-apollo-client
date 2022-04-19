@@ -116,12 +116,12 @@ module FieldMerge = {
     // FieldMergeFunction<TExisting, TIncoming, TOptions> | boolean;
     module FieldMergeUnion: {
       type t<'existing>
-      let mergeFunction: FieldMergeFunction.t<'existing> => t<'existing>
+      let mergeFunction: FieldMergeFunction.Js_.t<'existing> => t<'existing>
       let true_: t<'existing>
     } = {
       @unboxed
       type rec t<'existing> = Any('a): t<'existing>
-      let mergeFunction = (v: FieldMergeFunction.t<'existing>) => Any(v)
+      let mergeFunction = (v: FieldMergeFunction.Js_.t<'existing>) => Any(v)
       let true_ = Any(true)
     }
 
@@ -130,7 +130,8 @@ module FieldMerge = {
 
   let toJs: t<'existing> => Js_.t<'existing> = x =>
     switch x {
-    | MergeFunction(mergeFunction) => mergeFunction->Js_.FieldMergeUnion.mergeFunction
+    | MergeFunction(mergeFunction) =>
+      mergeFunction->FieldMergeFunction.toJs->Js_.FieldMergeUnion.mergeFunction
     | True => Js_.FieldMergeUnion.true_
     }
 }

@@ -4,13 +4,6 @@ module FieldNode = ApolloClient__Graphql.Language.Ast.FieldNode
 module ReadFieldFunction = ApolloClient__Cache_Core_Types_Common.ReadFieldFunction
 module ToReferenceFunction = ApolloClient__Cache_Core_Types_Common.ToReferenceFunction
 
-module FieldMergeFunction = {
-  module Js_ = {
-    type t
-  }
-  type t = Js_.t
-}
-
 module StorageType = {
   type t = Js.Dict.t<Js.Json.t>
   module Js_ = {
@@ -90,6 +83,59 @@ module FieldFunctionOptions = {
   }
 }
 
+module FieldMergeFunction = {
+  type t<'existing> = ('existing, 'existing, FieldFunctionOptions.t) => 'existing
+
+  module Js_ = {
+    //  export type FieldMergeFunction<
+    //    TExisting = any,
+    //    TIncoming = TExisting,
+    //    // Passing the whole FieldFunctionOptions makes the current definition
+    //    // independent from its implementation
+    //    TOptions extends FieldFunctionOptions = FieldFunctionOptions
+    //  > = (
+    //    existing: SafeReadonly<TExisting> | undefined,
+    //    // The incoming parameter needs to be positional as well, for the same
+    //    // reasons discussed in FieldReadFunction above.
+    //    incoming: SafeReadonly<TIncoming>,
+    //    options: TOptions,
+    //  ) => SafeReadonly<TExisting>;
+    type t<'existing> = ('existing, 'existing, FieldFunctionOptions.Js_.t) => 'existing
+  }
+
+  let toJs: t<'existing> => Js_.t<'existing> = (t, existing, incoming, jsFieldFunctionOptions) =>
+    t(existing, incoming, jsFieldFunctionOptions->FieldFunctionOptions.fromJs)
+}
+
+module FieldMerge = {
+  type t<'existing> =
+    | MergeFunction(FieldMergeFunction.t<'existing>)
+    | True
+
+  module Js_ = {
+    // FieldMergeFunction<TExisting, TIncoming, TOptions> | boolean;
+    module FieldMergeUnion: {
+      type t<'existing>
+      let mergeFunction: FieldMergeFunction.Js_.t<'existing> => t<'existing>
+      let true_: t<'existing>
+    } = {
+      @unboxed
+      type rec t<'existing> = Any('a): t<'existing>
+      let mergeFunction = (v: FieldMergeFunction.Js_.t<'existing>) => Any(v)
+      let true_ = Any(true)
+    }
+
+    type t<'existing> = FieldMergeUnion.t<'existing>
+  }
+
+  let toJs: t<'existing> => Js_.t<'existing> = x =>
+    switch x {
+    | MergeFunction(mergeFunction) =>
+      mergeFunction->FieldMergeFunction.toJs->Js_.FieldMergeUnion.mergeFunction
+    | True => Js_.FieldMergeUnion.true_
+    }
+}
+
 module FieldReadFunction = {
   type t<'existing> = (option<'existing>, FieldFunctionOptions.t) => 'existing
 
@@ -166,7 +212,7 @@ module FieldPolicy = {
   type t<'existing> = {
     keyArgs: option<FieldPolicy_KeyArgs.t>,
     read: option<FieldReadFunction.t<'existing>>,
-    merge: option<FieldMergeFunction.t>,
+    merge: option<FieldMerge.t<'existing>>,
   }
 
   module Js_ = {
@@ -178,13 +224,13 @@ module FieldPolicy = {
     type t<'existing> = {
       keyArgs: option<FieldPolicy_KeyArgs.Js_.t>,
       read: option<FieldReadFunction.Js_.t<'existing>>,
-      merge: option<FieldMergeFunction.Js_.t>,
+      merge: option<FieldMerge.Js_.t<'existing>>,
     }
   }
 
   let toJs: t<'existing> => Js_.t<'existing> = t => {
     keyArgs: t.keyArgs->Belt.Option.map(FieldPolicy_KeyArgs.toJs),
     read: t.read->Belt.Option.map(FieldReadFunction.toJs),
-    merge: t.merge,
+    merge: t.merge->Belt.Option.map(FieldMerge.toJs),
   }
 }

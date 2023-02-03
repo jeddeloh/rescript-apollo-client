@@ -1,7 +1,6 @@
 /**
  This file used for formatting/typechecking of code snippets on the documentation website
  */
-
 module TodosQuery = %graphql(`
     query TodosQuery {
       todos: allTodos {
@@ -20,7 +19,9 @@ module Basics = {
     | {error: Some(_error)} => "Error loading data"->React.string
     | {data: Some({todos})} =>
       <div>
-        {"There are "->React.string} {todos->Belt.Array.length->React.int} {" To-Dos"->React.string}
+        {"There are "->React.string}
+        {todos->Belt.Array.length->React.int}
+        {" To-Dos"->React.string}
       </div>
     | {data: None, error: None, loading: false} =>
       "I hope this is impossible, but sometimes it's not!"->React.string
@@ -63,14 +64,16 @@ module Lazy = {
     let (executeQuery, queryResult) = TodosQuery.useLazy()
     <div>
       {switch queryResult {
-      | Unexecuted(_) => <>
+      | Unexecuted(_) =>
+        <>
           {"Waiting to be executed... "->React.string}
           <button onClick={_ => executeQuery()->Ignore.promise} value="execute">
             {"Execute"->React.string}
           </button>
         </>
       | Executed({loading: true, data: None}) => <p> {"Loading"->React.string} </p>
-      | Executed({loading, data: Some({todos}), error}) => <>
+      | Executed({loading, data: Some({todos}), error}) =>
+        <>
           <dialog>
             {loading ? <p> {"Refreshing..."->React.string} </p> : React.null}
             {switch error {
@@ -114,7 +117,8 @@ module MutationTypical = {
     let (mutate, result) = AddTodoMutation.use()
 
     switch result {
-    | {called: false} => <>
+    | {called: false} =>
+      <>
         {"Not called... "->React.string}
         <button
           onClick={_ =>
@@ -172,7 +176,8 @@ module MutationTypical = {
     | {loading: true} => "Loading..."->React.string
     | {data: Some({todo: {text}}), error: None} =>
       <p> {React.string("To-Do added: \"" ++ (text ++ "\""))} </p>
-    | {error} => <>
+    | {error} =>
+      <>
         {"Error loading data"->React.string}
         {switch error {
         | Some(error) => React.string(": " ++ error.message)

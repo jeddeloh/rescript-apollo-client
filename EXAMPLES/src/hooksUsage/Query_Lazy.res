@@ -13,14 +13,16 @@ let make = () => {
   let (executeQuery, queryResult) = TodosQuery.useLazy()
   <div>
     {switch queryResult {
-    | Unexecuted(_) => <>
+    | Unexecuted(_) =>
+      <>
         {"Waiting to be executed... "->React.string}
         <button onClick={_ => executeQuery()->Ignore.promise} value="execute">
           {"Execute"->React.string}
         </button>
       </>
     | Executed({loading: true, data: None}) => <p> {"Loading"->React.string} </p>
-    | Executed({loading, data: Some({todos}), error}) => <>
+    | Executed({loading, data: Some({todos}), error}) =>
+      <>
         <dialog>
           {loading ? <p> {"Refreshing..."->React.string} </p> : React.null}
           {switch error {

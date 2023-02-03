@@ -1,5 +1,4 @@
-module TodosQuery = %graphql(
-  `
+module TodosQuery = %graphql(`
     query TodosQuery {
       todos: allTodos {
         id
@@ -7,8 +6,7 @@ module TodosQuery = %graphql(
         completed
       }
     }
-  `
-)
+  `)
 
 @react.component
 let make = () => {
@@ -39,12 +37,14 @@ let make = () => {
                   }
                 | None => previousData
                 }
-              , ())->Promise.map(result => {
+              , ())
+              ->Promise.thenResolve(result => {
                 switch result {
                 | Ok(_) => Js.log("fetchMore: success!")
                 | Error(_) => Js.log("fetchMore: failure!")
                 }
-              })->ignore
+              })
+              ->ignore
             }}>
             {"Fetch More!"->React.string}
           </button>

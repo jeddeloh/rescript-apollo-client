@@ -16,6 +16,10 @@
     }
   ],
   "ppx-flags": ["@reasonml-community/graphql-ppx/ppx"],
+  "jsx": {
+    "version": 4,
+    "mode": "automatic"
+  },
   "reason": {
     "react-jsx": 3
   },

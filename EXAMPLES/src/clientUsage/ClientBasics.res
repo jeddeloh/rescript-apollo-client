@@ -1,19 +1,16 @@
 module ApolloQueryResult = ApolloClient.Types.ApolloQueryResult
 module ObservableQuery = ApolloClient.Types.ObservableQuery
 
-module AddTodoMutation = %graphql(
-  `
+module AddTodoMutation = %graphql(`
     mutation AddTodo($text: String!) {
       todo: addTodoSimple(text: $text) {
         id
         text
       }
     }
-  `
-)
+  `)
 
-module TodosQuery = %graphql(
-  `
+module TodosQuery = %graphql(`
     query TodosQuery {
       todos: allTodos {
         id
@@ -21,29 +18,29 @@ module TodosQuery = %graphql(
         completed
       }
     }
-  `
-)
+  `)
 
-module StatsSubscription = %graphql(
-  `
+module StatsSubscription = %graphql(`
     subscription SorryItsNotASubscriptionForTodos {
       siteStatisticsUpdated {
         currentVisitorsOnline
       }
     }
-  `
-)
+  `)
 
-let logTodos = _ => Apollo.client.query(~query=module(TodosQuery), ())->Promise.map(result =>
+let logTodos = _ =>
+  Apollo.client.query(~query=module(TodosQuery), ())
+  ->Promise.thenResolve(result =>
     switch result {
     | Ok({data: {todos}}) => Js.log2("query To-Dos: ", todos)
     | Error(error) => Js.log2("Error: ", error)
     }
-  )->ignore
+  )
+  ->ignore
 
 let addTodo = _ =>
   Apollo.client.mutate(~mutation=module(AddTodoMutation), {text: "Another To-Do"})
-  ->Promise.map(result =>
+  ->Promise.thenResolve(result =>
     switch result {
     | Ok({data}) => Js.log2("mutate result: ", data)
     | Error(error) => Js.log2("Error: ", error)
@@ -76,7 +73,11 @@ let statsSubscription = Apollo.client.subscribe(
 @react.component
 let make = () =>
   <div>
-    <p> <button onClick=logTodos> {"Log To-Dos (Reason Promise)"->React.string} </button> </p>
-    <p> <button onClick=addTodo> {"Add To-Do"->React.string} </button> </p>
+    <p>
+      <button onClick=logTodos> {"Log To-Dos (Reason Promise)"->React.string} </button>
+    </p>
+    <p>
+      <button onClick=addTodo> {"Add To-Do"->React.string} </button>
+    </p>
     <p> {"[ To-Dos also logged in console with watchQuery ]"->React.string} </p>
   </div>

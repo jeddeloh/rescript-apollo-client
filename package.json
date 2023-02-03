@@ -1,7 +1,7 @@
 {
   "name": "rescript-apollo-client",
   "description": "ReScript bindings for the Apollo Client ecosystem",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "keywords": [
     "Apollo",
     "BuckleScript",

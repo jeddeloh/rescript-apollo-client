@@ -1,7 +1,6 @@
 module Cache = ApolloClient.Cache
 
-module AddTodoMutation = %graphql(
-  `
+module AddTodoMutation = %graphql(`
     mutation AddTodo($text: String!) {
       todo: addTodoSimple(text: $text) {
         id
@@ -9,11 +8,9 @@ module AddTodoMutation = %graphql(
         text
       }
     }
-  `
-)
+  `)
 
-module TodosQuery = %graphql(
-  `
+module TodosQuery = %graphql(`
     query TodosQuery {
       todos: allTodos {
         id
@@ -21,15 +18,15 @@ module TodosQuery = %graphql(
         text
       }
     }
-  `
-)
+  `)
 
 @react.component
 let make = () => {
   let (mutate, result) = AddTodoMutation.use()
 
   switch result {
-  | {called: false} => <>
+  | {called: false} =>
+    <>
       {"Not called... "->React.string}
       <button onClick={_ => mutate({text: "Another To-Do"})->ignore}>
         {"Add To-Do"->React.string}
@@ -49,12 +46,10 @@ let make = () => {
             ~update=({writeFragment, writeQuery}, {data}) =>
               switch data {
               | Some({todo}) =>
-                @ocaml.doc(
-                  "
+                @ocaml.doc("
                    * Apollo docs use cache.modify, but it's not typesafe. I recommend some
                    * combination of readQuery / writeQuery / writeFragment
-                   "
-                )
+                   ")
                 Js.log2("mutate.update To-Do: ", todo)
                 let _unusedRef = writeFragment(
                   ~fragment=module(Fragments.TodoItem),
@@ -95,7 +90,8 @@ let make = () => {
   | {loading: true} => "Loading..."->React.string
   | {data: Some({todo: {text}}), error: None} =>
     <p> {React.string("To-Do added: \"" ++ (text ++ "\""))} </p>
-  | {error} => <>
+  | {error} =>
+    <>
       {"Error loading data"->React.string}
       {switch error {
       | Some(error) => React.string(": " ++ error.message)

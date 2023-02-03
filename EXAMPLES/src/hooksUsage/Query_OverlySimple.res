@@ -15,7 +15,9 @@ let make = () =>
   | {error: Some(_error)} => "Error loading data"->React.string
   | {data: Some({todos})} =>
     <div>
-      {"There are "->React.string} {todos->Belt.Array.length->React.int} {" To-Dos"->React.string}
+      {"There are "->React.string}
+      {todos->Belt.Array.length->React.int}
+      {" To-Dos"->React.string}
     </div>
   | {data: None, error: None, loading: false} =>
     "I hope this is impossible, but sometimes it's not!"->React.string

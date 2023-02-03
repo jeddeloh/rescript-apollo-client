@@ -4,6 +4,9 @@ const outputDir = path.join(__dirname, "build/");
 
 const isProd = process.env.NODE_ENV === "production";
 
+/**
+ * @type import("webpack").Configuration
+ */
 module.exports = {
   entry: "./src/WebpackEntry.bs.js",
   mode: isProd ? "production" : "development",
@@ -19,7 +22,9 @@ module.exports = {
   ],
   devServer: {
     compress: true,
-    contentBase: outputDir,
+    static: {
+      directory: outputDir,
+    },
     port: process.env.PORT || 8000,
     historyApiFallback: true,
   },

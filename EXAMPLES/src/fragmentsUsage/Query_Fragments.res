@@ -24,7 +24,8 @@ let make = () => {
   <div>
     {switch queryResult {
     | {loading: true, data: None} => <p> {"Loading"->React.string} </p>
-    | {loading, data: Some({todos}), error} => <>
+    | {loading, data: Some({todos}), error} =>
+      <>
         <dialog>
           {loading ? <p> {"Refreshing..."->React.string} </p> : React.null}
           {switch error {

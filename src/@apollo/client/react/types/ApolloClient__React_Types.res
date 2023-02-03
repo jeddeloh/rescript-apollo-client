@@ -723,7 +723,7 @@ module BaseMutationOptions = {
       onCompleted: 'jsData => unit,
       optimisticResponse: option<'jsVariables => 'jsData>,
       refetchQueries: option<RefetchQueryDescription.Js_.t>,
-      update: option<MutationUpdaterFn.Js_.t<'jsData>>,
+      update: option<MutationUpdaterFn.Js_.t<'jsData, 'jsVariables>>,
       variables: option<'jsVariables>,
     }
   }
@@ -740,7 +740,7 @@ module BaseMutationOptions = {
     onCompleted: option<'data => unit>,
     optimisticResponse: option<'jsVariables => 'data>,
     refetchQueries: option<RefetchQueryDescription.t>,
-    update: option<MutationUpdaterFn.t<'data>>,
+    update: option<MutationUpdaterFn.t<'data, 'jsVariables>>,
     variables: option<'jsVariables>,
   }
 }
@@ -768,7 +768,7 @@ module MutationHookOptions = {
       ~onCompleted: 'jsData => unit=?,
       ~optimisticResponse: 'jsVariables => 'jsData=?,
       ~refetchQueries: RefetchQueryDescription.Js_.t=?,
-      ~update: MutationUpdaterFn.Js_.t<'jsData>=?,
+      ~update: MutationUpdaterFn.Js_.t<'jsData, 'jsVariables>=?,
       ~variables: 'jsVariables=?,
       unit,
     ) => t<'jsData, 'jsVariables> = ""
@@ -787,7 +787,7 @@ module MutationHookOptions = {
     onCompleted: option<Types.parseResult<'data> => unit>,
     optimisticResponse: option<'jsVariables => 'data>,
     refetchQueries: option<RefetchQueryDescription.t>,
-    update: option<MutationUpdaterFn.t<'data>>,
+    update: option<MutationUpdaterFn.t<'data, 'variables>>,
     variables: option<'variables>,
   }
 
@@ -797,12 +797,14 @@ module MutationHookOptions = {
     ~safeParse: Types.safeParse<'data, 'jsData>,
     ~serialize: 'data => 'jsData,
     ~serializeVariables: 'variables => 'jsVariables,
+    ~parseVariables: 'jsVariables => 'variables,
   ) => Js_.t<'jsData, 'jsVariables> = (
     t,
     ~mapJsVariables,
     ~safeParse,
     ~serialize,
     ~serializeVariables,
+    ~parseVariables,
   ) =>
     Js_.make(
       ~awaitRefetchQueries=?t.awaitRefetchQueries,
@@ -823,7 +825,7 @@ module MutationHookOptions = {
         optimisticResponse(variables)->serialize
       ),
       ~refetchQueries=?t.refetchQueries->Belt.Option.map(RefetchQueryDescription.toJs),
-      ~update=?t.update->Belt.Option.map(MutationUpdaterFn.toJs(~safeParse)),
+      ~update=?t.update->Belt.Option.map(MutationUpdaterFn.toJs(~safeParse, ~parseVariables)),
       ~variables=?t.variables->Belt.Option.map(v => v->serializeVariables->mapJsVariables),
       (),
     )
@@ -895,7 +897,7 @@ module MutationFunctionOptions = {
       optimisticResponse: option<(. 'jsVariables) => 'jsData>,
       refetchQueries: option<RefetchQueryDescription.Js_.t>,
       awaitRefetchQueries: option<bool>,
-      update: option<MutationUpdaterFn.Js_.t<'jsData>>,
+      update: option<MutationUpdaterFn.Js_.t<'jsData, 'jsVariables>>,
       context: option<Js.Json.t>, // actual: option(Context)
       fetchPolicy: option<WatchQueryFetchPolicy.Js_.t>,
     }
@@ -903,10 +905,10 @@ module MutationFunctionOptions = {
 
   type t<'data, 'variables, 'jsVariables> = {
     variables: 'variables,
-    optimisticResponse: option<'jsVariables => 'data>,
+    optimisticResponse: option<'jsVariables => 'data>, // shouldn't this be 'variables?
     refetchQueries: option<RefetchQueryDescription.t>,
     awaitRefetchQueries: option<bool>,
-    update: option<MutationUpdaterFn.t<'data>>,
+    update: option<MutationUpdaterFn.t<'data, 'variables>>,
     context: option<Js.Json.t>, // actual: option(Context)
     fetchPolicy: option<WatchQueryFetchPolicy.t>,
   }
@@ -917,12 +919,14 @@ module MutationFunctionOptions = {
     ~safeParse: Types.safeParse<'data, 'jsData>,
     ~serialize: 'data => 'jsData,
     ~serializeVariables: 'variables => 'jsVariables,
+    ~parseVariables: 'jsVariables => 'variables,
   ) => Js_.t<'jsData, 'jsVariables> = (
     t,
     ~mapJsVariables,
     ~safeParse,
     ~serialize,
     ~serializeVariables,
+    ~parseVariables,
   ) => {
     variables: t.variables->serializeVariables->mapJsVariables,
     optimisticResponse: t.optimisticResponse->Belt.Option.map((optimisticResponse, . variables) =>
@@ -930,7 +934,7 @@ module MutationFunctionOptions = {
     ),
     refetchQueries: t.refetchQueries->Belt.Option.map(RefetchQueryDescription.toJs),
     awaitRefetchQueries: t.awaitRefetchQueries,
-    update: t.update->Belt.Option.map(MutationUpdaterFn.toJs(~safeParse)),
+    update: t.update->Belt.Option.map(MutationUpdaterFn.toJs(~safeParse, ~parseVariables)),
     context: t.context,
     fetchPolicy: t.fetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
   }
@@ -954,7 +958,7 @@ module MutationTuple = {
     ~mapJsVariables: 'jsVariables => 'jsVariables=?,
     ~optimisticResponse: 'jsVariables => 'data=?,
     ~refetchQueries: RefetchQueryDescription.t=?,
-    ~update: MutationUpdaterFn.t<'data>=?,
+    ~update: MutationUpdaterFn.t<'data, 'variables>=?,
     'variables,
   ) => Js.Promise.t<Belt.Result.t<FetchResult.t__ok<'data>, ApolloError.t>>
 
@@ -968,11 +972,13 @@ module MutationTuple = {
     ~safeParse: Types.safeParse<'data, 'jsData>,
     ~serialize: 'data => 'jsData,
     ~serializeVariables: 'variables => 'jsVariables,
+    ~parseVariables: 'jsVariables => 'variables,
   ) => t<'data, 'variables, 'jsVariables> = (
     (jsMutationFn, jsMutationResult),
     ~safeParse,
     ~serialize,
     ~serializeVariables,
+    ~parseVariables,
   ) => {
     let mutationFn = (
       ~awaitRefetchQueries=?,
@@ -1000,6 +1006,7 @@ module MutationTuple = {
             ~safeParse,
             ~serialize,
             ~serializeVariables,
+            ~parseVariables,
           ),
         ),
       )
@@ -1025,17 +1032,20 @@ module MutationTuple__noVariables = {
     type t<'jsData, 'jsVariables> = MutationTuple.Js_.t<'jsData, 'jsVariables>
   }
 
-  type t_mutationFn<'data, 'jsVariables> = (
+  type t_mutationFn<'data, 'variables, 'jsVariables> = (
     ~optimisticResponse: 'jsVariables => 'data=?,
     ~refetchQueries: RefetchQueryDescription.t=?,
     ~awaitRefetchQueries: bool=?,
-    ~update: MutationUpdaterFn.t<'data>=?,
+    ~update: MutationUpdaterFn.t<'data, 'variables>=?,
     ~context: Js.Json.t=?,
     ~fetchPolicy: WatchQueryFetchPolicy.t=?,
     unit,
   ) => Js.Promise.t<Belt.Result.t<FetchResult.t__ok<'data>, ApolloError.t>>
 
-  type t<'data, 'jsVariables> = (t_mutationFn<'data, 'jsVariables>, MutationResult.t<'data>)
+  type t<'data, 'variables, 'jsVariables> = (
+    t_mutationFn<'data, 'variables, 'jsVariables>,
+    MutationResult.t<'data>,
+  )
 
   let fromJs: (
     Js_.t<'jsData, 'jsVariables>,
@@ -1043,13 +1053,15 @@ module MutationTuple__noVariables = {
     ~safeParse: Types.safeParse<'data, 'jsData>,
     ~serialize: 'data => 'jsData,
     ~serializeVariables: 'variables => 'jsVariables,
+    ~parseVariables: 'jsVariables => 'variables,
     ~variables: 'variables,
-  ) => t<'data, 'jsVariables> = (
+  ) => t<'data, 'variables, 'jsVariables> = (
     (jsMutationFn, jsMutationResult),
     ~mapJsVariables,
     ~safeParse,
     ~serialize,
     ~serializeVariables,
+    ~parseVariables,
     ~variables,
   ) => {
     let mutationFn = (
@@ -1077,6 +1089,7 @@ module MutationTuple__noVariables = {
             ~safeParse,
             ~serialize,
             ~serializeVariables,
+            ~parseVariables,
           ),
         ),
       )

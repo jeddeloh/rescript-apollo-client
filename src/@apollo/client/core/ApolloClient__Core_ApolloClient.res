@@ -432,7 +432,7 @@ type t = {
     ~optimisticResponse: 'jsVariables => 'data=?,
     ~refetchQueries: RefetchQueryDescription.t=?,
     ~updateQueries: MutationQueryReducersMap.t<'data>=?,
-    ~update: MutationUpdaterFn.t<'data>=?,
+    ~update: MutationUpdaterFn.t<'data, 'variables>=?,
     'variables,
   ) => Js.Promise.t<Belt.Result.t<FetchResult.t__ok<'data>, ApolloError.t>>,
   @as("rescript_onClearStore")
@@ -676,6 +676,7 @@ let make: (
         ~safeParse,
         ~serialize=Operation.serialize,
         ~serializeVariables=Operation.serializeVariables,
+        ~parseVariables=Operation.parseVariables,
       ),
     )
     ->Js.Promise.then_(

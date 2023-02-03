@@ -318,17 +318,46 @@ module SubscriptionOptions = {
 
 module MutationUpdaterFn = {
   module Js_ = {
-    type t<'jsData> = (. ApolloCache.t<Js.Json.t>, FetchResult.Js_.t<'jsData>) => unit // Non-Js_ cache is correct here
+    type options<'jsVariables> = {
+      context: option<Js.Json.t>,
+      variables: option<'jsVariables>,
+    }
+
+    type t<'jsData, 'jsVariables> = (
+      . ApolloCache.t<Js.Json.t>,
+      FetchResult.Js_.t<'jsData>,
+      options<'jsVariables>,
+    ) => unit // Non-Js_ cache is correct here
   }
 
-  type t<'data> = (ApolloCache.t<Js.Json.t>, FetchResult.t<'data>) => unit
+  type options<'variables> = {
+    context: option<Js.Json.t>,
+    variables: option<'variables>,
+  }
 
-  let toJs: (t<'data>, ~safeParse: Types.safeParse<'data, 'jsData>) => Js_.t<'jsData> = (
+  type t<'data, 'variables> = (
+    ApolloCache.t<Js.Json.t>,
+    FetchResult.t<'data>,
+    options<'variables>,
+  ) => unit
+
+  let toJs: (
+    t<'data, 'variables>,
+    ~safeParse: Types.safeParse<'data, 'jsData>,
+    ~parseVariables: 'jsVariables => 'variables,
+  ) => Js_.t<'jsData, 'jsVariables> = (
     mutationUpdaterFn,
     ~safeParse,
+    ~parseVariables: 'jsVariables => 'variables,
     . cache,
     jsFetchResult,
-  ) => mutationUpdaterFn(cache, jsFetchResult->FetchResult.fromJs(~safeParse))
+    jsOptions,
+  ) =>
+    mutationUpdaterFn(
+      cache,
+      jsFetchResult->FetchResult.fromJs(~safeParse),
+      {context: jsOptions.context, variables: jsOptions.variables->Belt.Option.map(parseVariables)},
+    )
 }
 
 module RefetchQueryDescription = {
@@ -378,7 +407,7 @@ module MutationOptions = {
       awaitRefetchQueries: option<bool>,
       errorPolicy: option<ErrorPolicy.Js_.t>,
       optimisticResponse: option<(. 'jsVariables) => 'jsData>,
-      update: option<MutationUpdaterFn.Js_.t<'jsData>>,
+      update: option<MutationUpdaterFn.Js_.t<'jsData, 'jsVariables>>,
       updateQueries: option<MutationQueryReducersMap.Js_.t<'jsData>>,
       refetchQueries: option<RefetchQueryDescription.Js_.t>,
       // We don't allow optional variables because it's not typesafe
@@ -395,7 +424,7 @@ module MutationOptions = {
     errorPolicy: option<ErrorPolicy.t>,
     optimisticResponse: option<'jsVariables => 'data>,
     refetchQueries: option<RefetchQueryDescription.t>,
-    update: option<MutationUpdaterFn.t<'data>>,
+    update: option<MutationUpdaterFn.t<'data, 'variables>>,
     updateQueries: option<MutationQueryReducersMap.t<'data>>,
     variables: 'variables,
   }
@@ -406,12 +435,14 @@ module MutationOptions = {
     ~safeParse: Types.safeParse<'data, 'jsData>,
     ~serialize: 'data => 'jsData,
     ~serializeVariables: 'variables => 'jsVariables,
+    ~parseVariables: 'jsVariables => 'variables,
   ) => Js_.t<'jsData, 'jsVariables> = (
     t,
     ~mapJsVariables,
     ~safeParse,
     ~serialize,
     ~serializeVariables,
+    ~parseVariables,
   ) => {
     awaitRefetchQueries: t.awaitRefetchQueries,
     context: t.context,
@@ -422,7 +453,7 @@ module MutationOptions = {
       optimisticResponse(variables)->serialize
     ),
     refetchQueries: t.refetchQueries->Belt.Option.map(RefetchQueryDescription.toJs),
-    update: t.update->Belt.Option.map(MutationUpdaterFn.toJs(~safeParse)),
+    update: t.update->Belt.Option.map(MutationUpdaterFn.toJs(~safeParse, ~parseVariables)),
     updateQueries: t.updateQueries->Belt.Option.map(MutationQueryReducersMap.toJs(~safeParse)),
     variables: t.variables->serializeVariables->mapJsVariables,
   }

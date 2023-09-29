@@ -35,8 +35,8 @@ module Options = {
     //     }
     // }
     type t = {
-      delay: option<T_delayUnion.t>,
-      attempts: option<T_attemptsUnion.t>,
+      delay?: T_delayUnion.t,
+      attempts?: T_attemptsUnion.t,
     }
   }
 
@@ -44,12 +44,12 @@ module Options = {
   type t_attempts = RetryFunctionOptions(RetryFunctionOptions.t) | RetryFunction(RetryFunction.t)
 
   type t = {
-    delay: option<t_delay>,
-    attempts: option<t_attempts>,
+    delay?: t_delay,
+    attempts?: t_attempts,
   }
 
   let toJs: t => Js_.t = t => {
-    delay: t.delay->Belt.Option.map(delay =>
+    delay: ?t.delay->Belt.Option.map(delay =>
       switch delay {
       | DelayFunctionOptions(delayFunctionOptions) =>
         Js_.T_delayUnion.delayFunctionOptions(delayFunctionOptions)
@@ -57,7 +57,7 @@ module Options = {
         Js_.T_delayUnion.delayFunction(delayFunction->DelayFunction.toJs)
       }
     ),
-    attempts: t.attempts->Belt.Option.map(attempts =>
+    attempts: ?t.attempts->Belt.Option.map(attempts =>
       switch attempts {
       | RetryFunctionOptions(retryFunctionOptions) =>
         Js_.T_attemptsUnion.retryFunctionOptions(retryFunctionOptions->RetryFunctionOptions.toJs)
@@ -82,7 +82,7 @@ module Js_ = {
 let make = (~attempts=?, ~delay=?, ()) =>
   Js_.make(
     Options.toJs({
-      attempts,
-      delay,
+      ?attempts,
+      ?delay,
     }),
   )

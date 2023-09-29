@@ -11,24 +11,16 @@ module InMemoryCacheConfig = {
     //     possibleTypes?: PossibleTypesMap;
     //     typePolicies?: TypePolicies;
     // }
-    // NOTE: Using deriving abstract here because passing properties that are undefined has effects
-    @deriving(abstract)
     type t = {
-      @optional
-      resultCaching: bool,
-      @optional
-      possibleTypes: PossibleTypesMap.Js_.t,
-      @optional
-      typePolicies: TypePolicies.Js_.t,
+      resultCaching?: bool,
+      possibleTypes?: PossibleTypesMap.Js_.t,
+      typePolicies?: TypePolicies.Js_.t,
       // ...extends ApolloReducerConfig
-      @optional
-      dataIdFromObject: KeyFieldsFunction.Js_.t,
-      @optional
-      addTypename: bool,
+      dataIdFromObject?: KeyFieldsFunction.Js_.t,
+      addTypename?: bool,
     }
   }
   type t = Js_.t
-  let make = Js_.t
 }
 
 module Js_ = {
@@ -88,13 +80,10 @@ let make: (
   ~typePolicies=?,
   (),
 ) =>
-  Js_.make(
-    InMemoryCacheConfig.make(
-      ~addTypename?,
-      ~dataIdFromObject?,
-      ~possibleTypes?,
-      ~resultCaching?,
-      ~typePolicies=?typePolicies->Belt.Option.map(TypePolicies.toJs),
-      (),
-    ),
-  )->ApolloCache.fromJs
+  Js_.make({
+    ?addTypename,
+    ?dataIdFromObject,
+    ?possibleTypes,
+    ?resultCaching,
+    typePolicies: ?typePolicies->Belt.Option.map(TypePolicies.toJs),
+  })->ApolloCache.fromJs

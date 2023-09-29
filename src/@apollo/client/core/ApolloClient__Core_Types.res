@@ -27,20 +27,20 @@ module PureQueryOptions = {
       query: Graphql.documentNode,
       // We don't allow optional variables because it's not typesafe
       variables: 'jsVariables,
-      context: option<Js.Json.t>,
+      context?: Js.Json.t,
     }
   }
 
   type t<'jsVariables> = {
     query: Graphql.documentNode,
     variables: 'jsVariables,
-    context: option<Js.Json.t>,
+    context?: Js.Json.t,
   }
 
   let toJs: t<'jsVariables> => Js_.t<'jsVariables> = t => {
     query: t.query,
     variables: t.variables,
-    context: t.context,
+    context: ?t.context,
   }
 }
 
@@ -136,7 +136,7 @@ module MutationQueryReducer = {
       queryVariables: Js.Json.t, // ACTUAL: Record<string, any>
     }
 
-    type t<'jsData> = (. Js.Json.t, options<'jsData>) => Js.Json.t
+    type t<'jsData> = (Js.Json.t, options<'jsData>) => Js.Json.t
   }
 
   type options<'data> = {
@@ -150,16 +150,17 @@ module MutationQueryReducer = {
   let toJs: (
     t<'data>,
     ~safeParse: Types.safeParse<'data, 'jsData>,
-  ) => (. Js.Json.t, Js_.options<'jsData>) => Js.Json.t = (t, ~safeParse) =>
-    (. previousResult, jsOptions) =>
-      t(
-        previousResult,
-        {
-          mutationResult: jsOptions.mutationResult->FetchResult.fromJs(~safeParse),
-          queryName: jsOptions.queryName,
-          queryVariables: jsOptions.queryVariables,
-        },
-      )
+    Js.Json.t,
+    Js_.options<'jsData>,
+  ) => Js.Json.t = (t, ~safeParse, previousResult, jsOptions) =>
+    t(
+      previousResult,
+      {
+        mutationResult: jsOptions.mutationResult->FetchResult.fromJs(~safeParse),
+        queryName: jsOptions.queryName,
+        queryVariables: jsOptions.queryVariables,
+      },
+    )
 }
 
 module MutationQueryReducersMap = {

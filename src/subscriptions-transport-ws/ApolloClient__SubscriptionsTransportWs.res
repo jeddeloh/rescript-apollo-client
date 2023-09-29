@@ -84,38 +84,39 @@ module ClientOptions = {
     //     inactivityTimeout?: number;
     // }
     type t = {
-      connectionParams: option<ConnectionParamsOptions.Js_.t>,
-      timeout: option<int>,
-      reconnect: option<bool>,
-      reconnectionAttempts: option<int>,
-      connectionCallback: option<(~error: array<Js.Exn.t>, ~result: option<Js.Json.t>) => unit>,
+      connectionParams?: ConnectionParamsOptions.Js_.t,
+      timeout?: int,
+      reconnect?: bool,
+      reconnectionAttempts?: int,
+      connectionCallback?: (~error: array<Js.Exn.t>, ~result: option<Js.Json.t>) => unit,
       @as("lazy")
-      lazy_: option<bool>,
-      inactivityTimeout: option<int>,
+      lazy_?: bool,
+      inactivityTimeout?: int,
     }
   }
 
   type t = {
-    connectionParams: option<ConnectionParamsOptions.t>,
-    timeout: option<int>,
-    reconnect: option<bool>,
-    reconnectionAttempts: option<int>,
-    connectionCallback: option<(~error: array<Js.Exn.t>, ~result: option<Js.Json.t>) => unit>,
+    connectionParams?: ConnectionParamsOptions.t,
+    timeout?: int,
+    reconnect?: bool,
+    reconnectionAttempts?: int,
+    connectionCallback?: (~error: array<Js.Exn.t>, ~result: option<Js.Json.t>) => unit,
     @as("lazy")
-    lazy_: option<bool>,
-    inactivityTimeout: option<int>,
+    lazy_?: bool,
+    inactivityTimeout?: int,
   }
 
   let toJs: t => Js_.t = t => {
-    connectionParams: t.connectionParams->Belt.Option.map(ConnectionParamsOptions.toJs),
-    timeout: t.timeout,
-    reconnect: t.reconnect,
-    reconnectionAttempts: t.reconnectionAttempts,
-    connectionCallback: t.connectionCallback,
-    lazy_: t.lazy_,
-    inactivityTimeout: t.inactivityTimeout,
+    connectionParams: ?t.connectionParams->Belt.Option.map(ConnectionParamsOptions.toJs),
+    timeout: ?t.timeout,
+    reconnect: ?t.reconnect,
+    reconnectionAttempts: ?t.reconnectionAttempts,
+    connectionCallback: ?t.connectionCallback,
+    lazy_: ?t.lazy_,
+    inactivityTimeout: ?t.inactivityTimeout,
   }
 
+  @deprecated("Construct the record directly instead")
   let make = (
     ~connectionParams=?,
     ~timeout=?,
@@ -126,13 +127,13 @@ module ClientOptions = {
     ~inactivityTimeout=?,
     (),
   ): t => {
-    connectionParams,
-    timeout,
-    reconnect,
-    reconnectionAttempts,
-    connectionCallback,
-    lazy_,
-    inactivityTimeout,
+    ?connectionParams,
+    ?timeout,
+    ?reconnect,
+    ?reconnectionAttempts,
+    ?connectionCallback,
+    ?lazy_,
+    ?inactivityTimeout,
   }
 }
 

@@ -17,10 +17,10 @@ module ReadQueryOptions = {
       query: Graphql.documentNode,
       // We don't allow optional variables because it's not typesafe
       variables: 'jsVariables,
-      id: option<string>,
-      // returnPartialData: option<bool>,
-      optimistic: option<bool>,
-      canonizeResults: option<bool>,
+      id?: string,
+      // returnPartialData?: bool,
+      optimistic?: bool,
+      canonizeResults?: bool,
     }
   }
 
@@ -33,10 +33,10 @@ module ReadQueryOptions = {
   ) => Js_.t<'jsVariables> = (t, ~mapJsVariables=Utils.identity, ~serializeVariables) => {
     query: t.query,
     variables: t.variables->serializeVariables->mapJsVariables,
-    id: t.id,
-    // returnPartialData: t.returnPartialData,
-    optimistic: t.optimistic,
-    canonizeResults: t.canonizeResults,
+    id: ?t.id,
+    // returnPartialData: ?t.returnPartialData,
+    optimistic: ?t.optimistic,
+    canonizeResults: ?t.canonizeResults,
   }
 }
 
@@ -58,10 +58,10 @@ module ReadFragmentOptions = {
       fragment: Graphql.documentNode,
       // We don't allow optional variables because it's not typesafe
       // variables: 'jsVariables,
-      fragmentName: option<string>,
-      // returnPartialData: option<bool>,
-      optimistic: option<bool>,
-      canonizeResults: option<bool>,
+      fragmentName?: string,
+      // returnPartialData?: bool,
+      optimistic?: bool,
+      canonizeResults?: bool,
     }
   }
 
@@ -70,10 +70,10 @@ module ReadFragmentOptions = {
     fragment: Graphql.documentNode,
     // We don't allow optional variables because it's not typesafe
     // variables: 'jsVariables,
-    fragmentName: option<string>,
-    // returnPartialData: option<bool>,
-    optimistic: option<bool>,
-    canonizeResults: option<bool>,
+    fragmentName?: string,
+    // returnPartialData?: bool,
+    optimistic?: bool,
+    canonizeResults?: bool,
   }
 }
 
@@ -85,23 +85,23 @@ module WriteQueryOptions = {
     // }
     type t<'jsData, 'jsVariables> = {
       data: 'jsData,
-      broadcast: option<bool>,
-      overwrite: option<bool>,
+      broadcast?: bool,
+      overwrite?: bool,
       // ...extends Query
       query: Graphql.documentNode,
       // We don't allow optional variables because it's not typesafe
       variables: 'jsVariables,
-      id: option<string>,
+      id?: string,
     }
   }
 
   type t<'data, 'variables> = {
     data: 'data,
-    broadcast: option<bool>,
-    overwrite: option<bool>,
+    broadcast?: bool,
+    overwrite?: bool,
     query: Graphql.documentNode,
     variables: 'variables,
-    id: option<string>,
+    id?: string,
   }
 
   let toJs: (
@@ -116,11 +116,11 @@ module WriteQueryOptions = {
     ~serializeVariables,
   ) => {
     data: t.data->serialize,
-    broadcast: t.broadcast,
-    overwrite: t.overwrite,
+    broadcast: ?t.broadcast,
+    overwrite: ?t.overwrite,
     query: t.query,
     variables: t.variables->serializeVariables->mapJsVariables,
-    id: t.id,
+    id: ?t.id,
   }
 }
 
@@ -132,12 +132,12 @@ module WriteFragmentOptions = {
     // }
     type t<'jsData, 'jsVariables> = {
       data: 'jsData,
-      broadcast: option<bool>,
-      overwrite: option<bool>,
+      broadcast?: bool,
+      overwrite?: bool,
       // ...extends Fragment
       id: string,
       fragment: Graphql.documentNode,
-      fragmentName: option<string>,
+      fragmentName?: string,
       // I think fragment variables are still experimental?
       // // We don't allow optional variables because it's not typesafe
       // variables: 'jsVariables,
@@ -146,11 +146,11 @@ module WriteFragmentOptions = {
 
   type t<'data, 'variables> = {
     data: 'data,
-    broadcast: option<bool>,
-    overwrite: option<bool>,
+    broadcast?: bool,
+    overwrite?: bool,
     id: string,
     fragment: Graphql.documentNode,
-    fragmentName: option<string>,
+    fragmentName?: string,
     // variables: 'variables,
   }
 
@@ -161,11 +161,11 @@ module WriteFragmentOptions = {
   ) => // ~serializeVariables: 'variables => 'jsVariables
   Js_.t<'jsData, 'jsVariables> = (t, ~serialize) => {
     data: t.data->serialize,
-    broadcast: t.broadcast,
-    overwrite: t.overwrite,
+    broadcast: ?t.broadcast,
+    overwrite: ?t.overwrite,
     id: t.id,
     fragment: t.fragment,
-    fragmentName: t.fragmentName,
+    fragmentName: ?t.fragmentName,
     // variables: t.variables->serializeVariables->mapJsVariables,
   }
 }
@@ -179,29 +179,29 @@ module UpdateQueryOptions = {
     type t<'jsVariables> = {
       // ReadQueryOptions<TData, TVariables>
       // ...extends Query
-      id: option<string>,
+      id?: string,
       query: Graphql.documentNode,
       // We don't allow optional variables because it's not typesafe
       variables: 'jsVariables,
       // ...extends ReadQueryOptions
-      optimistic: option<bool>,
-      canonizeResults: option<bool>,
+      optimistic?: bool,
+      canonizeResults?: bool,
       // ...extends Omit<WriteQueryOptions, 'data'>
-      // returnPartialData: option<bool>, // Don't believe this is supported by graphql-ppx
-      broadcast: option<bool>,
-      overwrite: option<bool>,
+      // returnPartialData?: bool, // Don't believe this is supported by graphql-ppx
+      broadcast?: bool,
+      overwrite?: bool,
     }
   }
 
   type t<'variables> = {
-    id: option<string>,
+    id?: string,
     query: Graphql.documentNode,
     variables: 'variables,
-    optimistic: option<bool>,
-    canonizeResults: option<bool>,
-    // returnPartialData: option<bool>, // Don't believe this is supported by graphql-ppx
-    broadcast: option<bool>,
-    overwrite: option<bool>,
+    optimistic?: bool,
+    canonizeResults?: bool,
+    // returnPartialData?: bool, // Don't believe this is supported by graphql-ppx
+    broadcast?: bool,
+    overwrite?: bool,
   }
 
   let toJs: (
@@ -209,14 +209,14 @@ module UpdateQueryOptions = {
     ~mapJsVariables: 'jsVariables => 'jsVariables=?,
     ~serializeVariables: 'variables => 'jsVariables,
   ) => Js_.t<'jsVariables> = (t, ~mapJsVariables=Utils.identity, ~serializeVariables) => {
-    id: t.id,
+    id: ?t.id,
     query: t.query,
     variables: t.variables->serializeVariables->mapJsVariables,
-    optimistic: t.optimistic,
-    canonizeResults: t.canonizeResults,
-    broadcast: t.broadcast,
-    overwrite: t.overwrite,
-    // returnPartialData: t.returnPartialData, // Don't believe this is supported by graphql-ppx
+    optimistic: ?t.optimistic,
+    canonizeResults: ?t.canonizeResults,
+    broadcast: ?t.broadcast,
+    overwrite: ?t.overwrite,
+    // returnPartialData: ?t.returnPartialData, // Don't believe this is supported by graphql-ppx
   }
 }
 
@@ -231,40 +231,40 @@ module UpdateFragmentOptions = {
       // ...extends Fragment
       id: string,
       fragment: Graphql.documentNode,
-      fragmentName: option<string>,
+      fragmentName?: string,
       // We don't allow optional variables because it's not typesafe
       // variables: 'jsVariables,
       // ...extends ReadFragmentOptions
-      optimistic: option<bool>,
-      canonizeResults: option<bool>,
+      optimistic?: bool,
+      canonizeResults?: bool,
       // ...extends Omit<WriteFragmentOptions, 'data'>
-      // returnPartialData: option<bool>, // Don't believe this is supported by graphql-ppx
-      broadcast: option<bool>,
-      overwrite: option<bool>,
+      // returnPartialData?: bool, // Don't believe this is supported by graphql-ppx
+      broadcast?: bool,
+      overwrite?: bool,
     }
   }
 
   type t<'variables> = {
     id: string,
     fragment: Graphql.documentNode,
-    fragmentName: option<string>,
+    fragmentName?: string,
     // variables: 'variables,
-    optimistic: option<bool>,
-    canonizeResults: option<bool>,
-    // returnPartialData: option<bool>, // Don't believe this is supported by graphql-ppx
-    broadcast: option<bool>,
-    overwrite: option<bool>,
+    optimistic?: bool,
+    canonizeResults?: bool,
+    // returnPartialData?: bool, // Don't believe this is supported by graphql-ppx
+    broadcast?: bool,
+    overwrite?: bool,
   }
 
   let toJs: t<'variables> => Js_.t<'jsVariables> = t => {
     id: t.id,
     fragment: t.fragment,
-    fragmentName: t.fragmentName,
+    fragmentName: ?t.fragmentName,
     // variables: t.variables,
-    optimistic: t.optimistic,
-    canonizeResults: t.canonizeResults,
-    broadcast: t.broadcast,
-    overwrite: t.overwrite,
+    optimistic: ?t.optimistic,
+    canonizeResults: ?t.canonizeResults,
+    broadcast: ?t.broadcast,
+    overwrite: ?t.overwrite,
     // returnPartialData: t.returnPartialData, // Don't believe this is supported by graphql-ppx
   }
 }

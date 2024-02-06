@@ -126,13 +126,13 @@ module ClientOptions = {
     ~inactivityTimeout=?,
     (),
   ): t => {
-    connectionParams: connectionParams,
-    timeout: timeout,
-    reconnect: reconnect,
-    reconnectionAttempts: reconnectionAttempts,
-    connectionCallback: connectionCallback,
-    lazy_: lazy_,
-    inactivityTimeout: inactivityTimeout,
+    connectionParams,
+    timeout,
+    reconnect,
+    reconnectionAttempts,
+    connectionCallback,
+    lazy_,
+    inactivityTimeout,
   }
 }
 

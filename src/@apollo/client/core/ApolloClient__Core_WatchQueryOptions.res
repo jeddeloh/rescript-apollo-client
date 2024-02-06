@@ -198,24 +198,23 @@ module UpdateQueryFn = {
     ~querySafeParse,
     ~querySerialize,
     ~subscriptionSafeParse,
-    . jsQueryData,
-    {subscriptionData: {data}},
   ) =>
-    switch (jsQueryData->querySafeParse, data->subscriptionSafeParse) {
-    | (Ok(queryData), Ok(subscriptionData)) =>
-      t(
-        queryData,
-        {
-          subscriptionData: {
-            data: subscriptionData,
+    (. jsQueryData, {subscriptionData: {data}}) =>
+      switch (jsQueryData->querySafeParse, data->subscriptionSafeParse) {
+      | (Ok(queryData), Ok(subscriptionData)) =>
+        t(
+          queryData,
+          {
+            subscriptionData: {
+              data: subscriptionData,
+            },
           },
-        },
-      )->querySerialize
-    | (Error(parseError), _)
-    | (_, Error(parseError)) =>
-      onParseError(parseError)
-      jsQueryData
-    }
+        )->querySerialize
+      | (Error(parseError), _)
+      | (_, Error(parseError)) =>
+        onParseError(parseError)
+        jsQueryData
+      }
 }
 
 module SubscribeToMoreOptions = {
@@ -326,9 +325,9 @@ module MutationUpdaterFn = {
   let toJs: (t<'data>, ~safeParse: Types.safeParse<'data, 'jsData>) => Js_.t<'jsData> = (
     mutationUpdaterFn,
     ~safeParse,
-    . cache,
-    jsFetchResult,
-  ) => mutationUpdaterFn(cache, jsFetchResult->FetchResult.fromJs(~safeParse))
+  ) =>
+    (. cache, jsFetchResult) =>
+      mutationUpdaterFn(cache, jsFetchResult->FetchResult.fromJs(~safeParse))
 }
 
 module RefetchQueryDescription = {
@@ -418,8 +417,8 @@ module MutationOptions = {
     errorPolicy: t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
     fetchPolicy: t.fetchPolicy->Belt.Option.map(FetchPolicy__noCacheExtracted.toJs),
     mutation: t.mutation,
-    optimisticResponse: t.optimisticResponse->Belt.Option.map((optimisticResponse, . variables) =>
-      optimisticResponse(variables)->serialize
+    optimisticResponse: t.optimisticResponse->Belt.Option.map(optimisticResponse =>
+      (. variables) => optimisticResponse(variables)->serialize
     ),
     refetchQueries: t.refetchQueries->Belt.Option.map(RefetchQueryDescription.toJs),
     update: t.update->Belt.Option.map(MutationUpdaterFn.toJs(~safeParse)),

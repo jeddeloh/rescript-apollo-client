@@ -33,30 +33,30 @@ module DefaultWatchQueryOptions = {
   module Js_ = {
     // Partial<QueryOptions>;
     type t = {
-      fetchPolicy: option<WatchQueryFetchPolicy.Js_.t>,
+      fetchPolicy?: WatchQueryFetchPolicy.Js_.t,
       // query: GraphQL.Language.documentNode,
-      // variables: option('jsVariables),
-      errorPolicy: option<ErrorPolicy.Js_.t>,
-      context: option<Js.Json.t>,
+      // variables?: 'jsVariables,
+      errorPolicy?: ErrorPolicy.Js_.t,
+      context?: Js.Json.t,
     }
   }
 
   type t = {
-    fetchPolicy: option<WatchQueryFetchPolicy.t>,
-    errorPolicy: option<ErrorPolicy.t>,
-    context: option<Js.Json.t>,
+    fetchPolicy?: WatchQueryFetchPolicy.t,
+    errorPolicy?: ErrorPolicy.t,
+    context?: Js.Json.t,
   }
 
   let toJs: t => Js_.t = t => {
-    fetchPolicy: t.fetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
-    errorPolicy: t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
-    context: t.context,
+    fetchPolicy: ?t.fetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
+    errorPolicy: ?t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
+    context: ?t.context,
   }
 
   let make = (~fetchPolicy=?, ~errorPolicy=?, ~context=?, ()) => {
-    fetchPolicy: fetchPolicy,
-    errorPolicy: errorPolicy,
-    context: context,
+    ?fetchPolicy,
+    ?errorPolicy,
+    ?context,
   }
 }
 
@@ -64,30 +64,30 @@ module DefaultQueryOptions = {
   module Js_ = {
     // Partial<QueryOptions>;
     type t = {
-      fetchPolicy: option<FetchPolicy.Js_.t>,
+      fetchPolicy?: FetchPolicy.Js_.t,
       // query: GraphQL.Language.documentNode,
-      // variables: option('jsVariables),
-      errorPolicy: option<ErrorPolicy.Js_.t>,
-      context: option<Js.Json.t>,
+      // variables?: 'jsVariables,
+      errorPolicy?: ErrorPolicy.Js_.t,
+      context?: Js.Json.t,
     }
   }
 
   type t = {
-    fetchPolicy: option<FetchPolicy.t>,
-    errorPolicy: option<ErrorPolicy.t>,
-    context: option<Js.Json.t>,
+    fetchPolicy?: FetchPolicy.t,
+    errorPolicy?: ErrorPolicy.t,
+    context?: Js.Json.t,
   }
 
   let toJs: t => Js_.t = t => {
-    fetchPolicy: t.fetchPolicy->Belt.Option.map(FetchPolicy.toJs),
-    errorPolicy: t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
-    context: t.context,
+    fetchPolicy: ?t.fetchPolicy->Belt.Option.map(FetchPolicy.toJs),
+    errorPolicy: ?t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
+    context: ?t.context,
   }
 
   let make = (~fetchPolicy=?, ~errorPolicy=?, ~context=?, ()) => {
-    fetchPolicy: fetchPolicy,
-    errorPolicy: errorPolicy,
-    context: context,
+    ?fetchPolicy,
+    ?errorPolicy,
+    ?context,
   }
 }
 
@@ -95,34 +95,35 @@ module DefaultMutateOptions = {
   module Js_ = {
     // Partial<MutationOptions>;
     type t = {
-      context: option<Js.Json.t>,
-      fetchPolicy: option<FetchPolicy__noCacheExtracted.Js_.t>,
-      awaitRefetchQueries: option<bool>,
-      errorPolicy: option<ErrorPolicy.Js_.t>,
-      // optimisticResponse: option('jsVariables => 'jsData),
-      // update: option(MutationUpdaterFn.Js_.t('jsData)),
-      // updateQueries: option(MutationQueryReducersMap.Js_.t('jsData)),
-      refetchQueries: option<RefetchQueryDescription.Js_.t>,
-      // variables: option('jsVariables),
+      context?: Js.Json.t,
+      fetchPolicy?: FetchPolicy__noCacheExtracted.Js_.t,
+      awaitRefetchQueries?: bool,
+      errorPolicy?: ErrorPolicy.Js_.t,
+      // optimisticResponse?: 'jsVariables => 'jsData,
+      // update?: MutationUpdaterFn.Js_.t<'jsData>,
+      // updateQueries?: MutationQueryReducersMap.Js_.t<'jsData>,
+      refetchQueries?: RefetchQueryDescription.Js_.t,
+      // variables?: 'jsVariables,
     }
   }
 
   type t = {
-    context: option<Js.Json.t>,
-    fetchPolicy: option<FetchPolicy__noCacheExtracted.t>,
-    awaitRefetchQueries: option<bool>,
-    errorPolicy: option<ErrorPolicy.t>,
-    refetchQueries: option<RefetchQueryDescription.t>,
+    context?: Js.Json.t,
+    fetchPolicy?: FetchPolicy__noCacheExtracted.t,
+    awaitRefetchQueries?: bool,
+    errorPolicy?: ErrorPolicy.t,
+    refetchQueries?: RefetchQueryDescription.t,
   }
 
   let toJs: t => Js_.t = t => {
-    context: t.context,
-    fetchPolicy: t.fetchPolicy->Belt.Option.map(FetchPolicy__noCacheExtracted.toJs),
-    awaitRefetchQueries: t.awaitRefetchQueries,
-    errorPolicy: t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
-    refetchQueries: t.refetchQueries->Belt.Option.map(RefetchQueryDescription.toJs),
+    context: ?t.context,
+    fetchPolicy: ?t.fetchPolicy->Belt.Option.map(FetchPolicy__noCacheExtracted.toJs),
+    awaitRefetchQueries: ?t.awaitRefetchQueries,
+    errorPolicy: ?t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
+    refetchQueries: ?t.refetchQueries->Belt.Option.map(RefetchQueryDescription.toJs),
   }
 
+  @deprecated("Just construct instead")
   let make = (
     ~context=?,
     ~fetchPolicy=?,
@@ -131,11 +132,11 @@ module DefaultMutateOptions = {
     ~refetchQueries=?,
     (),
   ) => {
-    context: context,
-    fetchPolicy: fetchPolicy,
-    awaitRefetchQueries: awaitRefetchQueries,
-    errorPolicy: errorPolicy,
-    refetchQueries: refetchQueries,
+    ?context,
+    ?fetchPolicy,
+    ?awaitRefetchQueries,
+    ?errorPolicy,
+    ?refetchQueries,
   }
 }
 
@@ -147,33 +148,34 @@ module DefaultOptions = {
     //     mutate?: Partial<MutationOptions>;
     // }
     type t = {
-      watchQuery: option<DefaultWatchQueryOptions.Js_.t>,
-      query: option<DefaultQueryOptions.Js_.t>,
-      mutate: option<DefaultMutateOptions.Js_.t>,
+      watchQuery?: DefaultWatchQueryOptions.Js_.t,
+      query?: DefaultQueryOptions.Js_.t,
+      mutate?: DefaultMutateOptions.Js_.t,
     }
   }
 
   type t = {
-    watchQuery: option<DefaultWatchQueryOptions.t>,
-    query: option<DefaultQueryOptions.t>,
-    mutate: option<DefaultMutateOptions.t>,
+    watchQuery?: DefaultWatchQueryOptions.t,
+    query?: DefaultQueryOptions.t,
+    mutate?: DefaultMutateOptions.t,
   }
 
   let toJs: t => Js_.t = t => {
-    watchQuery: t.watchQuery->Belt.Option.map(DefaultWatchQueryOptions.toJs),
-    query: t.query->Belt.Option.map(DefaultQueryOptions.toJs),
-    mutate: t.mutate->Belt.Option.map(DefaultMutateOptions.toJs),
+    watchQuery: ?t.watchQuery->Belt.Option.map(DefaultWatchQueryOptions.toJs),
+    query: ?t.query->Belt.Option.map(DefaultQueryOptions.toJs),
+    mutate: ?t.mutate->Belt.Option.map(DefaultMutateOptions.toJs),
   }
 
+  @deprecated("Just construct instead")
   let make: (
     ~mutate: DefaultMutateOptions.t=?,
     ~query: DefaultQueryOptions.t=?,
     ~watchQuery: DefaultWatchQueryOptions.t=?,
     unit,
   ) => t = (~mutate=?, ~query=?, ~watchQuery=?, ()) => {
-    watchQuery: watchQuery,
-    query: query,
-    mutate: mutate,
+    ?watchQuery,
+    ?query,
+    ?mutate,
   }
 }
 
@@ -198,61 +200,61 @@ module ApolloClientOptions = {
     //     version?: string;
     // };
     type t = {
-      uri: option<UriFunction.Js_.t>,
-      credentials: option<string>,
-      headers: option<Js.Dict.t<string>>,
-      link: option<ApolloLink.Js_.t>,
+      uri?: UriFunction.Js_.t,
+      credentials?: string,
+      headers?: Js.Dict.t<string>,
+      link?: ApolloLink.Js_.t,
       cache: ApolloCache.t<Js.Json.t>, // Non-Js_ ApolloCache is correct here
-      ssrForceFetchDelay: option<int>,
-      ssrMode: option<bool>,
-      connectToDevTools: option<bool>,
-      queryDeduplication: option<bool>,
-      defaultOptions: option<DefaultOptions.Js_.t>,
-      assumeImmutableResults: option<bool>,
-      resolvers: option<array<Resolvers.Js_.t>>,
-      typeDefs: option<array<Graphql.documentNode>>,
-      fragmentMatcher: option<FragmentMatcher.Js_.t>,
-      name: option<string>,
-      version: option<string>,
+      ssrForceFetchDelay?: int,
+      ssrMode?: bool,
+      connectToDevTools?: bool,
+      queryDeduplication?: bool,
+      defaultOptions?: DefaultOptions.Js_.t,
+      assumeImmutableResults?: bool,
+      resolvers?: array<Resolvers.Js_.t>,
+      typeDefs?: array<Graphql.documentNode>,
+      fragmentMatcher?: FragmentMatcher.Js_.t,
+      name?: string,
+      version?: string,
     }
   }
 
   type t = {
-    uri: option<UriFunction.t>,
-    credentials: option<string>,
-    headers: option<Js.Dict.t<string>>,
-    link: option<ApolloLink.t>,
+    uri?: UriFunction.t,
+    credentials?: string,
+    headers?: Js.Dict.t<string>,
+    link?: ApolloLink.t,
     cache: ApolloCache.t<Js.Json.t>,
-    ssrForceFetchDelay: option<int>,
-    ssrMode: option<bool>,
-    connectToDevTools: option<bool>,
-    queryDeduplication: option<bool>,
-    defaultOptions: option<DefaultOptions.t>,
-    assumeImmutableResults: option<bool>,
-    resolvers: option<array<Resolvers.t>>,
-    typeDefs: option<array<Graphql.documentNode>>,
-    fragmentMatcher: option<FragmentMatcher.t>,
-    name: option<string>,
-    version: option<string>,
+    ssrForceFetchDelay?: int,
+    ssrMode?: bool,
+    connectToDevTools?: bool,
+    queryDeduplication?: bool,
+    defaultOptions?: DefaultOptions.t,
+    assumeImmutableResults?: bool,
+    resolvers?: array<Resolvers.t>,
+    typeDefs?: array<Graphql.documentNode>,
+    fragmentMatcher?: FragmentMatcher.t,
+    name?: string,
+    version?: string,
   }
 
   let toJs: t => Js_.t = t => {
-    uri: t.uri,
-    credentials: t.credentials,
-    headers: t.headers,
-    link: t.link,
+    uri: ?t.uri,
+    credentials: ?t.credentials,
+    headers: ?t.headers,
+    link: ?t.link,
     cache: t.cache,
-    ssrForceFetchDelay: t.ssrForceFetchDelay,
-    ssrMode: t.ssrMode,
-    connectToDevTools: t.connectToDevTools,
-    queryDeduplication: t.queryDeduplication,
-    defaultOptions: t.defaultOptions->Belt.Option.map(DefaultOptions.toJs),
-    assumeImmutableResults: t.assumeImmutableResults,
-    resolvers: t.resolvers,
-    typeDefs: t.typeDefs,
-    fragmentMatcher: t.fragmentMatcher,
-    name: t.name,
-    version: t.version,
+    ssrForceFetchDelay: ?t.ssrForceFetchDelay,
+    ssrMode: ?t.ssrMode,
+    connectToDevTools: ?t.connectToDevTools,
+    queryDeduplication: ?t.queryDeduplication,
+    defaultOptions: ?t.defaultOptions->Belt.Option.map(DefaultOptions.toJs),
+    assumeImmutableResults: ?t.assumeImmutableResults,
+    resolvers: ?t.resolvers,
+    typeDefs: ?t.typeDefs,
+    fragmentMatcher: ?t.fragmentMatcher,
+    name: ?t.name,
+    version: ?t.version,
   }
 }
 
@@ -610,22 +612,22 @@ let make: (
 ) => {
   let jsClient = Js_.make(
     ApolloClientOptions.toJs({
-      uri: uri,
-      credentials: credentials,
-      headers: headers,
-      link: link,
-      cache: cache,
-      ssrForceFetchDelay: ssrForceFetchDelay,
-      ssrMode: ssrMode,
-      connectToDevTools: connectToDevTools,
-      queryDeduplication: queryDeduplication,
-      defaultOptions: defaultOptions,
-      assumeImmutableResults: assumeImmutableResults,
-      resolvers: resolvers,
-      typeDefs: typeDefs,
-      fragmentMatcher: fragmentMatcher,
-      name: name,
-      version: version,
+      ?uri,
+      ?credentials,
+      ?headers,
+      ?link,
+      cache,
+      ?ssrForceFetchDelay,
+      ?ssrMode,
+      ?connectToDevTools,
+      ?queryDeduplication,
+      ?defaultOptions,
+      ?assumeImmutableResults,
+      ?resolvers,
+      ?typeDefs,
+      ?fragmentMatcher,
+      ?name,
+      ?version,
     }),
   )
 
@@ -661,16 +663,16 @@ let make: (
       jsClient,
       ~options=MutationOptions.toJs(
         {
-          awaitRefetchQueries: awaitRefetchQueries,
-          context: context,
-          errorPolicy: errorPolicy,
-          fetchPolicy: fetchPolicy,
+          awaitRefetchQueries,
+          context,
+          errorPolicy,
+          fetchPolicy,
           mutation: Operation.query,
-          optimisticResponse: optimisticResponse,
-          updateQueries: updateQueries,
-          refetchQueries: refetchQueries,
-          update: update,
-          variables: variables,
+          optimisticResponse,
+          updateQueries,
+          refetchQueries,
+          update,
+          variables,
         },
         ~mapJsVariables,
         ~safeParse,
@@ -721,11 +723,11 @@ let make: (
       jsClient,
       ~options=QueryOptions.toJs(
         {
-          fetchPolicy: fetchPolicy,
+          fetchPolicy,
           query: Operation.query,
-          variables: variables,
-          errorPolicy: errorPolicy,
-          context: context,
+          variables,
+          errorPolicy,
+          context,
         },
         ~mapJsVariables,
         ~serializeVariables=Operation.serializeVariables,
@@ -767,11 +769,11 @@ let make: (
     jsClient
     ->Js_.readFragment(
       ~options={
-        id: id,
+        id,
         fragment: Fragment.query,
-        fragmentName: fragmentName,
-        optimistic: optimistic,
-        canonizeResults: canonizeResults,
+        fragmentName,
+        optimistic,
+        canonizeResults,
       },
       ~optimistic?,
       (),
@@ -799,11 +801,11 @@ let make: (
       jsClient,
       ~options=DataProxy.ReadQueryOptions.toJs(
         {
-          id: id,
+          id,
           query: Operation.query,
-          variables: variables,
-          optimistic: optimistic,
-          canonizeResults: canonizeResults,
+          variables,
+          optimistic,
+          canonizeResults,
         },
         ~mapJsVariables,
         ~serializeVariables=Operation.serializeVariables,
@@ -848,11 +850,11 @@ let make: (
       jsClient,
       ~options=SubscriptionOptions.toJs(
         {
-          fetchPolicy: fetchPolicy,
+          fetchPolicy,
           query: Operation.query,
-          variables: variables,
-          errorPolicy: errorPolicy,
-          context: context,
+          variables,
+          errorPolicy,
+          context,
         },
         ~mapJsVariables,
         ~serializeVariables=Operation.serializeVariables,
@@ -904,13 +906,13 @@ let make: (
     ->Js_.watchQuery(
       ~options=WatchQueryOptions.toJs(
         {
-          fetchPolicy: fetchPolicy,
-          nextFetchPolicy: nextFetchPolicy,
+          fetchPolicy,
+          nextFetchPolicy,
           query: Operation.query,
-          variables: variables,
-          errorPolicy: errorPolicy,
-          context: context,
-          pollInterval: pollInterval,
+          variables,
+          errorPolicy,
+          context,
+          pollInterval,
         },
         ~mapJsVariables,
         ~serializeVariables=Operation.serializeVariables,
@@ -932,12 +934,12 @@ let make: (
     jsClient->Js_.writeFragment(
       ~options=DataProxy.WriteFragmentOptions.toJs(
         {
-          broadcast: broadcast,
-          data: data,
-          id: id,
+          broadcast,
+          data,
+          id,
           fragment: Fragment.query,
-          fragmentName: fragmentName,
-          overwrite: overwrite,
+          fragmentName,
+          overwrite,
         },
         ~serialize=Fragment.serialize,
       ),
@@ -960,12 +962,12 @@ let make: (
     jsClient->Js_.writeQuery(
       ~options=DataProxy.WriteQueryOptions.toJs(
         {
-          broadcast: broadcast,
-          data: data,
-          id: id,
+          broadcast,
+          data,
+          id,
           query: Operation.query,
-          variables: variables,
-          overwrite: overwrite,
+          variables,
+          overwrite,
         },
         ~mapJsVariables,
         ~serialize=Operation.serialize,
@@ -992,25 +994,27 @@ let make: (
     let safeParse = Utils.safeParse(Operation.parse)
 
     jsClient
-    ->Js_.updateQuery(~options=DataProxy.UpdateQueryOptions.toJs(
-      {
-        optimistic: optimistic,
-        canonizeResults: canonizeResults,
-        broadcast: broadcast,
-        id: id,
-        query: Operation.query,
-        variables: variables,
-        overwrite: overwrite,
-      },
-      ~mapJsVariables,
-      ~serializeVariables=Operation.serializeVariables,
-    ), ~update=jsData =>
-      jsData
-      ->Js.nullToOption
-      ->Belt.Option.map(Operation.parse)
-      ->update
-      ->Belt.Option.map(Operation.serialize)
-      ->Js.Nullable.fromOption
+    ->Js_.updateQuery(
+      ~options=DataProxy.UpdateQueryOptions.toJs(
+        {
+          optimistic,
+          canonizeResults,
+          broadcast,
+          id,
+          query: Operation.query,
+          variables,
+          overwrite,
+        },
+        ~mapJsVariables,
+        ~serializeVariables=Operation.serializeVariables,
+      ),
+      ~update=jsData =>
+        jsData
+        ->Js.nullToOption
+        ->Belt.Option.map(Operation.parse)
+        ->update
+        ->Belt.Option.map(Operation.serialize)
+        ->Js.Nullable.fromOption,
     )
     ->Js.toOption
     ->Belt.Option.map(safeParse)
@@ -1031,21 +1035,23 @@ let make: (
     let safeParse = Utils.safeParse(Fragment.parse)
 
     jsClient
-    ->Js_.updateFragment(~options=DataProxy.UpdateFragmentOptions.toJs({
-      optimistic: optimistic,
-      canonizeResults: canonizeResults,
-      broadcast: broadcast,
-      id: id,
-      fragment: Fragment.query,
-      fragmentName: fragmentName,
-      overwrite: overwrite,
-    }), ~update=jsData =>
-      jsData
-      ->Js.nullToOption
-      ->Belt.Option.map(Fragment.parse)
-      ->update
-      ->Belt.Option.map(Fragment.serialize)
-      ->Js.Nullable.fromOption
+    ->Js_.updateFragment(
+      ~options=DataProxy.UpdateFragmentOptions.toJs({
+        optimistic,
+        canonizeResults,
+        broadcast,
+        id,
+        fragment: Fragment.query,
+        fragmentName,
+        overwrite,
+      }),
+      ~update=jsData =>
+        jsData
+        ->Js.nullToOption
+        ->Belt.Option.map(Fragment.parse)
+        ->update
+        ->Belt.Option.map(Fragment.serialize)
+        ->Js.Nullable.fromOption,
     )
     ->Js.toOption
     ->Belt.Option.map(safeParse)
@@ -1054,24 +1060,24 @@ let make: (
   preserveJsPropsAndContext(
     jsClient,
     {
-      clearStore: clearStore,
-      extract: extract,
-      mutate: mutate,
-      onClearStore: onClearStore,
-      onResetStore: onResetStore,
-      query: query,
-      readFragment: readFragment,
-      readQuery: readQuery,
-      resetStore: resetStore,
-      restore: restore,
-      setLink: setLink,
-      stop: stop,
-      subscribe: subscribe,
-      watchQuery: watchQuery,
-      writeFragment: writeFragment,
-      writeQuery: writeQuery,
-      updateQuery: updateQuery,
-      updateFragment: updateFragment,
+      clearStore,
+      extract,
+      mutate,
+      onClearStore,
+      onResetStore,
+      query,
+      readFragment,
+      readQuery,
+      resetStore,
+      restore,
+      setLink,
+      stop,
+      subscribe,
+      watchQuery,
+      writeFragment,
+      writeQuery,
+      updateQuery,
+      updateFragment,
     },
   )
 }

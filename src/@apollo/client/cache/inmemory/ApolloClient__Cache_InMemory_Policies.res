@@ -9,24 +9,10 @@ module SelectionSetNode = ApolloClient__Graphql.Language.Ast.SelectionSetNode
 
 module KeyFieldsContext = {
   type t = {
-    typename: option<string>,
-    selectionSet: option<SelectionSetNode.t>,
-    fragment: option<FragmentMap.t>,
-    keyObject: option<Js.Json.t>,
-  }
-  module Js_ = {
-    // declare type KeyFieldsContext = {
-    //     typename?: string;
-    //     selectionSet?: SelectionSetNode;
-    //     fragmentMap?: FragmentMap;
-    //     keyObject?: Record<string, any>;
-    // };
-    type t = t = {
-      typename: option<string>,
-      selectionSet: option<SelectionSetNode.t>,
-      fragment: option<FragmentMap.Js_.t>,
-      keyObject: option<Js.Json.t>,
-    }
+    typename?: string,
+    selectionSet?: SelectionSetNode.t,
+    fragment?: FragmentMap.t,
+    keyObject?: Js.Json.t,
   }
 }
 
@@ -126,11 +112,11 @@ module TypePolicy = {
     ~subscriptionType: bool=?,
     unit,
   ) => t = (~fields=?, ~keyFields=?, ~mutationType=?, ~queryType=?, ~subscriptionType=?, ()) => {
-    fields: fields,
-    keyFields: keyFields,
-    mutationType: mutationType,
-    queryType: queryType,
-    subscriptionType: subscriptionType,
+    fields,
+    keyFields,
+    mutationType,
+    queryType,
+    subscriptionType,
   }
 }
 

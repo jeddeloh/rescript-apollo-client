@@ -8,7 +8,7 @@ module PureQueryOptions = ApolloClient__Core_Types.PureQueryOptions
 module ErrorPolicy = {
   module Js_ = {
     // export declare type ErrorPolicy = 'none' | 'ignore' | 'all';
-    type t = string
+    type t = [#none | #ignore | #all]
   }
 
   type t =
@@ -18,16 +18,16 @@ module ErrorPolicy = {
 
   let toJs = x =>
     switch x {
-    | None => "none"
-    | Ignore => "ignore"
-    | All => "all"
+    | None => #none
+    | Ignore => #ignore
+    | All => #all
     }
 }
 
 module FetchPolicy = {
   module Js_ = {
     // export declare type FetchPolicy = 'cache-first' | 'network-only' | 'cache-only' | 'no-cache' | 'standby';
-    type t = string
+    type t = [#"cache-first" | #"network-only" | #"cache-only" | #"no-cache" | #standby]
   }
 
   type t =
@@ -37,13 +37,13 @@ module FetchPolicy = {
     | NoCache
     | Standby
 
-  let toJs = x =>
+  let toJs = (x): Js_.t =>
     switch x {
-    | CacheFirst => "cache-first"
-    | CacheOnly => "cache-only"
-    | NetworkOnly => "network-only"
-    | NoCache => "no-cache"
-    | Standby => "standby"
+    | CacheFirst => #"cache-first"
+    | CacheOnly => #"cache-only"
+    | NetworkOnly => #"network-only"
+    | NoCache => #"no-cache"
+    | Standby => #standby
     }
 }
 
@@ -63,7 +63,7 @@ module FetchPolicy__noCacheExtracted = {
 module WatchQueryFetchPolicy = {
   module Js_ = {
     // export declare type WatchQueryFetchPolicy = FetchPolicy | 'cache-and-network';
-    type t = string
+    type t = [FetchPolicy.Js_.t | #"cache-and-network"]
   }
 
   type t =
@@ -74,14 +74,14 @@ module WatchQueryFetchPolicy = {
     | NoCache
     | Standby
 
-  let toJs = x =>
+  let toJs = (x): Js_.t =>
     switch x {
-    | CacheAndNetwork => "cache-and-network"
-    | CacheFirst => "cache-first"
-    | CacheOnly => "cache-only"
-    | NetworkOnly => "network-only"
-    | NoCache => "no-cache"
-    | Standby => "standby"
+    | CacheAndNetwork => #"cache-and-network"
+    | CacheFirst => #"cache-first"
+    | CacheOnly => #"cache-only"
+    | NetworkOnly => #"network-only"
+    | NoCache => #"no-cache"
+    | Standby => #standby
     }
 }
 
@@ -198,24 +198,23 @@ module UpdateQueryFn = {
     ~querySafeParse,
     ~querySerialize,
     ~subscriptionSafeParse,
-    . jsQueryData,
-    {subscriptionData: {data}},
   ) =>
-    switch (jsQueryData->querySafeParse, data->subscriptionSafeParse) {
-    | (Ok(queryData), Ok(subscriptionData)) =>
-      t(
-        queryData,
-        {
-          subscriptionData: {
-            data: subscriptionData,
+    (. jsQueryData, {subscriptionData: {data}}) =>
+      switch (jsQueryData->querySafeParse, data->subscriptionSafeParse) {
+      | (Ok(queryData), Ok(subscriptionData)) =>
+        t(
+          queryData,
+          {
+            subscriptionData: {
+              data: subscriptionData,
+            },
           },
-        },
-      )->querySerialize
-    | (Error(parseError), _)
-    | (_, Error(parseError)) =>
-      onParseError(parseError)
-      jsQueryData
-    }
+        )->querySerialize
+      | (Error(parseError), _)
+      | (_, Error(parseError)) =>
+        onParseError(parseError)
+        jsQueryData
+      }
 }
 
 module SubscribeToMoreOptions = {
@@ -326,9 +325,9 @@ module MutationUpdaterFn = {
   let toJs: (t<'data>, ~safeParse: Types.safeParse<'data, 'jsData>) => Js_.t<'jsData> = (
     mutationUpdaterFn,
     ~safeParse,
-    . cache,
-    jsFetchResult,
-  ) => mutationUpdaterFn(cache, jsFetchResult->FetchResult.fromJs(~safeParse))
+  ) =>
+    (. cache, jsFetchResult) =>
+      mutationUpdaterFn(cache, jsFetchResult->FetchResult.fromJs(~safeParse))
 }
 
 module RefetchQueryDescription = {
@@ -418,8 +417,8 @@ module MutationOptions = {
     errorPolicy: t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
     fetchPolicy: t.fetchPolicy->Belt.Option.map(FetchPolicy__noCacheExtracted.toJs),
     mutation: t.mutation,
-    optimisticResponse: t.optimisticResponse->Belt.Option.map((optimisticResponse, . variables) =>
-      optimisticResponse(variables)->serialize
+    optimisticResponse: t.optimisticResponse->Belt.Option.map(optimisticResponse =>
+      (. variables) => optimisticResponse(variables)->serialize
     ),
     refetchQueries: t.refetchQueries->Belt.Option.map(RefetchQueryDescription.toJs),
     update: t.update->Belt.Option.map(MutationUpdaterFn.toJs(~safeParse)),

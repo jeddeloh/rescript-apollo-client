@@ -108,7 +108,7 @@ module Js_ = {
             } else if (error && typeof error.message === "string" && error.extensions) {
               return makeApolloError({graphQLErrors: [error]});
             } else {
-              return makeApolloError({networkError: ensureError(error)}) 
+              return makeApolloError({networkError: ensureError(error)})
             }
           }
         `)(error, make, ensureError)
@@ -161,11 +161,11 @@ let make: (
   unit,
 ) => t = (~graphQLErrors=?, ~networkError=?, ~errorMessage=?, ~extraInfo=?, ()) => {
   let errorWithoutNetworkError = Js_.make({
-    graphQLErrors: graphQLErrors,
+    graphQLErrors,
     networkError: Js.Nullable.undefined,
-    errorMessage: errorMessage,
-    extraInfo: extraInfo,
+    errorMessage,
+    extraInfo,
   })->fromJs
 
-  {...errorWithoutNetworkError, networkError: networkError}
+  {...errorWithoutNetworkError, networkError}
 }

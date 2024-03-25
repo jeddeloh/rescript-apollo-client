@@ -32,7 +32,7 @@ let makeResult = (
       data->toJson->Js.Nullable.return
     ),
     error: error->Belt.Option.mapWithDefault(Js.Nullable.null, Js.Nullable.return),
-    loading: loading,
+    loading,
   }
 
   mockResult(queryResult)

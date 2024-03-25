@@ -16,15 +16,16 @@
   "scripts": {
     "build": "rescript build -with-deps",
     "clean": "rescript clean",
+    "format:ci": "rescript format -check -all",
     "start": "rescript build -with-deps -w",
     "test": "jest"
   },
   "devDependencies": {
     "@apollo/client": "^3.5.0",
-    "@reasonml-community/graphql-ppx": "^1.0.0",
+    "@reasonml-community/graphql-ppx": "1.2.4-1345e061.0",
     "@rescript/react": "~0.11.0",
     "rescript": "~10.1.2",
-    "graphql": "^14.0.0",
+    "graphql": "^15.0.0",
     "jest": "26.5.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

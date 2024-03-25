@@ -126,11 +126,11 @@ module TypePolicy = {
     ~subscriptionType: bool=?,
     unit,
   ) => t = (~fields=?, ~keyFields=?, ~mutationType=?, ~queryType=?, ~subscriptionType=?, ()) => {
-    fields: fields,
-    keyFields: keyFields,
-    mutationType: mutationType,
-    queryType: queryType,
-    subscriptionType: subscriptionType,
+    fields,
+    keyFields,
+    mutationType,
+    queryType,
+    subscriptionType,
   }
 }
 

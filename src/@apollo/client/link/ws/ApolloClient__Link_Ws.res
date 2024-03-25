@@ -49,9 +49,9 @@ module WebSocketLink = {
   ) => ApolloLink.t = (~uri, ~options=?, ~webSocketImpl=?, ()) =>
     Js_.make(
       #Configuration({
-        uri: uri,
+        uri,
         options: options->Belt.Option.map(ClientOptions.toJs),
-        webSocketImpl: webSocketImpl,
+        webSocketImpl,
       }),
     )
 

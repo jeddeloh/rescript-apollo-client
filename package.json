@@ -21,14 +21,14 @@
     "test": "jest"
   },
   "devDependencies": {
-    "@apollo/client": "^3.5.0",
-    "@reasonml-community/graphql-ppx": "1.2.4-1345e061.0",
+    "@apollo/client": "^3.10.8",
+    "@reasonml-community/graphql-ppx": "^1.2.4",
     "@rescript/react": "~0.11.0",
-    "graphql": "^15.0.0",
+    "rescript": "^11.1.4",
+    "graphql": "^16.9.0",
     "jest": "26.5.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "rescript": "~10.1.2",
     "subscriptions-transport-ws": "^0.9.17"
   },
   "peerDependencies": {

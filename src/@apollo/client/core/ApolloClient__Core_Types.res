@@ -82,8 +82,8 @@ module ApolloQueryResult = {
     )
 
     {
-      data: data,
-      error: error,
+      data,
+      error,
       loading: js.loading,
       networkStatus: js.networkStatus->NetworkStatus.fromJs,
     }
@@ -107,7 +107,7 @@ module ApolloQueryResult = {
     switch apolloQueryResult {
     | {data: Some(data)} =>
       Ok({
-        data: data,
+        data,
         error: apolloQueryResult.error,
         loading: apolloQueryResult.loading,
         networkStatus: apolloQueryResult.networkStatus,
@@ -136,7 +136,7 @@ module MutationQueryReducer = {
       queryVariables: Js.Json.t, // ACTUAL: Record<string, any>
     }
 
-    type t<'jsData> = (. Js.Json.t, options<'jsData>) => Js.Json.t
+    type t<'jsData> = (Js.Json.t, options<'jsData>) => Js.Json.t
   }
 
   type options<'data> = {
@@ -150,9 +150,9 @@ module MutationQueryReducer = {
   let toJs: (
     t<'data>,
     ~safeParse: Types.safeParse<'data, 'jsData>,
-    . Js.Json.t,
+    Js.Json.t,
     Js_.options<'jsData>,
-  ) => Js.Json.t = (t, ~safeParse, . previousResult, jsOptions) =>
+  ) => Js.Json.t = (t, ~safeParse, previousResult, jsOptions) =>
     t(
       previousResult,
       {
@@ -180,7 +180,8 @@ module MutationQueryReducersMap = {
     ~safeParse,
   ) =>
     Js.Dict.map(
-      (. mutationQueryReducer) => mutationQueryReducer->MutationQueryReducer.toJs(~safeParse),
+      mutationQueryReducer => (json, options) =>
+        mutationQueryReducer->MutationQueryReducer.toJs(~safeParse, json, options),
       t,
     )
 }

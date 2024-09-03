@@ -10,8 +10,8 @@ module RetryFunction = {
 
   type t = (~count: int, ~operation: Operation.t, ~error: option<Js.Json.t>) => Js.Promise.t<bool>
 
-  let toJs: (. t) => Js_.t = (. t) =>
-    (. count, operation, error) => t(~count, ~operation=operation->Operation.fromJs, ~error)
+  let toJs: t => Js_.t = (t, count, operation, error) =>
+    t(~count, ~operation=operation->Operation.fromJs, ~error)
 }
 
 module RetryFunctionOptions = {

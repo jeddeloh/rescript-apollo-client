@@ -172,7 +172,7 @@ module UpdateQueryFn = {
     //     variables?: TSubscriptionVariables;
     // }) => TData;
     type t<'jsQueryData, 'subscriptionVariables, 'jsSubscriptionData> = (
-      . 'jsQueryData,
+      'jsQueryData,
       t_options<'jsSubscriptionData, 'subscriptionVariables>,
     ) => 'jsQueryData
   }
@@ -198,23 +198,24 @@ module UpdateQueryFn = {
     ~querySafeParse,
     ~querySerialize,
     ~subscriptionSafeParse,
+    jsQueryData,
+    {subscriptionData: {data}},
   ) =>
-    (. jsQueryData, {subscriptionData: {data}}) =>
-      switch (querySafeParse(. jsQueryData), subscriptionSafeParse(. data)) {
-      | (Ok(queryData), Ok(subscriptionData)) =>
-        t(
-          queryData,
-          {
-            subscriptionData: {
-              data: subscriptionData,
-            },
+    switch (jsQueryData->querySafeParse, data->subscriptionSafeParse) {
+    | (Ok(queryData), Ok(subscriptionData)) =>
+      t(
+        queryData,
+        {
+          subscriptionData: {
+            data: subscriptionData,
           },
-        )->querySerialize
-      | (Error(parseError), _)
-      | (_, Error(parseError)) =>
-        onParseError(parseError)
-        jsQueryData
-      }
+        },
+      )->querySerialize
+    | (Error(parseError), _)
+    | (_, Error(parseError)) =>
+      onParseError(parseError)
+      jsQueryData
+    }
 }
 
 module SubscribeToMoreOptions = {
@@ -316,7 +317,7 @@ module SubscriptionOptions = {
 
 module MutationUpdaterFn = {
   module Js_ = {
-    type t<'jsData> = (. ApolloCache.t<Js.Json.t>, FetchResult.Js_.t<'jsData>) => unit // Non-Js_ cache is correct here
+    type t<'jsData> = (ApolloCache.t<Js.Json.t>, FetchResult.Js_.t<'jsData>) => unit // Non-Js_ cache is correct here
   }
 
   type t<'data> = (ApolloCache.t<Js.Json.t>, FetchResult.t<'data>) => unit
@@ -324,9 +325,8 @@ module MutationUpdaterFn = {
   let toJs: (. t<'data>, ~safeParse: Types.safeParse<'data, 'jsData>) => Js_.t<'jsData> = (.
     mutationUpdaterFn,
     ~safeParse,
-  ) =>
-    (. cache, jsFetchResult) =>
-      mutationUpdaterFn(cache, FetchResult.fromJs(jsFetchResult, ~safeParse))
+  ) => (. cache, jsFetchResult) =>
+    mutationUpdaterFn(cache, jsFetchResult->FetchResult.fromJs(~safeParse))
 }
 
 module RefetchQueryDescription = {
@@ -417,16 +417,12 @@ module MutationOptions = {
     errorPolicy: ?t.errorPolicy->Belt.Option.mapU(ErrorPolicy.toJs),
     fetchPolicy: ?t.fetchPolicy->Belt.Option.mapU(FetchPolicy__noCacheExtracted.toJs),
     mutation: t.mutation,
-    optimisticResponse: ?t.optimisticResponse->Belt.Option.mapU((. optimisticResponse) =>
-      (. variables) => optimisticResponse(variables)->serialize
-    ),
-    refetchQueries: ?t.refetchQueries->Belt.Option.mapU(RefetchQueryDescription.toJs),
-    update: ?t.update->Belt.Option.mapU((. updater) =>
-      MutationUpdaterFn.toJs(. updater, ~safeParse)
-    ),
-    updateQueries: ?t.updateQueries->Belt.Option.mapU((. data) =>
-      MutationQueryReducersMap.toJs(. data, ~safeParse)
-    ),
+    optimisticResponse: ?t.optimisticResponse->Belt.Option.map(optimisticResponse => (.
+      variables,
+    ) => optimisticResponse(variables)->serialize),
+    refetchQueries: t.refetchQueries->Belt.Option.map(RefetchQueryDescription.toJs),
+    update: t.update->Belt.Option.map(MutationUpdaterFn.toJs(~safeParse)),
+    updateQueries: ?t.updateQueries->Belt.Option.map(MutationQueryReducersMap.toJs(~safeParse)),
     variables: t.variables->serializeVariables->mapJsVariables,
   }
 }

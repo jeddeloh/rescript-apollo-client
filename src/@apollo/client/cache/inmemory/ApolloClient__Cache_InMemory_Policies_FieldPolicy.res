@@ -103,7 +103,7 @@ module FieldMergeFunction = {
     type t<'existing> = ('existing, 'existing, FieldFunctionOptions.Js_.t) => 'existing
   }
 
-  let toJs: t<'existing> => Js_.t<'existing> = (t, existing, incoming, jsFieldFunctionOptions) =>
+  let toJs: t<'existing> => Js_.t<'existing> = t => (existing, incoming, jsFieldFunctionOptions) =>
     t(existing, incoming, jsFieldFunctionOptions->FieldFunctionOptions.fromJs)
 }
 
@@ -144,7 +144,7 @@ module FieldReadFunction = {
     type t<'existing> = (option<'existing>, FieldFunctionOptions.Js_.t) => 'existing
   }
 
-  let toJs: t<'existing> => Js_.t<'existing> = (t, existing, jsFieldFunctionOptions) =>
+  let toJs: t<'existing> => Js_.t<'existing> = t => (existing, jsFieldFunctionOptions) =>
     t(existing, jsFieldFunctionOptions->FieldFunctionOptions.fromJs)
 }
 

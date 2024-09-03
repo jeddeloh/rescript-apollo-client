@@ -172,7 +172,7 @@ module UpdateQueryFn = {
     //     variables?: TSubscriptionVariables;
     // }) => TData;
     type t<'jsQueryData, 'subscriptionVariables, 'jsSubscriptionData> = (
-      . 'jsQueryData,
+      'jsQueryData,
       t_options<'jsSubscriptionData, 'subscriptionVariables>,
     ) => 'jsQueryData
   }
@@ -198,9 +198,7 @@ module UpdateQueryFn = {
     ~querySafeParse,
     ~querySerialize,
     ~subscriptionSafeParse,
-    . jsQueryData,
-    {subscriptionData: {data}},
-  ) =>
+  ) => (jsQueryData, {subscriptionData: {data}}) =>
     switch (jsQueryData->querySafeParse, data->subscriptionSafeParse) {
     | (Ok(queryData), Ok(subscriptionData)) =>
       t(
@@ -318,7 +316,7 @@ module SubscriptionOptions = {
 
 module MutationUpdaterFn = {
   module Js_ = {
-    type t<'jsData> = (. ApolloCache.t<Js.Json.t>, FetchResult.Js_.t<'jsData>) => unit // Non-Js_ cache is correct here
+    type t<'jsData> = (ApolloCache.t<Js.Json.t>, FetchResult.Js_.t<'jsData>) => unit // Non-Js_ cache is correct here
   }
 
   type t<'data> = (ApolloCache.t<Js.Json.t>, FetchResult.t<'data>) => unit

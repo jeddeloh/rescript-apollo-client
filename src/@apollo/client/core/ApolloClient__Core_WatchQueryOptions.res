@@ -261,13 +261,14 @@ module SubscribeToMoreOptions = {
   ) => {
     document: t.document,
     variables: t.variables,
-    updateQuery: t.updateQuery->Belt.Option.map(
+    updateQuery: t.updateQuery->Belt.Option.map(updateQueryFn =>
       UpdateQueryFn.toJs(
+        updateQueryFn,
         ~onParseError=onUpdateQueryParseError,
         ~querySafeParse,
         ~querySerialize,
         ~subscriptionSafeParse,
-      ),
+      )
     ),
     onError: t.onError,
     context: t.context,
@@ -324,9 +325,8 @@ module MutationUpdaterFn = {
   let toJs: (t<'data>, ~safeParse: Types.safeParse<'data, 'jsData>) => Js_.t<'jsData> = (
     mutationUpdaterFn,
     ~safeParse,
-    . cache,
-    jsFetchResult,
-  ) => mutationUpdaterFn(cache, jsFetchResult->FetchResult.fromJs(~safeParse))
+  ) => (cache, jsFetchResult) =>
+    mutationUpdaterFn(cache, jsFetchResult->FetchResult.fromJs(~safeParse))
 }
 
 module RefetchQueryDescription = {
@@ -375,7 +375,7 @@ module MutationOptions = {
       // ...extends MutationBaseOption,
       awaitRefetchQueries: option<bool>,
       errorPolicy: option<ErrorPolicy.Js_.t>,
-      optimisticResponse: option<(. 'jsVariables) => 'jsData>,
+      optimisticResponse: option<'jsVariables => 'jsData>,
       update: option<MutationUpdaterFn.Js_.t<'jsData>>,
       updateQueries: option<MutationQueryReducersMap.Js_.t<'jsData>>,
       refetchQueries: option<RefetchQueryDescription.Js_.t>,
@@ -416,7 +416,7 @@ module MutationOptions = {
     errorPolicy: t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
     fetchPolicy: t.fetchPolicy->Belt.Option.map(FetchPolicy__noCacheExtracted.toJs),
     mutation: t.mutation,
-    optimisticResponse: t.optimisticResponse->Belt.Option.map((optimisticResponse, . variables) =>
+    optimisticResponse: t.optimisticResponse->Belt.Option.map((optimisticResponse, variables) =>
       optimisticResponse(variables)->serialize
     ),
     refetchQueries: t.refetchQueries->Belt.Option.map(RefetchQueryDescription.toJs),

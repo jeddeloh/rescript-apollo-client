@@ -416,12 +416,13 @@ module MutationOptions = {
     errorPolicy: t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
     fetchPolicy: t.fetchPolicy->Belt.Option.map(FetchPolicy__noCacheExtracted.toJs),
     mutation: t.mutation,
-    optimisticResponse: t.optimisticResponse->Belt.Option.map((optimisticResponse, variables) =>
-      optimisticResponse(variables)->serialize
-    ),
+    optimisticResponse: t.optimisticResponse->Belt.Option.mapU(optimisticResponse => variables =>
+      optimisticResponse(variables)->serialize),
     refetchQueries: t.refetchQueries->Belt.Option.map(RefetchQueryDescription.toJs),
-    update: t.update->Belt.Option.map(MutationUpdaterFn.toJs(~safeParse)),
-    updateQueries: t.updateQueries->Belt.Option.map(MutationQueryReducersMap.toJs(~safeParse)),
+    update: t.update->Belt.Option.mapU(t => MutationUpdaterFn.toJs(t, ~safeParse)),
+    updateQueries: t.updateQueries->Belt.Option.mapU(t =>
+      MutationQueryReducersMap.toJs(t, ~safeParse)
+    ),
     variables: t.variables->serializeVariables->mapJsVariables,
   }
 }

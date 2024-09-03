@@ -1,0 +1,25 @@
+{
+  "name": "rescript-apollo-client",
+  "package-specs": [
+    {
+      "module": "commonjs",
+      "in-source": true
+    }
+  ],
+  "reason": {
+    "react-jsx": 3
+  },
+  "refmt": 3,
+  "jsx": {
+    "version": 4,
+    "mode": "automatic"
+  },
+  "sources": [
+    {
+      "dir": "src",
+      "subdirs": true
+    }
+  ],
+  "suffix": ".bs.js",
+  "bs-dependencies": ["@reasonml-community/graphql-ppx", "@rescript/react"]
+}

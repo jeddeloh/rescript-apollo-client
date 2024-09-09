@@ -709,9 +709,9 @@ let make: (
     , _)
   }
 
-  let onClearStore = (~cb) => jsClient->Js_.onClearStore(~cb)
+  let onClearStore = t => (~cb) => jsClient->Js_.onClearStore(t, ~cb)
 
-  let onResetStore = (~cb) => jsClient->Js_.onResetStore(~cb)
+  let onResetStore = t => (~cb) => jsClient->Js_.onResetStore(t, ~cb)
 
   let query = (
     type data variables jsVariables,

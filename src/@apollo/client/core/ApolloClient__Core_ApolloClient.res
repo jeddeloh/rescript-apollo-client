@@ -643,8 +643,8 @@ let make: (
   let clearStore = () =>
     jsClient
     ->Js_.clearStore
-    ->Js.Promise.then_(value => Js.Promise.resolve(Ok(value)), _)
-    ->Js.Promise.catch(e => Js.Promise.resolve(Error(Utils.ensureError(Any(e)))), _)
+    ->(Js.Promise.then_(value => Js.Promise.resolve(Ok(value)), _))
+    ->(Js.Promise.catch(e => Js.Promise.resolve(Error(Utils.ensureError(Any(e)))), _))
 
   let extract = (~optimistic=?, ()) => jsClient->Js_.extract(~optimistic?, ())
 
@@ -689,24 +689,24 @@ let make: (
         ~serializeVariables=Operation.serializeVariables,
       ),
     )
-    ->Js.Promise.then_(
+    ->(Js.Promise.then_(
       jsFetchResult =>
         Js.Promise.resolve(jsFetchResult->FetchResult.fromJs(~safeParse)->FetchResult.toResult),
       _,
-    )
-    ->Js.Promise.catch(error =>
-      Js.Promise.resolve(
-        Error(
-          ApolloError.make(
-            ~networkError=FetchFailure({
-              open Utils
-              ensureError(Any(error))
-            }),
-            (),
+    ))
+    ->(Js.Promise.catch(error =>
+        Js.Promise.resolve(
+          Error(
+            ApolloError.make(
+              ~networkError=FetchFailure({
+                open Utils
+                ensureError(Any(error))
+              }),
+              (),
+            ),
           ),
-        ),
-      )
-    , _)
+        )
+      , _))
   }
 
   let onClearStore = t => (~cb) => jsClient->Js_.onClearStore(t, ~cb)
@@ -742,26 +742,26 @@ let make: (
         ~serializeVariables=Operation.serializeVariables,
       ),
     )
-    ->Js.Promise.then_(
+    ->(Js.Promise.then_(
       jsApolloQueryResult =>
         Js.Promise.resolve(
           jsApolloQueryResult->ApolloQueryResult.fromJs(~safeParse)->ApolloQueryResult.toResult,
         ),
       _,
-    )
-    ->Js.Promise.catch(error =>
-      Js.Promise.resolve(
-        Error(
-          ApolloError.make(
-            ~networkError=FetchFailure({
-              open Utils
-              ensureError(Any(error))
-            }),
-            (),
+    ))
+    ->(Js.Promise.catch(error =>
+        Js.Promise.resolve(
+          Error(
+            ApolloError.make(
+              ~networkError=FetchFailure({
+                open Utils
+                ensureError(Any(error))
+              }),
+              (),
+            ),
           ),
-        ),
-      )
-    , _)
+        )
+      , _))
   }
 
   let readFragment = (
@@ -830,8 +830,8 @@ let make: (
   > = () =>
     jsClient
     ->Js_.resetStore
-    ->Js.Promise.then_(value => Js.Promise.resolve(Ok(value->Js.toOption)), _)
-    ->Js.Promise.catch(e => Js.Promise.resolve(Error(Utils.ensureError(Any(e)))), _)
+    ->(Js.Promise.then_(value => Js.Promise.resolve(Ok(value->Js.toOption)), _))
+    ->(Js.Promise.catch(e => Js.Promise.resolve(Error(Utils.ensureError(Any(e)))), _))
 
   let restore = (~serializedState) =>
     jsClient->Js_.restore(serializedState)->Js_.Cast.asRescriptCache

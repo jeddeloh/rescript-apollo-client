@@ -698,9 +698,9 @@ let make: (
     , _)
   }
 
-  let onClearStore = (~cb) => jsClient->Js_.onClearStore(~cb)
+  let onClearStore = t => (~cb) => jsClient->Js_.onClearStore(t, ~cb)
 
-  let onResetStore = (~cb) => jsClient->Js_.onResetStore(~cb)
+  let onResetStore = t => (~cb) => jsClient->Js_.onResetStore(t, ~cb)
 
   let query = (
     type data variables jsVariables,
@@ -777,7 +777,7 @@ let make: (
       (),
     )
     ->Js.toOption
-    ->Belt.Option.map(safeParse)
+    ->Belt.Option.mapU(safeParse)
   }
 
   let readQuery = (
@@ -811,7 +811,7 @@ let make: (
       ~optimistic,
     )
     ->Js.toOption
-    ->Belt.Option.map(safeParse)
+    ->Belt.Option.mapU(safeParse)
   }
 
   let resetStore: unit => Js.Promise.t<
@@ -1013,7 +1013,7 @@ let make: (
       ->Js.Nullable.fromOption
     )
     ->Js.toOption
-    ->Belt.Option.map(safeParse)
+    ->Belt.Option.mapU(safeParse)
   }
 
   let updateFragment = (
@@ -1048,7 +1048,7 @@ let make: (
       ->Js.Nullable.fromOption
     )
     ->Js.toOption
-    ->Belt.Option.map(safeParse)
+    ->Belt.Option.mapU(safeParse)
   }
 
   preserveJsPropsAndContext(

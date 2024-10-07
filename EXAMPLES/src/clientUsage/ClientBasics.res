@@ -74,7 +74,7 @@ let statsSubscription = Apollo.client.subscribe(
 let make = () =>
   <div>
     <p>
-      <button onClick=logTodos> {"Log To-Dos (Reason Promise)"->React.string} </button>
+      <button onClick=logTodos> {"Log To-Dos"->React.string} </button>
     </p>
     <p>
       <button onClick=addTodo> {"Add To-Do"->React.string} </button>

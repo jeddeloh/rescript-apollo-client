@@ -77,15 +77,15 @@ module QueryHookOptions = {
     client: ?t.client,
     context: ?t.context,
     displayName: ?t.displayName,
-    errorPolicy: ?t.errorPolicy->Belt.Option.mapU(ErrorPolicy.toJs),
-    onCompleted: ?t.onCompleted->Belt.Option.mapU((. onCompleted) =>
-      (. jsData) => safeParse(. jsData)->onCompleted
+    errorPolicy: ?t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
+    onCompleted: ?t.onCompleted->Belt.Option.map(onCompleted =>
+      jsData => jsData->safeParse->onCompleted
     ),
-    onError: ?t.onError->Belt.Option.mapU((. onError) =>
-      (. jsApolloError) => ApolloError.fromJs(. jsApolloError)->onError
+    onError: ?t.onError->Belt.Option.mapU(onError =>
+      jsApolloError => jsApolloError->ApolloError.fromJs->onError
     ),
-    fetchPolicy: ?t.fetchPolicy->Belt.Option.mapU(WatchQueryFetchPolicy.toJs),
-    nextFetchPolicy: ?t.nextFetchPolicy->Belt.Option.mapU(WatchQueryFetchPolicy.toJs),
+    fetchPolicy: ?t.fetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
+    nextFetchPolicy: ?t.nextFetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
     notifyOnNetworkStatusChange: ?t.notifyOnNetworkStatusChange,
     query: ?t.query,
     pollInterval: ?t.pollInterval,
@@ -106,8 +106,8 @@ module LazyQueryHookOptions = {
       query?: Graphql.documentNode,
       // ...extends QueryFunctionOptions
       displayName?: string,
-      onCompleted?: (. 'jsData) => unit,
-      onError?: (. ApolloError.Js_.t) => unit,
+      onCompleted?: 'jsData => unit,
+      onError?: ApolloError.Js_.t => unit,
       // ..extends BaseQueryOptions
       client?: ApolloClient.t,
       context?: Js.Json.t, // ACTUAL: Record<string, any>,
@@ -409,20 +409,20 @@ module QueryResult = {
             jsApolloQueryResult->ApolloQueryResult.fromJs(~safeParse)->ApolloQueryResult.toResult
           },
         )
-      , _)
-      ->Js.Promise.catch(error =>
-        Js.Promise.resolve(
-          Error(
-            ApolloError.make(
-              ~networkError=FetchFailure({
-                open Utils
-                ensureError(Any(error))
-              }),
-              (),
+      , _))
+      ->(Js.Promise.catch(error =>
+          Js.Promise.resolve(
+            Error(
+              ApolloError.make(
+                ~networkError=FetchFailure({
+                  open Utils
+                  ensureError(Any(error))
+                }),
+                (),
+              ),
             ),
-          ),
-        )
-      , _)
+          )
+        , _))
     }
 
     let refetch = (~mapJsVariables=Utils.identity, ~variables=?, ()) =>
@@ -434,13 +434,17 @@ module QueryResult = {
             jsApolloQueryResult->ApolloQueryResult.fromJs(~safeParse)->ApolloQueryResult.toResult,
           ),
         _,
-      )
-      ->Js.Promise.catch(
-        error =>
-          Js.Promise.resolve(
-            Error(ApolloError.make(~networkError=FetchFailure(Utils.ensureError(Any(error))), ())),
-          ),
-        _,
+      ))
+      ->(
+        Js.Promise.catch(
+          error =>
+            Js.Promise.resolve(
+              Error(
+                ApolloError.make(~networkError=FetchFailure(Utils.ensureError(Any(error))), ()),
+              ),
+            ),
+          _,
+        )
       )
 
     let startPolling = pollInterval => js->Js_.startPolling(pollInterval)
@@ -981,17 +985,21 @@ module MutationTuple = {
           ),
         ),
       )
-      ->Js.Promise.then_(
+      ->(Js.Promise.then_(
         jsFetchResult =>
           Js.Promise.resolve(FetchResult.fromJs(jsFetchResult, ~safeParse)->FetchResult.toResult),
         _,
-      )
-      ->Js.Promise.catch(
-        error =>
-          Js.Promise.resolve(
-            Error(ApolloError.make(~networkError=FetchFailure(Utils.ensureError(Any(error))), ())),
-          ),
-        _,
+      ))
+      ->(
+        Js.Promise.catch(
+          error =>
+            Js.Promise.resolve(
+              Error(
+                ApolloError.make(~networkError=FetchFailure(Utils.ensureError(Any(error))), ()),
+              ),
+            ),
+          _,
+        )
       )
 
     (mutationFn, jsMutationResult->MutationResult.fromJs(~safeParse))
@@ -1058,17 +1066,21 @@ module MutationTuple__noVariables = {
           ),
         ),
       )
-      ->Js.Promise.then_(
+      ->(Js.Promise.then_(
         jsFetchResult =>
           Js.Promise.resolve(FetchResult.fromJs(jsFetchResult, ~safeParse)->FetchResult.toResult),
         _,
-      )
-      ->Js.Promise.catch(
-        error =>
-          Js.Promise.resolve(
-            Error(ApolloError.make(~networkError=FetchFailure(Utils.ensureError(Any(error))), ())),
-          ),
-        _,
+      ))
+      ->(
+        Js.Promise.catch(
+          error =>
+            Js.Promise.resolve(
+              Error(
+                ApolloError.make(~networkError=FetchFailure(Utils.ensureError(Any(error))), ()),
+              ),
+            ),
+          _,
+        )
       )
 
     (mutationFn, jsMutationResult->MutationResult.fromJs(~safeParse))

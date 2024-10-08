@@ -31,7 +31,7 @@ let safeParseAndLiftToCommonResultProps: (
   | (None, None) => None
   }
 
-  switch jsData->Belt.Option.map(jsData => safeParse(jsData)) {
+  switch jsData->Belt.Option.map(safeParse(_)) {
   | Some(Error(parseError)) =>
     // Be careful we do not overwrite an existing error with a ParseError
     existingError->Belt.Option.isSome

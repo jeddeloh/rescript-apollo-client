@@ -365,7 +365,7 @@ module QueryResult = {
       safeParse,
     )
 
-    let previousData = js.previousData->Belt.Option.mapU(safeParse)
+    let previousData = js.previousData->Belt.Option.map(safeParse(_))
 
     let fetchMore = (
       ~context=?,
@@ -386,7 +386,7 @@ module QueryResult = {
           ) =>
             switch (
               safeParse(previousResult),
-              jsFetchMoreOptions.fetchMoreResult->Belt.Option.mapU(safeParse),
+              jsFetchMoreOptions.fetchMoreResult->Belt.Option.map(safeParse(_)),
             ) {
             | (Ok(previousResult), Some(Ok(fetchMoreResult))) =>
               updateQuery(

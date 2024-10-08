@@ -196,7 +196,7 @@ module ApolloCache = {
         (),
       )
       ->Js.toOption
-      ->Belt.Option.mapU(safeParse)
+      ->Belt.Option.map(fragment => safeParse(fragment))
     }
 
     let readQuery = (

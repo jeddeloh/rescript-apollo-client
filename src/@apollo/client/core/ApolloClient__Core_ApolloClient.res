@@ -318,11 +318,11 @@ module Js_ = {
 
   // onClearStore(cb: () => Promise<any>): () => void;
   @send
-  external onClearStore: (t, ~cb: unit => Js.Promise.t<unit>, unit) => unit = "onClearStore"
+  external onClearStore: (t, ~cb: unit => Js.Promise.t<unit>) => unit = "onClearStore"
 
   // onResetStore(cb: () => Promise<any>): () => void;
   @send
-  external onResetStore: (t, ~cb: unit => Js.Promise.t<unit>, unit) => unit = "onResetStore"
+  external onResetStore: (t, ~cb: unit => Js.Promise.t<unit>) => unit = "onResetStore"
 
   // query<T = any, TVariables = OperationVariables>(options: QueryOptions<TVariables>): Promise<ApolloQueryResult<T>>;
   @send
@@ -436,9 +436,9 @@ type t = {
     'variables,
   ) => Js.Promise.t<Belt.Result.t<FetchResult.t__ok<'data>, ApolloError.t>>,
   @as("rescript_onClearStore")
-  onClearStore: (~cb: unit => Js.Promise.t<unit>, unit) => unit,
+  onClearStore: (~cb: unit => Js.Promise.t<unit>) => unit,
   @as("rescript_onResetStore")
-  onResetStore: (~cb: unit => Js.Promise.t<unit>, unit) => unit,
+  onResetStore: (~cb: unit => Js.Promise.t<unit>) => unit,
   @as("rescript_query")
   query: 'data 'variables 'jsVariables. (
     ~query: module(Operation with
@@ -698,9 +698,9 @@ let make: (
       , _))
   }
 
-  let onClearStore = t => (~cb) => jsClient->Js_.onClearStore(t, ~cb)
+  let onClearStore = (~cb) => jsClient->Js_.onClearStore(~cb)
 
-  let onResetStore = t => (~cb) => jsClient->Js_.onResetStore(t, ~cb)
+  let onResetStore = (~cb) => jsClient->Js_.onResetStore(~cb)
 
   let query = (
     type data variables jsVariables,

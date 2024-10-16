@@ -54,9 +54,9 @@ module DefaultWatchQueryOptions = {
   }
 
   let make = (~fetchPolicy=?, ~errorPolicy=?, ~context=?, ()) => {
-    fetchPolicy: fetchPolicy,
-    errorPolicy: errorPolicy,
-    context: context,
+    fetchPolicy,
+    errorPolicy,
+    context,
   }
 }
 
@@ -85,9 +85,9 @@ module DefaultQueryOptions = {
   }
 
   let make = (~fetchPolicy=?, ~errorPolicy=?, ~context=?, ()) => {
-    fetchPolicy: fetchPolicy,
-    errorPolicy: errorPolicy,
-    context: context,
+    fetchPolicy,
+    errorPolicy,
+    context,
   }
 }
 
@@ -131,11 +131,11 @@ module DefaultMutateOptions = {
     ~refetchQueries=?,
     (),
   ) => {
-    context: context,
-    fetchPolicy: fetchPolicy,
-    awaitRefetchQueries: awaitRefetchQueries,
-    errorPolicy: errorPolicy,
-    refetchQueries: refetchQueries,
+    context,
+    fetchPolicy,
+    awaitRefetchQueries,
+    errorPolicy,
+    refetchQueries,
   }
 }
 
@@ -171,9 +171,9 @@ module DefaultOptions = {
     ~watchQuery: DefaultWatchQueryOptions.t=?,
     unit,
   ) => t = (~mutate=?, ~query=?, ~watchQuery=?, ()) => {
-    watchQuery: watchQuery,
-    query: query,
-    mutate: mutate,
+    watchQuery,
+    query,
+    mutate,
   }
 }
 
@@ -200,7 +200,7 @@ module ApolloClientOptions = {
     type t = {
       uri: option<UriFunction.Js_.t>,
       credentials: option<string>,
-      headers: option<Js.Dict.t<string>>,
+      headers: option<RescriptCore.Dict.t<string>>,
       link: option<ApolloLink.Js_.t>,
       cache: ApolloCache.t<Js.Json.t>, // Non-Js_ ApolloCache is correct here
       ssrForceFetchDelay: option<int>,
@@ -220,7 +220,7 @@ module ApolloClientOptions = {
   type t = {
     uri: option<UriFunction.t>,
     credentials: option<string>,
-    headers: option<Js.Dict.t<string>>,
+    headers: option<RescriptCore.Dict.t<string>>,
     link: option<ApolloLink.t>,
     cache: ApolloCache.t<Js.Json.t>,
     ssrForceFetchDelay: option<int>,
@@ -318,11 +318,11 @@ module Js_ = {
 
   // onClearStore(cb: () => Promise<any>): () => void;
   @send
-  external onClearStore: (t, ~cb: unit => Js.Promise.t<unit>, unit) => unit = "onClearStore"
+  external onClearStore: (t, ~cb: unit => Js.Promise.t<unit>) => unit = "onClearStore"
 
   // onResetStore(cb: () => Promise<any>): () => void;
   @send
-  external onResetStore: (t, ~cb: unit => Js.Promise.t<unit>, unit) => unit = "onResetStore"
+  external onResetStore: (t, ~cb: unit => Js.Promise.t<unit>) => unit = "onResetStore"
 
   // query<T = any, TVariables = OperationVariables>(options: QueryOptions<TVariables>): Promise<ApolloQueryResult<T>>;
   @send
@@ -436,9 +436,9 @@ type t = {
     'variables,
   ) => Js.Promise.t<Belt.Result.t<FetchResult.t__ok<'data>, ApolloError.t>>,
   @as("rescript_onClearStore")
-  onClearStore: (~cb: unit => Js.Promise.t<unit>, unit) => unit,
+  onClearStore: (~cb: unit => Js.Promise.t<unit>) => unit,
   @as("rescript_onResetStore")
-  onResetStore: (~cb: unit => Js.Promise.t<unit>, unit) => unit,
+  onResetStore: (~cb: unit => Js.Promise.t<unit>) => unit,
   @as("rescript_query")
   query: 'data 'variables 'jsVariables. (
     ~query: module(Operation with
@@ -574,7 +574,7 @@ let preserveJsPropsAndContext: (Js_.t, t) => t = %raw(`
 let make: (
   ~uri: UriFunction.t=?,
   ~credentials: string=?,
-  ~headers: Js.Dict.t<string>=?,
+  ~headers: RescriptCore.Dict.t<string>=?,
   ~link: ApolloLink.t=?,
   ~cache: ApolloCache.t<Js.Json.t>,
   ~ssrForceFetchDelay: int=?,
@@ -610,30 +610,30 @@ let make: (
 ) => {
   let jsClient = Js_.make(
     ApolloClientOptions.toJs({
-      uri: uri,
-      credentials: credentials,
-      headers: headers,
-      link: link,
-      cache: cache,
-      ssrForceFetchDelay: ssrForceFetchDelay,
-      ssrMode: ssrMode,
-      connectToDevTools: connectToDevTools,
-      queryDeduplication: queryDeduplication,
-      defaultOptions: defaultOptions,
-      assumeImmutableResults: assumeImmutableResults,
-      resolvers: resolvers,
-      typeDefs: typeDefs,
-      fragmentMatcher: fragmentMatcher,
-      name: name,
-      version: version,
+      uri,
+      credentials,
+      headers,
+      link,
+      cache,
+      ssrForceFetchDelay,
+      ssrMode,
+      connectToDevTools,
+      queryDeduplication,
+      defaultOptions,
+      assumeImmutableResults,
+      resolvers,
+      typeDefs,
+      fragmentMatcher,
+      name,
+      version,
     }),
   )
 
   let clearStore = () =>
     jsClient
     ->Js_.clearStore
-    ->Js.Promise.then_(value => Js.Promise.resolve(Ok(value)), _)
-    ->Js.Promise.catch(e => Js.Promise.resolve(Error(Utils.ensureError(Any(e)))), _)
+    ->(Js.Promise.then_(value => Js.Promise.resolve(Ok(value)), _))
+    ->(Js.Promise.catch(e => Js.Promise.resolve(Error(Utils.ensureError(Any(e)))), _))
 
   let extract = (~optimistic=?, ()) => jsClient->Js_.extract(~optimistic?, ())
 
@@ -661,16 +661,16 @@ let make: (
       jsClient,
       ~options=MutationOptions.toJs(
         {
-          awaitRefetchQueries: awaitRefetchQueries,
-          context: context,
-          errorPolicy: errorPolicy,
-          fetchPolicy: fetchPolicy,
+          awaitRefetchQueries,
+          context,
+          errorPolicy,
+          fetchPolicy,
           mutation: Operation.query,
-          optimisticResponse: optimisticResponse,
-          updateQueries: updateQueries,
-          refetchQueries: refetchQueries,
-          update: update,
-          variables: variables,
+          optimisticResponse,
+          updateQueries,
+          refetchQueries,
+          update,
+          variables,
         },
         ~mapJsVariables,
         ~safeParse,
@@ -678,24 +678,24 @@ let make: (
         ~serializeVariables=Operation.serializeVariables,
       ),
     )
-    ->Js.Promise.then_(
+    ->(Js.Promise.then_(
       jsFetchResult =>
         Js.Promise.resolve(jsFetchResult->FetchResult.fromJs(~safeParse)->FetchResult.toResult),
       _,
-    )
-    ->Js.Promise.catch(error =>
-      Js.Promise.resolve(
-        Error(
-          ApolloError.make(
-            ~networkError=FetchFailure({
-              open Utils
-              ensureError(Any(error))
-            }),
-            (),
+    ))
+    ->(Js.Promise.catch(error =>
+        Js.Promise.resolve(
+          Error(
+            ApolloError.make(
+              ~networkError=FetchFailure({
+                open Utils
+                ensureError(Any(error))
+              }),
+              (),
+            ),
           ),
-        ),
-      )
-    , _)
+        )
+      , _))
   }
 
   let onClearStore = (~cb) => jsClient->Js_.onClearStore(~cb)
@@ -721,36 +721,36 @@ let make: (
       jsClient,
       ~options=QueryOptions.toJs(
         {
-          fetchPolicy: fetchPolicy,
+          fetchPolicy,
           query: Operation.query,
-          variables: variables,
-          errorPolicy: errorPolicy,
-          context: context,
+          variables,
+          errorPolicy,
+          context,
         },
         ~mapJsVariables,
         ~serializeVariables=Operation.serializeVariables,
       ),
     )
-    ->Js.Promise.then_(
+    ->(Js.Promise.then_(
       jsApolloQueryResult =>
         Js.Promise.resolve(
           jsApolloQueryResult->ApolloQueryResult.fromJs(~safeParse)->ApolloQueryResult.toResult,
         ),
       _,
-    )
-    ->Js.Promise.catch(error =>
-      Js.Promise.resolve(
-        Error(
-          ApolloError.make(
-            ~networkError=FetchFailure({
-              open Utils
-              ensureError(Any(error))
-            }),
-            (),
+    ))
+    ->(Js.Promise.catch(error =>
+        Js.Promise.resolve(
+          Error(
+            ApolloError.make(
+              ~networkError=FetchFailure({
+                open Utils
+                ensureError(Any(error))
+              }),
+              (),
+            ),
           ),
-        ),
-      )
-    , _)
+        )
+      , _))
   }
 
   let readFragment = (
@@ -767,17 +767,17 @@ let make: (
     jsClient
     ->Js_.readFragment(
       ~options={
-        id: id,
+        id,
         fragment: Fragment.query,
-        fragmentName: fragmentName,
-        optimistic: optimistic,
-        canonizeResults: canonizeResults,
+        fragmentName,
+        optimistic,
+        canonizeResults,
       },
       ~optimistic?,
       (),
     )
     ->Js.toOption
-    ->Belt.Option.map(safeParse)
+    ->Belt.Option.map(safeParse(_))
   }
 
   let readQuery = (
@@ -799,11 +799,11 @@ let make: (
       jsClient,
       ~options=DataProxy.ReadQueryOptions.toJs(
         {
-          id: id,
+          id,
           query: Operation.query,
-          variables: variables,
-          optimistic: optimistic,
-          canonizeResults: canonizeResults,
+          variables,
+          optimistic,
+          canonizeResults,
         },
         ~mapJsVariables,
         ~serializeVariables=Operation.serializeVariables,
@@ -811,7 +811,7 @@ let make: (
       ~optimistic,
     )
     ->Js.toOption
-    ->Belt.Option.map(safeParse)
+    ->Belt.Option.map(safeParse(_))
   }
 
   let resetStore: unit => Js.Promise.t<
@@ -819,8 +819,8 @@ let make: (
   > = () =>
     jsClient
     ->Js_.resetStore
-    ->Js.Promise.then_(value => Js.Promise.resolve(Ok(value->Js.toOption)), _)
-    ->Js.Promise.catch(e => Js.Promise.resolve(Error(Utils.ensureError(Any(e)))), _)
+    ->(Js.Promise.then_(value => Js.Promise.resolve(Ok(value->Js.toOption)), _))
+    ->(Js.Promise.catch(e => Js.Promise.resolve(Error(Utils.ensureError(Any(e)))), _))
 
   let restore = (~serializedState) =>
     jsClient->Js_.restore(serializedState)->Js_.Cast.asRescriptCache
@@ -848,11 +848,11 @@ let make: (
       jsClient,
       ~options=SubscriptionOptions.toJs(
         {
-          fetchPolicy: fetchPolicy,
+          fetchPolicy,
           query: Operation.query,
-          variables: variables,
-          errorPolicy: errorPolicy,
-          context: context,
+          variables,
+          errorPolicy,
+          context,
         },
         ~mapJsVariables,
         ~serializeVariables=Operation.serializeVariables,
@@ -904,13 +904,13 @@ let make: (
     ->Js_.watchQuery(
       ~options=WatchQueryOptions.toJs(
         {
-          fetchPolicy: fetchPolicy,
-          nextFetchPolicy: nextFetchPolicy,
+          fetchPolicy,
+          nextFetchPolicy,
           query: Operation.query,
-          variables: variables,
-          errorPolicy: errorPolicy,
-          context: context,
-          pollInterval: pollInterval,
+          variables,
+          errorPolicy,
+          context,
+          pollInterval,
         },
         ~mapJsVariables,
         ~serializeVariables=Operation.serializeVariables,
@@ -932,12 +932,12 @@ let make: (
     jsClient->Js_.writeFragment(
       ~options=DataProxy.WriteFragmentOptions.toJs(
         {
-          broadcast: broadcast,
-          data: data,
-          id: id,
+          broadcast,
+          data,
+          id,
           fragment: Fragment.query,
-          fragmentName: fragmentName,
-          overwrite: overwrite,
+          fragmentName,
+          overwrite,
         },
         ~serialize=Fragment.serialize,
       ),
@@ -960,12 +960,12 @@ let make: (
     jsClient->Js_.writeQuery(
       ~options=DataProxy.WriteQueryOptions.toJs(
         {
-          broadcast: broadcast,
-          data: data,
-          id: id,
+          broadcast,
+          data,
+          id,
           query: Operation.query,
-          variables: variables,
-          overwrite: overwrite,
+          variables,
+          overwrite,
         },
         ~mapJsVariables,
         ~serialize=Operation.serialize,
@@ -992,28 +992,30 @@ let make: (
     let safeParse = Utils.safeParse(Operation.parse)
 
     jsClient
-    ->Js_.updateQuery(~options=DataProxy.UpdateQueryOptions.toJs(
-      {
-        optimistic: optimistic,
-        canonizeResults: canonizeResults,
-        broadcast: broadcast,
-        id: id,
-        query: Operation.query,
-        variables: variables,
-        overwrite: overwrite,
-      },
-      ~mapJsVariables,
-      ~serializeVariables=Operation.serializeVariables,
-    ), ~update=jsData =>
-      jsData
-      ->Js.nullToOption
-      ->Belt.Option.map(Operation.parse)
-      ->update
-      ->Belt.Option.map(Operation.serialize)
-      ->Js.Nullable.fromOption
+    ->Js_.updateQuery(
+      ~options=DataProxy.UpdateQueryOptions.toJs(
+        {
+          optimistic,
+          canonizeResults,
+          broadcast,
+          id,
+          query: Operation.query,
+          variables,
+          overwrite,
+        },
+        ~mapJsVariables,
+        ~serializeVariables=Operation.serializeVariables,
+      ),
+      ~update=jsData =>
+        jsData
+        ->Js.nullToOption
+        ->Belt.Option.map(Operation.parse)
+        ->update
+        ->Belt.Option.map(Operation.serialize)
+        ->Js.Nullable.fromOption,
     )
     ->Js.toOption
-    ->Belt.Option.map(safeParse)
+    ->Belt.Option.map(safeParse(_))
   }
 
   let updateFragment = (
@@ -1031,47 +1033,49 @@ let make: (
     let safeParse = Utils.safeParse(Fragment.parse)
 
     jsClient
-    ->Js_.updateFragment(~options=DataProxy.UpdateFragmentOptions.toJs({
-      optimistic: optimistic,
-      canonizeResults: canonizeResults,
-      broadcast: broadcast,
-      id: id,
-      fragment: Fragment.query,
-      fragmentName: fragmentName,
-      overwrite: overwrite,
-    }), ~update=jsData =>
-      jsData
-      ->Js.nullToOption
-      ->Belt.Option.map(Fragment.parse)
-      ->update
-      ->Belt.Option.map(Fragment.serialize)
-      ->Js.Nullable.fromOption
+    ->Js_.updateFragment(
+      ~options=DataProxy.UpdateFragmentOptions.toJs({
+        optimistic,
+        canonizeResults,
+        broadcast,
+        id,
+        fragment: Fragment.query,
+        fragmentName,
+        overwrite,
+      }),
+      ~update=jsData =>
+        jsData
+        ->Js.nullToOption
+        ->Belt.Option.map(Fragment.parse)
+        ->update
+        ->Belt.Option.map(Fragment.serialize)
+        ->Js.Nullable.fromOption,
     )
     ->Js.toOption
-    ->Belt.Option.map(safeParse)
+    ->Belt.Option.map(safeParse(_))
   }
 
   preserveJsPropsAndContext(
     jsClient,
     {
-      clearStore: clearStore,
-      extract: extract,
-      mutate: mutate,
-      onClearStore: onClearStore,
-      onResetStore: onResetStore,
-      query: query,
-      readFragment: readFragment,
-      readQuery: readQuery,
-      resetStore: resetStore,
-      restore: restore,
-      setLink: setLink,
-      stop: stop,
-      subscribe: subscribe,
-      watchQuery: watchQuery,
-      writeFragment: writeFragment,
-      writeQuery: writeQuery,
-      updateQuery: updateQuery,
-      updateFragment: updateFragment,
+      clearStore,
+      extract,
+      mutate,
+      onClearStore,
+      onResetStore,
+      query,
+      readFragment,
+      readQuery,
+      resetStore,
+      restore,
+      setLink,
+      stop,
+      subscribe,
+      watchQuery,
+      writeFragment,
+      writeQuery,
+      updateQuery,
+      updateFragment,
     },
   )
 }

@@ -69,7 +69,7 @@ module TypePolicy = {
       queryType: option<bool>,
       mutationType: option<bool>,
       subscriptionType: option<bool>,
-      fields: option<Js.Dict.t<FieldsUnion.t>>,
+      fields: option<RescriptCore.Dict.t<FieldsUnion.t>>,
     }
   }
 
@@ -92,7 +92,7 @@ module TypePolicy = {
     fields: option<t_fields>,
   }
 
-  let toJs: (. t) => Js_.t = (. t) => {
+  let toJs: t => Js_.t = t => {
     keyFields: t.keyFields->Belt.Option.map(KeyArgs.toJs),
     queryType: t.queryType,
     mutationType: t.mutationType,
@@ -114,7 +114,7 @@ module TypePolicy = {
           fieldReadFunction->FieldReadFunction.toJs->Js_.FieldsUnion.fieldReadFunction
         },
       ))
-      ->Js.Dict.fromArray
+      ->RescriptCore.Dict.fromArray
     ),
   }
 
@@ -126,11 +126,11 @@ module TypePolicy = {
     ~subscriptionType: bool=?,
     unit,
   ) => t = (~fields=?, ~keyFields=?, ~mutationType=?, ~queryType=?, ~subscriptionType=?, ()) => {
-    fields: fields,
-    keyFields: keyFields,
-    mutationType: mutationType,
-    queryType: queryType,
-    subscriptionType: subscriptionType,
+    fields,
+    keyFields,
+    mutationType,
+    queryType,
+    subscriptionType,
   }
 }
 
@@ -139,7 +139,7 @@ module TypePolicies = {
     // export declare type TypePolicies = {
     //     [__typename: string]: TypePolicy;
     // };
-    type t = Js.Dict.t<TypePolicy.Js_.t>
+    type t = RescriptCore.Dict.t<TypePolicy.Js_.t>
   }
 
   type typename = string
@@ -147,11 +147,13 @@ module TypePolicies = {
   type t = array<(typename, TypePolicy.t)>
 
   let toJs: t => Js_.t = t =>
-    t->Belt.Array.map(((key, policy)) => (key, TypePolicy.toJs(. policy)))->Js.Dict.fromArray
+    t
+    ->Belt.Array.map(((key, policy)) => (key, TypePolicy.toJs(policy)))
+    ->RescriptCore.Dict.fromArray
 }
 
 module PossibleTypesMap = {
-  type t = Js.Dict.t<array<string>>
+  type t = RescriptCore.Dict.t<array<string>>
   module Js_ = {
     // export declare type PossibleTypesMap = {
     //     [supertype: string]: string[];

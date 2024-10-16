@@ -21,6 +21,9 @@
     }
   ],
   "suffix": ".bs.js",
-  "bs-dependencies": ["@reasonml-community/graphql-ppx", "@rescript/react"],
-  "uncurried": false
+  "bs-dependencies": [
+    "@reasonml-community/graphql-ppx",
+    "@rescript/react",
+    "@rescript/core"
+  ]
 }

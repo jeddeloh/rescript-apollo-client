@@ -186,11 +186,11 @@ module ApolloCache = {
       js
       ->Js_.readFragment(
         ~options={
-          id: id,
+          id,
           fragment: Fragment.query,
-          fragmentName: fragmentName,
-          optimistic: optimistic,
-          canonizeResults: canonizeResults,
+          fragmentName,
+          optimistic,
+          canonizeResults,
         },
         ~optimistic?,
         (),
@@ -218,11 +218,11 @@ module ApolloCache = {
       ->Js_.readQuery(
         ~options=DataProxy.ReadQueryOptions.toJs(
           {
-            id: id,
+            id,
             query: Operation.query,
-            variables: variables,
-            optimistic: optimistic,
-            canonizeResults: canonizeResults,
+            variables,
+            optimistic,
+            canonizeResults,
           },
           ~mapJsVariables,
           ~serializeVariables=Operation.serializeVariables,
@@ -247,12 +247,12 @@ module ApolloCache = {
       js->Js_.writeFragment(
         ~options=DataProxy.WriteFragmentOptions.toJs(
           {
-            broadcast: broadcast,
-            data: data,
-            id: id,
+            broadcast,
+            data,
+            id,
             fragment: Fragment.query,
-            fragmentName: fragmentName,
-            overwrite: overwrite,
+            fragmentName,
+            overwrite,
           },
           ~serialize=Fragment.serialize,
         ),
@@ -275,12 +275,12 @@ module ApolloCache = {
       js->Js_.writeQuery(
         ~options=DataProxy.WriteQueryOptions.toJs(
           {
-            broadcast: broadcast,
-            data: data,
-            id: id,
+            broadcast,
+            data,
+            id,
             query: Operation.query,
-            variables: variables,
-            overwrite: overwrite,
+            variables,
+            overwrite,
           },
           ~mapJsVariables,
           ~serialize=Operation.serialize,
@@ -307,25 +307,27 @@ module ApolloCache = {
       let safeParse = Utils.safeParse(Operation.parse)
 
       js
-      ->Js_.updateQuery(~options=DataProxy.UpdateQueryOptions.toJs(
-        {
-          optimistic: optimistic,
-          canonizeResults: canonizeResults,
-          broadcast: broadcast,
-          id: id,
-          query: Operation.query,
-          variables: variables,
-          overwrite: overwrite,
-        },
-        ~mapJsVariables,
-        ~serializeVariables=Operation.serializeVariables,
-      ), ~update=jsData =>
-        jsData
-        ->Js.nullToOption
-        ->Belt.Option.map(Operation.parse)
-        ->update
-        ->Belt.Option.map(Operation.serialize)
-        ->Js.Nullable.fromOption
+      ->Js_.updateQuery(
+        ~options=DataProxy.UpdateQueryOptions.toJs(
+          {
+            optimistic,
+            canonizeResults,
+            broadcast,
+            id,
+            query: Operation.query,
+            variables,
+            overwrite,
+          },
+          ~mapJsVariables,
+          ~serializeVariables=Operation.serializeVariables,
+        ),
+        ~update=jsData =>
+          jsData
+          ->Js.nullToOption
+          ->Belt.Option.map(Operation.parse)
+          ->update
+          ->Belt.Option.map(Operation.serialize)
+          ->Js.Nullable.fromOption,
       )
       ->Js.toOption
       ->Belt.Option.map(safeParse)
@@ -346,21 +348,23 @@ module ApolloCache = {
       let safeParse = Utils.safeParse(Fragment.parse)
 
       js
-      ->Js_.updateFragment(~options=DataProxy.UpdateFragmentOptions.toJs({
-        optimistic: optimistic,
-        canonizeResults: canonizeResults,
-        broadcast: broadcast,
-        id: id,
-        fragment: Fragment.query,
-        fragmentName: fragmentName,
-        overwrite: overwrite,
-      }), ~update=jsData =>
-        jsData
-        ->Js.nullToOption
-        ->Belt.Option.map(Fragment.parse)
-        ->update
-        ->Belt.Option.map(Fragment.serialize)
-        ->Js.Nullable.fromOption
+      ->Js_.updateFragment(
+        ~options=DataProxy.UpdateFragmentOptions.toJs({
+          optimistic,
+          canonizeResults,
+          broadcast,
+          id,
+          fragment: Fragment.query,
+          fragmentName,
+          overwrite,
+        }),
+        ~update=jsData =>
+          jsData
+          ->Js.nullToOption
+          ->Belt.Option.map(Fragment.parse)
+          ->update
+          ->Belt.Option.map(Fragment.serialize)
+          ->Js.Nullable.fromOption,
       )
       ->Js.toOption
       ->Belt.Option.map(safeParse)
@@ -369,12 +373,12 @@ module ApolloCache = {
     preserveJsPropsAndContext(
       js,
       {
-        readFragment: readFragment,
-        readQuery: readQuery,
-        writeFragment: writeFragment,
-        writeQuery: writeQuery,
-        updateFragment: updateFragment,
-        updateQuery: updateQuery,
+        readFragment,
+        readQuery,
+        writeFragment,
+        writeQuery,
+        updateFragment,
+        updateQuery,
       },
     )
   }

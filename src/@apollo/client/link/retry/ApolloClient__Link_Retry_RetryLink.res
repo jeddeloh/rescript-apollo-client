@@ -82,7 +82,7 @@ module Js_ = {
 let make = (~attempts=?, ~delay=?, ()) =>
   Js_.make(
     Options.toJs({
-      attempts: attempts,
-      delay: delay,
+      attempts,
+      delay,
     }),
   )

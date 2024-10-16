@@ -200,7 +200,7 @@ module ApolloClientOptions = {
     type t = {
       uri: option<UriFunction.Js_.t>,
       credentials: option<string>,
-      headers: option<Js.Dict.t<string>>,
+      headers: option<RescriptCore.Dict.t<string>>,
       link: option<ApolloLink.Js_.t>,
       cache: ApolloCache.t<Js.Json.t>, // Non-Js_ ApolloCache is correct here
       ssrForceFetchDelay: option<int>,
@@ -220,7 +220,7 @@ module ApolloClientOptions = {
   type t = {
     uri: option<UriFunction.t>,
     credentials: option<string>,
-    headers: option<Js.Dict.t<string>>,
+    headers: option<RescriptCore.Dict.t<string>>,
     link: option<ApolloLink.t>,
     cache: ApolloCache.t<Js.Json.t>,
     ssrForceFetchDelay: option<int>,
@@ -574,7 +574,7 @@ let preserveJsPropsAndContext: (Js_.t, t) => t = %raw(`
 let make: (
   ~uri: UriFunction.t=?,
   ~credentials: string=?,
-  ~headers: Js.Dict.t<string>=?,
+  ~headers: RescriptCore.Dict.t<string>=?,
   ~link: ApolloLink.t=?,
   ~cache: ApolloCache.t<Js.Json.t>,
   ~ssrForceFetchDelay: int=?,

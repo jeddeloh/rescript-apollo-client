@@ -31,5 +31,5 @@ type t = {
   source: option<Source.t>,
   position: option<array<int>>,
   originalError: Js.nullable<Js.Exn.t>,
-  extensions: option<Js.Dict.t<Js.Json.t>>,
+  extensions: option<RescriptCore.Dict.t<Js.Json.t>>,
 }

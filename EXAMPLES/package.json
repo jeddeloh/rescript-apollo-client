@@ -4,6 +4,7 @@
   "description": "Examples for rescript-apollo-client",
   "private": true,
   "scripts": {
+    "build": "rescript build -with-deps",
     "clean": "rescript clean",
     "graphql-server": "graphql-client-example-server",
     "server": "webpack-dev-server",
@@ -20,12 +21,11 @@
   },
   "dependencies": {
     "@apollo/client": "3.7.6",
-    "@rescript/react": "0.11.0",
+    "@rescript/react": "~0.11.0",
     "@ryyppy/rescript-promise": "2.1.0",
     "graphql": "^15.7.2",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "reason-promise": "1.1.5",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "rescript-apollo-client": "3.2.0",
     "subscriptions-transport-ws": "0.11.0"
   }

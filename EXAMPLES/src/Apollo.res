@@ -1,4 +1,4 @@
-let graphqlEndpoint = "localhost:4000"
+let graphqlEndpoint = "localhost:4000/graphql"
 
 let headers = {"high": "five"}
 

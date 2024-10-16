@@ -20,10 +20,6 @@
     "version": 4,
     "mode": "automatic"
   },
-  "reason": {
-    "react-jsx": 3
-  },
-  "refmt": 3,
   "sources": [
     {
       "dir": "src",

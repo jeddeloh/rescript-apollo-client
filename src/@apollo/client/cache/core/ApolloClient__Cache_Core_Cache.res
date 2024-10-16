@@ -188,9 +188,9 @@ module ApolloCache = {
         ~options={
           id,
           fragment: Fragment.query,
-          fragmentName,
-          optimistic,
-          canonizeResults,
+          ?fragmentName,
+          ?optimistic,
+          ?canonizeResults,
         },
         ~optimistic?,
         (),
@@ -218,11 +218,11 @@ module ApolloCache = {
       ->Js_.readQuery(
         ~options=DataProxy.ReadQueryOptions.toJs(
           {
-            id,
+            ?id,
             query: Operation.query,
             variables,
-            optimistic,
-            canonizeResults,
+            ?optimistic,
+            ?canonizeResults,
           },
           ~mapJsVariables,
           ~serializeVariables=Operation.serializeVariables,
@@ -247,12 +247,12 @@ module ApolloCache = {
       js->Js_.writeFragment(
         ~options=DataProxy.WriteFragmentOptions.toJs(
           {
-            broadcast,
+            ?broadcast,
             data,
             id,
             fragment: Fragment.query,
-            fragmentName,
-            overwrite,
+            ?fragmentName,
+            ?overwrite,
           },
           ~serialize=Fragment.serialize,
         ),
@@ -275,12 +275,12 @@ module ApolloCache = {
       js->Js_.writeQuery(
         ~options=DataProxy.WriteQueryOptions.toJs(
           {
-            broadcast,
+            ?broadcast,
             data,
-            id,
+            ?id,
             query: Operation.query,
             variables,
-            overwrite,
+            ?overwrite,
           },
           ~mapJsVariables,
           ~serialize=Operation.serialize,
@@ -310,13 +310,13 @@ module ApolloCache = {
       ->Js_.updateQuery(
         ~options=DataProxy.UpdateQueryOptions.toJs(
           {
-            optimistic,
-            canonizeResults,
-            broadcast,
-            id,
+            ?optimistic,
+            ?canonizeResults,
+            ?broadcast,
+            ?id,
             query: Operation.query,
             variables,
-            overwrite,
+            ?overwrite,
           },
           ~mapJsVariables,
           ~serializeVariables=Operation.serializeVariables,
@@ -350,13 +350,13 @@ module ApolloCache = {
       js
       ->Js_.updateFragment(
         ~options=DataProxy.UpdateFragmentOptions.toJs({
-          optimistic,
-          canonizeResults,
-          broadcast,
+          ?optimistic,
+          ?canonizeResults,
+          ?broadcast,
           id,
           fragment: Fragment.query,
-          fragmentName,
-          overwrite,
+          ?fragmentName,
+          ?overwrite,
         }),
         ~update=jsData =>
           jsData

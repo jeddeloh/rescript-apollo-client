@@ -11,7 +11,7 @@
     "start": "rescript build -with-deps -w"
   },
   "devDependencies": {
-    "@reasonml-community/graphql-ppx": "1.2.3",
+    "@reasonml-community/graphql-ppx": "1.2.4-1345e061.0",
     "graphql-client-example-server": "1.5.2",
     "html-webpack-plugin": "5.5.0",
     "rescript": "10.1.2",

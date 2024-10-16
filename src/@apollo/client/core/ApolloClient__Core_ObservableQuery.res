@@ -52,13 +52,14 @@ module ObservableQuery = {
     // ...extends Observable<ApolloQueryResult<TData>>
     // <R>(callback: (value: T) => R): Observable<R>;
     @send external map: (t<'t>, 't => 'r) => t<'r> = "map"
+
+    /**
+    We should be able to just map, but it's broken:
+    https://github.com/apollographql/apollo-client/issues/6144
+    This is not any sort of real map, of course. It just returns an observable
+    with a subcribe method that builds the transformation into onNext :(
+    */
     let fakeMap: (t<'t>, ('t, Js.Exn.t => unit) => option<'r>) => t<'r> = (js, fn) =>
-      @ocaml.doc("
-          * We should be able to just map, but it's broken:
-          * https://github.com/apollographql/apollo-client/issues/6144
-          * This is not any sort of real map, of course. It just returns an observable
-          * with a subcribe method that builds the transformation into onNext :(
-          ")
       %raw(`
             function (js, fn) {
               var originalSubscribe = js.subscribe.bind(js);

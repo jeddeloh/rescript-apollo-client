@@ -108,7 +108,7 @@ module Js_ = {
             } else if (error && typeof error.message === "string" && error.extensions) {
               return makeApolloError({graphQLErrors: [error]});
             } else {
-              return makeApolloError({networkError: ensureError(error)}) 
+              return makeApolloError({networkError: ensureError(error)})
             }
           }
         `)(error, make, ensureError)

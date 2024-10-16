@@ -19,7 +19,7 @@ module Js_ = {
   // export declare function useMutation<TData = any, TVariables = OperationVariables>(mutation: DocumentNode, options?: MutationHookOptions<TData, TVariables>): MutationTuple<TData, TVariables>;
   @module("@apollo/client")
   external useMutation: (
-    . Graphql.documentNode,
+    Graphql.documentNode,
     MutationHookOptions.Js_.t<'jsData, 'jsVariables>,
   ) => MutationTuple.Js_.t<'jsData, 'jsVariables> = "useMutation"
 }
@@ -63,7 +63,7 @@ let useMutation:
   ) => {
     let safeParse = Utils.safeParse(Operation.parse)
 
-    let jsMutationTuple = Js_.useMutation(.
+    let jsMutationTuple = Js_.useMutation(
       Operation.query,
       MutationHookOptions.toJs(
         {
@@ -141,7 +141,7 @@ let useMutationWithVariables:
   ) => {
     let safeParse = Utils.safeParse(Operation.parse)
 
-    let jsMutationTuple = Js_.useMutation(.
+    let jsMutationTuple = Js_.useMutation(
       Operation.query,
       MutationHookOptions.toJs(
         {

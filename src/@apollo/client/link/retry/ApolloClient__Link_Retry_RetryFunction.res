@@ -21,18 +21,18 @@ module RetryFunctionOptions = {
     //     retryIf?: (error: any, operation: Operation) => boolean | Promise<boolean>;
     // }
     type t = {
-      max: option<int>,
+      max?: int,
       retryIf: (option<Js.Json.t>, Operation.Js_.t) => Js.Promise.t<bool>,
     }
   }
 
   type t = {
-    max: option<int>,
+    max?: int,
     retryIf: (~error: option<Js.Json.t>, ~operation: Operation.t) => Js.Promise.t<bool>,
   }
 
   let toJs: t => Js_.t = t => {
-    max: t.max,
+    max: ?t.max,
     retryIf: (error, operation) => t.retryIf(~error, ~operation=operation->Operation.fromJs),
   }
 }

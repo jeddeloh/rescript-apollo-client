@@ -16,7 +16,7 @@ module Js_ = {
   // export declare function useQuery<TData = any, TVariables = OperationVariables>(query: DocumentNode, options?: QueryHookOptions<TData, TVariables>): QueryResult<TData, TVariables>;
   @module("@apollo/client")
   external useQuery: (
-    . Graphql.documentNode,
+    Graphql.documentNode,
     QueryHookOptions.Js_.t<'jsData, 'jsVariables>,
   ) => QueryResult.Js_.t<'jsData, 'jsVariables> = "useQuery"
 }
@@ -65,24 +65,23 @@ let useQuery:
   ) => {
     let safeParse = Utils.safeParse(Operation.parse)
 
-    let jsQueryResult = Js_.useQuery(.
+    let jsQueryResult = Js_.useQuery(
       Operation.query,
       QueryHookOptions.toJs(
         {
-          client,
-          context,
-          displayName,
-          errorPolicy,
-          fetchPolicy,
-          nextFetchPolicy,
-          onCompleted,
-          onError,
-          notifyOnNetworkStatusChange,
-          partialRefetch,
-          pollInterval,
-          query: None,
-          skip,
-          ssr,
+          ?client,
+          ?context,
+          ?displayName,
+          ?errorPolicy,
+          ?fetchPolicy,
+          ?nextFetchPolicy,
+          ?onCompleted,
+          ?onError,
+          ?notifyOnNetworkStatusChange,
+          ?partialRefetch,
+          ?pollInterval,
+          ?skip,
+          ?ssr,
           variables,
         },
         ~mapJsVariables,
@@ -117,7 +116,7 @@ module Extend = (M: Operation) => {
     RefetchQueryDescription.PureQueryOptions({
       query: M.query,
       variables: jsVariables,
-      context,
+      ?context,
     })
   }
 

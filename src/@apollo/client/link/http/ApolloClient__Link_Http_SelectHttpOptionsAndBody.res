@@ -30,13 +30,13 @@ module HttpOptions = {
     type t_fetch
 
     type t = {
-      uri: option<UriFunction.Js_.t>,
-      includeExtensions: option<bool>,
-      fetch: option<t_fetch>,
-      headers: option<Js.Json.t>,
-      credentials: option<string>,
-      fetchOptions: option<Js.Json.t>,
-      useGETForQueries: option<bool>,
+      uri?: UriFunction.Js_.t,
+      includeExtensions?: bool,
+      fetch?: t_fetch,
+      headers?: Js.Json.t,
+      credentials?: string,
+      fetchOptions?: Js.Json.t,
+      useGETForQueries?: bool,
     }
   }
 

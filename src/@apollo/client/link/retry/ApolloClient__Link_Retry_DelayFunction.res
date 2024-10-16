@@ -21,9 +21,9 @@ module DelayFunctionOptions = {
   //     jitter?: boolean;
   // }
   type t = {
-    initial: option<int>,
-    max: option<int>,
-    jitter: option<int>,
+    initial?: int,
+    max?: int,
+    jitter?: int,
   }
 
   module Js_ = {

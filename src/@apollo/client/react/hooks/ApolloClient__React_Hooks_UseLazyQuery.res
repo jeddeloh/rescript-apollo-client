@@ -16,7 +16,7 @@ module Js_ = {
   // export declare function useLazyQuery<TData = any, TVariables = OperationVariables>(query: DocumentNode, options?: LazyQueryHookOptions<TData, TVariables>): QueryTuple<TData, TVariables>;
   @module("@apollo/client")
   external useLazyQuery: (
-    . Graphql.documentNode,
+    Graphql.documentNode,
     LazyQueryHookOptions.Js_.t<'jsData, 'jsVariables>,
   ) => QueryTuple.Js_.t<'jsData, 'jsVariables> = "useLazyQuery"
 }
@@ -60,24 +60,22 @@ let useLazyQuery:
     (),
   ) => {
     let safeParse = Utils.safeParse(Operation.parse)
-    let jsQueryTuple = Js_.useLazyQuery(.
+    let jsQueryTuple = Js_.useLazyQuery(
       Operation.query,
       LazyQueryHookOptions.toJs(
         {
-          client,
-          context,
-          displayName,
-          errorPolicy,
-          fetchPolicy,
-          nextFetchPolicy,
-          onCompleted,
-          onError,
-          notifyOnNetworkStatusChange,
-          partialRefetch,
-          pollInterval,
-          query: None,
-          ssr,
-          variables: None,
+          ?client,
+          ?context,
+          ?displayName,
+          ?errorPolicy,
+          ?fetchPolicy,
+          ?nextFetchPolicy,
+          ?onCompleted,
+          ?onError,
+          ?notifyOnNetworkStatusChange,
+          ?partialRefetch,
+          ?pollInterval,
+          ?ssr,
         },
         ~safeParse,
         ~serializeVariables=Operation.serializeVariables,
@@ -137,24 +135,23 @@ let useLazyQueryWithVariables:
   ) => {
     let safeParse = Utils.safeParse(Operation.parse)
 
-    let jsQueryTuple = Js_.useLazyQuery(.
+    let jsQueryTuple = Js_.useLazyQuery(
       Operation.query,
       LazyQueryHookOptions.toJs(
         {
-          client,
-          context,
-          displayName,
-          errorPolicy,
-          fetchPolicy,
-          nextFetchPolicy,
-          onCompleted,
-          onError,
-          notifyOnNetworkStatusChange,
-          partialRefetch,
-          pollInterval,
-          query: None,
-          ssr,
-          variables: Some(variables),
+          ?client,
+          ?context,
+          ?displayName,
+          ?errorPolicy,
+          ?fetchPolicy,
+          ?nextFetchPolicy,
+          ?onCompleted,
+          ?onError,
+          ?notifyOnNetworkStatusChange,
+          ?partialRefetch,
+          ?pollInterval,
+          ?ssr,
+          variables,
         },
         ~safeParse,
         ~serializeVariables=Operation.serializeVariables,

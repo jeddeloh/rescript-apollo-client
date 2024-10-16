@@ -210,9 +210,9 @@ module FieldPolicy_KeyArgs = {
 
 module FieldPolicy = {
   type t<'existing> = {
-    keyArgs: option<FieldPolicy_KeyArgs.t>,
-    read: option<FieldReadFunction.t<'existing>>,
-    merge: option<FieldMerge.t<'existing>>,
+    keyArgs?: FieldPolicy_KeyArgs.t,
+    read?: FieldReadFunction.t<'existing>,
+    merge?: FieldMerge.t<'existing>,
   }
 
   module Js_ = {
@@ -222,15 +222,15 @@ module FieldPolicy = {
     //     merge?: FieldMergeFunction<TExisting, TIncoming> | boolean;
     // };
     type t<'existing> = {
-      keyArgs: option<FieldPolicy_KeyArgs.Js_.t>,
-      read: option<FieldReadFunction.Js_.t<'existing>>,
-      merge: option<FieldMerge.Js_.t<'existing>>,
+      keyArgs?: FieldPolicy_KeyArgs.Js_.t,
+      read?: FieldReadFunction.Js_.t<'existing>,
+      merge?: FieldMerge.Js_.t<'existing>,
     }
   }
 
   let toJs: t<'existing> => Js_.t<'existing> = t => {
-    keyArgs: t.keyArgs->Belt.Option.map(FieldPolicy_KeyArgs.toJs),
-    read: t.read->Belt.Option.map(FieldReadFunction.toJs),
-    merge: t.merge->Belt.Option.map(FieldMerge.toJs),
+    keyArgs: ?t.keyArgs->Belt.Option.map(FieldPolicy_KeyArgs.toJs),
+    read: ?t.read->Belt.Option.map(FieldReadFunction.toJs),
+    merge: ?t.merge->Belt.Option.map(FieldMerge.toJs),
   }
 }

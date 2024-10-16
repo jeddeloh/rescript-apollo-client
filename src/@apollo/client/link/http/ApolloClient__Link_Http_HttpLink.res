@@ -32,11 +32,11 @@ let make: (
   (),
 ) =>
   Js_.make({
-    uri,
-    includeExtensions,
-    fetch,
-    headers,
-    credentials,
-    fetchOptions,
-    useGETForQueries,
+    ?uri,
+    ?includeExtensions,
+    ?fetch,
+    ?headers,
+    ?credentials,
+    ?fetchOptions,
+    ?useGETForQueries,
   })

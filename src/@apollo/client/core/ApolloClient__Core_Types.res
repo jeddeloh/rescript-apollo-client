@@ -171,20 +171,17 @@ module MutationQueryReducersMap = {
     // }> = {
     //     [queryName: string]: MutationQueryReducer<T>;
     // };
-    type t<'jsData> = Js.Dict.t<MutationQueryReducer.Js_.t<'jsData>>
+    type t<'jsData> = RescriptCore.Dict.t<MutationQueryReducer.Js_.t<'jsData>>
   }
 
-  type t<'data> = Js.Dict.t<MutationQueryReducer.t<'data>>
+  type t<'data> = RescriptCore.Dict.t<MutationQueryReducer.t<'data>>
 
   let toJs: (t<'data>, ~safeParse: Types.safeParse<'data, 'jsData>) => Js_.t<'jsData> = (
     t,
     ~safeParse,
   ) =>
-    Js.Dict.map(
-      mutationQueryReducer => (json, options) =>
-        mutationQueryReducer->MutationQueryReducer.toJs(~safeParse, json, options),
-      t,
-    )
+    RescriptCore.Dict.mapValues(t, mutationQueryReducer => (json, options) =>
+      mutationQueryReducer->MutationQueryReducer.toJs(~safeParse, json, options))
 }
 
 module Resolvers = {
@@ -194,7 +191,7 @@ module Resolvers = {
     //         [field: string]: Resolver;
     //     };
     // }
-    type t = Js.Dict.t<Js.Dict.t<Resolver.Js_.t>>
+    type t = RescriptCore.Dict.t<RescriptCore.Dict.t<Resolver.Js_.t>>
   }
   type t = Js_.t
 }

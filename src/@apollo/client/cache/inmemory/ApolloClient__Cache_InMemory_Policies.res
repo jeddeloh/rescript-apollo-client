@@ -78,14 +78,14 @@ module TypePolicy = {
     fields?: t_fields,
   }
 
-  let toJs: (. t) => Js_.t = (. t) => {
-    keyFields: ?t.keyFields->Belt.Option.mapU(KeyArgs.toJs),
+  let toJs: t => Js_.t = t => {
+    keyFields: ?t.keyFields->Belt.Option.map(KeyArgs.toJs),
     queryType: ?t.queryType,
     mutationType: ?t.mutationType,
     subscriptionType: ?t.subscriptionType,
-    fields: ?t.fields->Belt.Option.mapU((. fields) =>
+    fields: ?t.fields->Belt.Option.mapU(fields =>
       fields
-      ->Belt.Array.mapU((. (fieldKey, t_field)) => (
+      ->Belt.Array.mapU(((fieldKey, t_field)) => (
         fieldKey,
         switch t_field {
         | ConcatPagination(keyArgs) =>
@@ -97,7 +97,7 @@ module TypePolicy = {
 
         | FieldPolicy(fieldPolicy) => fieldPolicy->FieldPolicy.toJs->Js_.FieldsUnion.fieldPolicy
         | FieldReadFunction(fieldReadFunction) =>
-          FieldReadFunction.toJs(. fieldReadFunction)->Js_.FieldsUnion.fieldReadFunction
+          FieldReadFunction.toJs(fieldReadFunction)->Js_.FieldsUnion.fieldReadFunction
         },
       ))
       ->Js.Dict.fromArray
@@ -126,19 +126,21 @@ module TypePolicies = {
     // export declare type TypePolicies = {
     //     [__typename: string]: TypePolicy;
     // };
-    type t = Js.Dict.t<TypePolicy.Js_.t>
+    type t = RescriptCore.Dict.t<TypePolicy.Js_.t>
   }
 
   type typename = string
 
   type t = array<(typename, TypePolicy.t)>
 
-  let toJs: (. t) => Js_.t = (. t) =>
-    t->Belt.Array.mapU((. (key, policy)) => (key, TypePolicy.toJs(. policy)))->Js.Dict.fromArray
+  let toJs: t => Js_.t = t =>
+    t
+    ->Belt.Array.map(((key, policy)) => (key, TypePolicy.toJs(policy)))
+    ->Js.Dict.fromArray
 }
 
 module PossibleTypesMap = {
-  type t = Js.Dict.t<array<string>>
+  type t = RescriptCore.Dict.t<array<string>>
   module Js_ = {
     // export declare type PossibleTypesMap = {
     //     [supertype: string]: string[];

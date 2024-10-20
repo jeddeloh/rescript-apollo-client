@@ -553,7 +553,7 @@ module LazyQueryResult = {
         | UnexecutedLazyResult(UnexecutedLazyResult.Js_.t)
         | QueryResult(QueryResult.Js_.t<'jsData, 'jsVariables>)
       let classify = (Any(v): t): case<'jsData, 'jsVariables> =>
-        if %raw(`function (value) { return "client" in value}`)(v) {
+        if %raw(`function (value) { return "called" in value && value.called === true; }`)(v) {
           QueryResult((Obj.magic(v): QueryResult.Js_.t<'jsData, 'jsVariables>))
         } else {
           UnexecutedLazyResult((Obj.magic(v): UnexecutedLazyResult.Js_.t))

@@ -169,7 +169,7 @@ module RequestHandler = {
   module Js_ = {
     // export declare type RequestHandler = (operation: Operation, forward: NextLink) => Observable<FetchResult> | null;
     type t = (
-      Operation.Js_.t,
+      . Operation.Js_.t,
       NextLink.Js_.t,
     ) => Js.Null.t<Observable.t<FetchResult.Js_.t<Js.Json.t>, Js.Exn.t>>
   }
@@ -180,5 +180,5 @@ module RequestHandler = {
     NextLink.Js_.t,
   ) => option<Observable.t<FetchResult.Js_.t<Js.Json.t>, Js.Exn.t>>
 
-  let toJs: t => Js_.t = (t, operation, forward) => t(operation, forward)->Js.Null.fromOption
+  let toJs: t => Js_.t = t => (. operation, forward) => t(operation, forward)->Js.Null.fromOption
 }

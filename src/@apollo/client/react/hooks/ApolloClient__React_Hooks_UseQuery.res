@@ -63,7 +63,7 @@ let useQuery:
     ~ssr=?,
     variables,
   ) => {
-    let safeParse = Utils.safeParse(Operation.parse)
+    let safeParse = Utils.safeParse(. Operation.parse)
 
     let jsQueryResult = Js_.useQuery(
       Operation.query,

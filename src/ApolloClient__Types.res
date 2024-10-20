@@ -41,4 +41,4 @@ type parseError = {
 
 type parseResult<'data> = result<'data, parseError>
 
-type safeParse<'data, 'jsData> = 'jsData => parseResult<'data>
+type safeParse<'data, 'jsData> = (. 'jsData) => parseResult<'data>

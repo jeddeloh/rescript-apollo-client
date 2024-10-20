@@ -133,14 +133,14 @@ type t = {
   stack: option<string>,
 }
 
-let fromJs: Js_.t => t = untrustedJs => {
+let fromJs: (. Js_.t) => t = (. untrustedJs) => {
   let js = Js_.ensureApolloError(untrustedJs)
   {
     extraInfo: js.extraInfo,
     graphQLErrors: js.graphQLErrors->Belt.Option.getWithDefault([]),
     networkError: js.networkError
     ->Js.toOption
-    ->Belt.Option.map(networkError =>
+    ->Belt.Option.mapU((. networkError) =>
       switch networkError->Js_.NetworkErrorUnion.classify {
       | Error(error) => FetchFailure(error)
       | ServerError(error) => BadStatus(error.statusCode, error)
@@ -165,7 +165,7 @@ let make: (
     networkError: Js.Nullable.undefined,
     errorMessage,
     extraInfo,
-  })->fromJs
+  })->fromJs(. _)
 
   {...errorWithoutNetworkError, networkError}
 }

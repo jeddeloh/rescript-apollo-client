@@ -85,7 +85,7 @@ module ErrorResponse = {
 
   let fromJs: Js_.t => t = js => {
     graphQLErrors: js.graphQLErrors,
-    networkError: js.networkError->Belt.Option.map(networkError =>
+    networkError: js.networkError->Belt.Option.mapU((. networkError) =>
       switch networkError->Js_.NetworkErrorUnion.classify {
       | Error(error) => FetchFailure(error)
       | ServerError(error) => BadStatus(error.statusCode, error)

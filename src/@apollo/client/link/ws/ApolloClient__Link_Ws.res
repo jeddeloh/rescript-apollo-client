@@ -50,7 +50,7 @@ module WebSocketLink = {
     Js_.make(
       #Configuration({
         uri,
-        options: options->Belt.Option.map(ClientOptions.toJs),
+        options: options->Belt.Option.mapU(ClientOptions.toJs),
         webSocketImpl,
       }),
     )

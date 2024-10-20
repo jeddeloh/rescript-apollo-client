@@ -100,11 +100,12 @@ module FieldMergeFunction = {
     //    incoming: SafeReadonly<TIncoming>,
     //    options: TOptions,
     //  ) => SafeReadonly<TExisting>;
-    type t<'existing> = ('existing, 'existing, FieldFunctionOptions.Js_.t) => 'existing
+    type t<'existing> = (. 'existing, 'existing, FieldFunctionOptions.Js_.t) => 'existing
   }
 
-  let toJs: t<'existing> => Js_.t<'existing> = (t, existing, incoming, jsFieldFunctionOptions) =>
-    t(existing, incoming, jsFieldFunctionOptions->FieldFunctionOptions.fromJs)
+  let toJs: (. t<'existing>) => Js_.t<'existing> = (. t) =>
+    (. existing, incoming, jsFieldFunctionOptions) =>
+      t(existing, incoming, jsFieldFunctionOptions->FieldFunctionOptions.fromJs)
 }
 
 module FieldMerge = {
@@ -116,22 +117,22 @@ module FieldMerge = {
     // FieldMergeFunction<TExisting, TIncoming, TOptions> | boolean;
     module FieldMergeUnion: {
       type t<'existing>
-      let mergeFunction: FieldMergeFunction.Js_.t<'existing> => t<'existing>
+      let mergeFunction: (. FieldMergeFunction.Js_.t<'existing>) => t<'existing>
       let true_: t<'existing>
     } = {
       @unboxed
       type rec t<'existing> = Any('a): t<'existing>
-      let mergeFunction = (v: FieldMergeFunction.Js_.t<'existing>) => Any(v)
+      let mergeFunction = (. v: FieldMergeFunction.Js_.t<'existing>) => Any(v)
       let true_ = Any(true)
     }
 
     type t<'existing> = FieldMergeUnion.t<'existing>
   }
 
-  let toJs: t<'existing> => Js_.t<'existing> = x =>
+  let toJs: (. t<'existing>) => Js_.t<'existing> = (. x) =>
     switch x {
     | MergeFunction(mergeFunction) =>
-      mergeFunction->FieldMergeFunction.toJs->Js_.FieldMergeUnion.mergeFunction
+      Js_.FieldMergeUnion.mergeFunction(. FieldMergeFunction.toJs(. mergeFunction))
     | True => Js_.FieldMergeUnion.true_
     }
 }
@@ -141,11 +142,12 @@ module FieldReadFunction = {
 
   module Js_ = {
     // export declare type FieldReadFunction<TExisting = any, TReadResult = TExisting> = (existing: SafeReadonly<TExisting> | undefined, options: FieldFunctionOptions) => TReadResult | undefined;
-    type t<'existing> = (option<'existing>, FieldFunctionOptions.Js_.t) => 'existing
+    type t<'existing> = (. option<'existing>, FieldFunctionOptions.Js_.t) => 'existing
   }
 
-  let toJs: t<'existing> => Js_.t<'existing> = (t, existing, jsFieldFunctionOptions) =>
-    t(existing, jsFieldFunctionOptions->FieldFunctionOptions.fromJs)
+  let toJs: (. t<'existing>) => Js_.t<'existing> = (. t) =>
+    (. existing, jsFieldFunctionOptions) =>
+      t(existing, jsFieldFunctionOptions->FieldFunctionOptions.fromJs)
 }
 
 module KeySpecifier = {
@@ -200,7 +202,7 @@ module FieldPolicy_KeyArgs = {
     type t = KeyArgsUnion.t
   }
 
-  let toJs: t => Js_.t = x =>
+  let toJs: (. t) => Js_.t = (. x) =>
     switch x {
     | KeySpecifier(keySpecifier) => keySpecifier->Js_.KeyArgsUnion.keySpecifier
     | KeyArgsFunction(keyArgsFunction) => keyArgsFunction->Js_.KeyArgsUnion.keyArgsFunction
@@ -229,8 +231,8 @@ module FieldPolicy = {
   }
 
   let toJs: t<'existing> => Js_.t<'existing> = t => {
-    keyArgs: ?t.keyArgs->Belt.Option.map(FieldPolicy_KeyArgs.toJs),
-    read: ?t.read->Belt.Option.map(FieldReadFunction.toJs),
-    merge: ?t.merge->Belt.Option.map(FieldMerge.toJs),
+    keyArgs: ?t.keyArgs->Belt.Option.mapU(FieldPolicy_KeyArgs.toJs),
+    read: ?t.read->Belt.Option.mapU(FieldReadFunction.toJs),
+    merge: ?t.merge->Belt.Option.mapU(FieldMerge.toJs),
   }
 }

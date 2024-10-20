@@ -5,13 +5,13 @@ module RetryFunction = {
     // export interface RetryFunction {
     //     (count: number, operation: Operation, error: any): boolean | Promise<boolean>;
     // }
-    type t = (int, Operation.Js_.t, option<Js.Json.t>) => Js.Promise.t<bool>
+    type t = (. int, Operation.Js_.t, option<Js.Json.t>) => Js.Promise.t<bool>
   }
 
   type t = (~count: int, ~operation: Operation.t, ~error: option<Js.Json.t>) => Js.Promise.t<bool>
 
-  let toJs: t => Js_.t = (t, count, operation, error) =>
-    t(~count, ~operation=operation->Operation.fromJs, ~error)
+  let toJs: (. t) => Js_.t = (. t) =>
+    (. count, operation, error) => t(~count, ~operation=operation->Operation.fromJs, ~error)
 }
 
 module RetryFunctionOptions = {

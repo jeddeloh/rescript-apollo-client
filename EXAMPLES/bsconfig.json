@@ -1,7 +1,9 @@
 {
   "name": "examples",
+  "uncurried": false,
   "graphql": {
     "apolloMode": true,
+    "uncurried": false,
     "extendMutation": "ApolloClient.GraphQL_PPX.ExtendMutation",
     "extendQuery": "ApolloClient.GraphQL_PPX.ExtendQuery",
     "extendSubscription": "ApolloClient.GraphQL_PPX.ExtendSubscription",

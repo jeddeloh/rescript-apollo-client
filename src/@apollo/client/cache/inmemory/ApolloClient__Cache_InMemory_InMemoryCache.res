@@ -85,5 +85,5 @@ let make: (
     ?dataIdFromObject,
     ?possibleTypes,
     ?resultCaching,
-    typePolicies: ?typePolicies->Belt.Option.map(TypePolicies.toJs),
+    typePolicies: ?typePolicies->Belt.Option.mapU(TypePolicies.toJs),
   })->ApolloCache.fromJs

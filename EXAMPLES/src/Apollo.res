@@ -8,6 +8,12 @@ let httpLink = ApolloClient.Link.HttpLink.make(
   (),
 )
 
+let _retryLink = ApolloClient.Link.RetryLink.make(
+  ~attempts=RetryFunction(async (~count, ~operation as _, ~error as _) => count < 3),
+  ~delay=DelayFunction((~count as _, ~operation as _, ~error as _) => 1_000),
+  (),
+)
+
 let wsLink = {
   open ApolloClient.Link.WebSocketLink
   make(
@@ -42,3 +48,14 @@ let client = {
     (),
   )
 }
+
+client.onClearStore(~cb=async () => {
+  Js.log("store cleared")
+})
+
+client.onResetStore(~cb=async () => {
+  Js.log("store reset")
+})
+
+let _ = client.clearStore()
+let _ = client.resetStore()

@@ -66,7 +66,7 @@ let useSubscription:
     ~skip=?,
     variables,
   ) => {
-    let safeParse = Utils.safeParse(Operation.parse)
+    let safeParse = Utils.safeParse(. Operation.parse)
 
     let jsSubscriptionResult = Js_.useSubscription(
       Operation.query,
@@ -90,7 +90,7 @@ let useSubscription:
       variables: jsSubscriptionResult.variables,
       loading: jsSubscriptionResult.loading,
       data: jsSubscriptionResult.data->Belt.Option.map(Operation.parse),
-      error: jsSubscriptionResult.error->Belt.Option.map(ApolloError.fromJs),
+      error: jsSubscriptionResult.error->Belt.Option.mapU(ApolloError.fromJs),
     }, jsSubscriptionResult)
   }
 

@@ -61,7 +61,7 @@ let useMutation:
     ~update=?,
     (),
   ) => {
-    let safeParse = Utils.safeParse(Operation.parse)
+    let safeParse = Utils.safeParse(. Operation.parse)
 
     let jsMutationTuple = Js_.useMutation(
       Operation.query,
@@ -139,7 +139,7 @@ let useMutationWithVariables:
     ~update=?,
     variables,
   ) => {
-    let safeParse = Utils.safeParse(Operation.parse)
+    let safeParse = Utils.safeParse(. Operation.parse)
 
     let jsMutationTuple = Js_.useMutation(
       Operation.query,

@@ -9,23 +9,23 @@ module Options = {
     module T_delayUnion: {
       type t
       let delayFunctionOptions: DelayFunctionOptions.Js_.t => t
-      let delayFunction: DelayFunction.Js_.t => t
+      let delayFunction: (. DelayFunction.Js_.t) => t
     } = {
       @unboxed
       type rec t = Any('a): t
       let delayFunctionOptions = (v: DelayFunctionOptions.Js_.t) => Any(v)
-      let delayFunction = (v: DelayFunction.Js_.t) => Any(v)
+      let delayFunction = (. v: DelayFunction.Js_.t) => Any(v)
     }
 
     module T_attemptsUnion: {
       type t
       let retryFunctionOptions: RetryFunctionOptions.Js_.t => t
-      let retryFunction: RetryFunction.Js_.t => t
+      let retryFunction: (. RetryFunction.Js_.t) => t
     } = {
       @unboxed
       type rec t = Any('a): t
       let retryFunctionOptions = (v: RetryFunctionOptions.Js_.t) => Any(v)
-      let retryFunction = (v: RetryFunction.Js_.t) => Any(v)
+      let retryFunction = (. v: RetryFunction.Js_.t) => Any(v)
     }
 
     // export declare namespace RetryLink {
@@ -49,20 +49,20 @@ module Options = {
   }
 
   let toJs: t => Js_.t = t => {
-    delay: ?t.delay->Belt.Option.map(delay =>
+    delay: ?t.delay->Belt.Option.mapU((. delay) =>
       switch delay {
       | DelayFunctionOptions(delayFunctionOptions) =>
         Js_.T_delayUnion.delayFunctionOptions(delayFunctionOptions)
       | DelayFunction(delayFunction) =>
-        Js_.T_delayUnion.delayFunction(delayFunction->DelayFunction.toJs)
+        Js_.T_delayUnion.delayFunction(. DelayFunction.toJs(. delayFunction))
       }
     ),
-    attempts: ?t.attempts->Belt.Option.map(attempts =>
+    attempts: ?t.attempts->Belt.Option.mapU((. attempts) =>
       switch attempts {
       | RetryFunctionOptions(retryFunctionOptions) =>
         Js_.T_attemptsUnion.retryFunctionOptions(retryFunctionOptions->RetryFunctionOptions.toJs)
       | RetryFunction(retryFunction) =>
-        Js_.T_attemptsUnion.retryFunction(retryFunction->RetryFunction.toJs)
+        Js_.T_attemptsUnion.retryFunction(. RetryFunction.toJs(. retryFunction))
       }
     ),
   }

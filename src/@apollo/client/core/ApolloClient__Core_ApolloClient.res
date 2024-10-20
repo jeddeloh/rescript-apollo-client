@@ -33,30 +33,31 @@ module DefaultWatchQueryOptions = {
   module Js_ = {
     // Partial<QueryOptions>;
     type t = {
-      fetchPolicy: option<WatchQueryFetchPolicy.Js_.t>,
+      fetchPolicy?: WatchQueryFetchPolicy.Js_.t,
       // query: GraphQL.Language.documentNode,
-      // variables: option('jsVariables),
-      errorPolicy: option<ErrorPolicy.Js_.t>,
-      context: option<Js.Json.t>,
+      // variables?: 'jsVariables,
+      errorPolicy?: ErrorPolicy.Js_.t,
+      context?: Js.Json.t,
     }
   }
 
   type t = {
-    fetchPolicy: option<WatchQueryFetchPolicy.t>,
-    errorPolicy: option<ErrorPolicy.t>,
-    context: option<Js.Json.t>,
+    fetchPolicy?: WatchQueryFetchPolicy.t,
+    errorPolicy?: ErrorPolicy.t,
+    context?: Js.Json.t,
   }
 
   let toJs: t => Js_.t = t => {
-    fetchPolicy: t.fetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
-    errorPolicy: t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
-    context: t.context,
+    fetchPolicy: ?t.fetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
+    errorPolicy: ?t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
+    context: ?t.context,
   }
 
+  @deprecated("Just construct t instead")
   let make = (~fetchPolicy=?, ~errorPolicy=?, ~context=?, ()) => {
-    fetchPolicy,
-    errorPolicy,
-    context,
+    ?fetchPolicy,
+    ?errorPolicy,
+    ?context,
   }
 }
 
@@ -64,30 +65,37 @@ module DefaultQueryOptions = {
   module Js_ = {
     // Partial<QueryOptions>;
     type t = {
-      fetchPolicy: option<FetchPolicy.Js_.t>,
+      fetchPolicy?: FetchPolicy.Js_.t,
       // query: GraphQL.Language.documentNode,
-      // variables: option('jsVariables),
-      errorPolicy: option<ErrorPolicy.Js_.t>,
-      context: option<Js.Json.t>,
+      // variables?: 'jsVariables,
+      errorPolicy?: ErrorPolicy.Js_.t,
+      context?: Js.Json.t,
     }
   }
 
   type t = {
-    fetchPolicy: option<FetchPolicy.t>,
-    errorPolicy: option<ErrorPolicy.t>,
-    context: option<Js.Json.t>,
+    fetchPolicy?: FetchPolicy.t,
+    errorPolicy?: ErrorPolicy.t,
+    context?: Js.Json.t,
   }
 
   let toJs: t => Js_.t = t => {
-    fetchPolicy: t.fetchPolicy->Belt.Option.map(FetchPolicy.toJs),
-    errorPolicy: t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
-    context: t.context,
+    fetchPolicy: ?switch t.fetchPolicy {
+    | Some(fetchPolicy) => FetchPolicy.toJs(fetchPolicy)->Some
+    | None => None
+    },
+    errorPolicy: ?switch t.errorPolicy {
+    | Some(errorPolicy) => ErrorPolicy.toJs(errorPolicy)->Some
+    | None => None
+    },
+    context: ?t.context,
   }
 
+  @deprecated("Just construct t instead")
   let make = (~fetchPolicy=?, ~errorPolicy=?, ~context=?, ()) => {
-    fetchPolicy,
-    errorPolicy,
-    context,
+    ?fetchPolicy,
+    ?errorPolicy,
+    ?context,
   }
 }
 
@@ -95,34 +103,35 @@ module DefaultMutateOptions = {
   module Js_ = {
     // Partial<MutationOptions>;
     type t = {
-      context: option<Js.Json.t>,
-      fetchPolicy: option<FetchPolicy__noCacheExtracted.Js_.t>,
-      awaitRefetchQueries: option<bool>,
-      errorPolicy: option<ErrorPolicy.Js_.t>,
-      // optimisticResponse: option('jsVariables => 'jsData),
-      // update: option(MutationUpdaterFn.Js_.t('jsData)),
-      // updateQueries: option(MutationQueryReducersMap.Js_.t('jsData)),
-      refetchQueries: option<RefetchQueryDescription.Js_.t>,
-      // variables: option('jsVariables),
+      context?: Js.Json.t,
+      fetchPolicy?: FetchPolicy__noCacheExtracted.Js_.t,
+      awaitRefetchQueries?: bool,
+      errorPolicy?: ErrorPolicy.Js_.t,
+      // optimisticResponse?: 'jsVariables => 'jsData,
+      // update?: MutationUpdaterFn.Js_.t<'jsData>,
+      // updateQueries?: MutationQueryReducersMap.Js_.t<'jsData>,
+      refetchQueries?: RefetchQueryDescription.Js_.t,
+      // variables?: 'jsVariables,
     }
   }
 
   type t = {
-    context: option<Js.Json.t>,
-    fetchPolicy: option<FetchPolicy__noCacheExtracted.t>,
-    awaitRefetchQueries: option<bool>,
-    errorPolicy: option<ErrorPolicy.t>,
-    refetchQueries: option<RefetchQueryDescription.t>,
+    context?: Js.Json.t,
+    fetchPolicy?: FetchPolicy__noCacheExtracted.t,
+    awaitRefetchQueries?: bool,
+    errorPolicy?: ErrorPolicy.t,
+    refetchQueries?: RefetchQueryDescription.t,
   }
 
   let toJs: t => Js_.t = t => {
-    context: t.context,
-    fetchPolicy: t.fetchPolicy->Belt.Option.map(FetchPolicy__noCacheExtracted.toJs),
-    awaitRefetchQueries: t.awaitRefetchQueries,
-    errorPolicy: t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
-    refetchQueries: t.refetchQueries->Belt.Option.map(RefetchQueryDescription.toJs),
+    context: ?t.context,
+    fetchPolicy: ?t.fetchPolicy->Belt.Option.map(FetchPolicy__noCacheExtracted.toJs),
+    awaitRefetchQueries: ?t.awaitRefetchQueries,
+    errorPolicy: ?t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
+    refetchQueries: ?t.refetchQueries->Belt.Option.map(RefetchQueryDescription.toJs),
   }
 
+  @deprecated("Just construct instead")
   let make = (
     ~context=?,
     ~fetchPolicy=?,
@@ -131,11 +140,11 @@ module DefaultMutateOptions = {
     ~refetchQueries=?,
     (),
   ) => {
-    context,
-    fetchPolicy,
-    awaitRefetchQueries,
-    errorPolicy,
-    refetchQueries,
+    ?context,
+    ?fetchPolicy,
+    ?awaitRefetchQueries,
+    ?errorPolicy,
+    ?refetchQueries,
   }
 }
 
@@ -147,33 +156,34 @@ module DefaultOptions = {
     //     mutate?: Partial<MutationOptions>;
     // }
     type t = {
-      watchQuery: option<DefaultWatchQueryOptions.Js_.t>,
-      query: option<DefaultQueryOptions.Js_.t>,
-      mutate: option<DefaultMutateOptions.Js_.t>,
+      watchQuery?: DefaultWatchQueryOptions.Js_.t,
+      query?: DefaultQueryOptions.Js_.t,
+      mutate?: DefaultMutateOptions.Js_.t,
     }
   }
 
   type t = {
-    watchQuery: option<DefaultWatchQueryOptions.t>,
-    query: option<DefaultQueryOptions.t>,
-    mutate: option<DefaultMutateOptions.t>,
+    watchQuery?: DefaultWatchQueryOptions.t,
+    query?: DefaultQueryOptions.t,
+    mutate?: DefaultMutateOptions.t,
   }
 
   let toJs: t => Js_.t = t => {
-    watchQuery: t.watchQuery->Belt.Option.map(DefaultWatchQueryOptions.toJs),
-    query: t.query->Belt.Option.map(DefaultQueryOptions.toJs),
-    mutate: t.mutate->Belt.Option.map(DefaultMutateOptions.toJs),
+    watchQuery: ?t.watchQuery->Belt.Option.map(DefaultWatchQueryOptions.toJs),
+    query: ?t.query->Belt.Option.map(DefaultQueryOptions.toJs),
+    mutate: ?t.mutate->Belt.Option.map(DefaultMutateOptions.toJs),
   }
 
+  @deprecated("Just construct instead")
   let make: (
     ~mutate: DefaultMutateOptions.t=?,
     ~query: DefaultQueryOptions.t=?,
     ~watchQuery: DefaultWatchQueryOptions.t=?,
     unit,
   ) => t = (~mutate=?, ~query=?, ~watchQuery=?, ()) => {
-    watchQuery,
-    query,
-    mutate,
+    ?watchQuery,
+    ?query,
+    ?mutate,
   }
 }
 
@@ -198,61 +208,61 @@ module ApolloClientOptions = {
     //     version?: string;
     // };
     type t = {
-      uri: option<UriFunction.Js_.t>,
-      credentials: option<string>,
-      headers: option<Js.Dict.t<string>>,
-      link: option<ApolloLink.Js_.t>,
+      uri?: UriFunction.Js_.t,
+      credentials?: string,
+      headers?: Js.Dict.t<string>,
+      link?: ApolloLink.Js_.t,
       cache: ApolloCache.t<Js.Json.t>, // Non-Js_ ApolloCache is correct here
-      ssrForceFetchDelay: option<int>,
-      ssrMode: option<bool>,
-      connectToDevTools: option<bool>,
-      queryDeduplication: option<bool>,
-      defaultOptions: option<DefaultOptions.Js_.t>,
-      assumeImmutableResults: option<bool>,
-      resolvers: option<array<Resolvers.Js_.t>>,
-      typeDefs: option<array<Graphql.documentNode>>,
-      fragmentMatcher: option<FragmentMatcher.Js_.t>,
-      name: option<string>,
-      version: option<string>,
+      ssrForceFetchDelay?: int,
+      ssrMode?: bool,
+      connectToDevTools?: bool,
+      queryDeduplication?: bool,
+      defaultOptions?: DefaultOptions.Js_.t,
+      assumeImmutableResults?: bool,
+      resolvers?: array<Resolvers.Js_.t>,
+      typeDefs?: array<Graphql.documentNode>,
+      fragmentMatcher?: FragmentMatcher.Js_.t,
+      name?: string,
+      version?: string,
     }
   }
 
   type t = {
-    uri: option<UriFunction.t>,
-    credentials: option<string>,
-    headers: option<Js.Dict.t<string>>,
-    link: option<ApolloLink.t>,
+    uri?: UriFunction.t,
+    credentials?: string,
+    headers?: Js.Dict.t<string>,
+    link?: ApolloLink.t,
     cache: ApolloCache.t<Js.Json.t>,
-    ssrForceFetchDelay: option<int>,
-    ssrMode: option<bool>,
-    connectToDevTools: option<bool>,
-    queryDeduplication: option<bool>,
-    defaultOptions: option<DefaultOptions.t>,
-    assumeImmutableResults: option<bool>,
-    resolvers: option<array<Resolvers.t>>,
-    typeDefs: option<array<Graphql.documentNode>>,
-    fragmentMatcher: option<FragmentMatcher.t>,
-    name: option<string>,
-    version: option<string>,
+    ssrForceFetchDelay?: int,
+    ssrMode?: bool,
+    connectToDevTools?: bool,
+    queryDeduplication?: bool,
+    defaultOptions?: DefaultOptions.t,
+    assumeImmutableResults?: bool,
+    resolvers?: array<Resolvers.t>,
+    typeDefs?: array<Graphql.documentNode>,
+    fragmentMatcher?: FragmentMatcher.t,
+    name?: string,
+    version?: string,
   }
 
   let toJs: t => Js_.t = t => {
-    uri: t.uri,
-    credentials: t.credentials,
-    headers: t.headers,
-    link: t.link,
+    uri: ?t.uri,
+    credentials: ?t.credentials,
+    headers: ?t.headers,
+    link: ?t.link,
     cache: t.cache,
-    ssrForceFetchDelay: t.ssrForceFetchDelay,
-    ssrMode: t.ssrMode,
-    connectToDevTools: t.connectToDevTools,
-    queryDeduplication: t.queryDeduplication,
-    defaultOptions: t.defaultOptions->Belt.Option.map(DefaultOptions.toJs),
-    assumeImmutableResults: t.assumeImmutableResults,
-    resolvers: t.resolvers,
-    typeDefs: t.typeDefs,
-    fragmentMatcher: t.fragmentMatcher,
-    name: t.name,
-    version: t.version,
+    ssrForceFetchDelay: ?t.ssrForceFetchDelay,
+    ssrMode: ?t.ssrMode,
+    connectToDevTools: ?t.connectToDevTools,
+    queryDeduplication: ?t.queryDeduplication,
+    defaultOptions: ?t.defaultOptions->Belt.Option.map(DefaultOptions.toJs),
+    assumeImmutableResults: ?t.assumeImmutableResults,
+    resolvers: ?t.resolvers,
+    typeDefs: ?t.typeDefs,
+    fragmentMatcher: ?t.fragmentMatcher,
+    name: ?t.name,
+    version: ?t.version,
   }
 }
 
@@ -610,22 +620,22 @@ let make: (
 ) => {
   let jsClient = Js_.make(
     ApolloClientOptions.toJs({
-      uri,
-      credentials,
-      headers,
-      link,
+      ?uri,
+      ?credentials,
+      ?headers,
+      ?link,
       cache,
-      ssrForceFetchDelay,
-      ssrMode,
-      connectToDevTools,
-      queryDeduplication,
-      defaultOptions,
-      assumeImmutableResults,
-      resolvers,
-      typeDefs,
-      fragmentMatcher,
-      name,
-      version,
+      ?ssrForceFetchDelay,
+      ?ssrMode,
+      ?connectToDevTools,
+      ?queryDeduplication,
+      ?defaultOptions,
+      ?assumeImmutableResults,
+      ?resolvers,
+      ?typeDefs,
+      ?fragmentMatcher,
+      ?name,
+      ?version,
     }),
   )
 
@@ -661,15 +671,15 @@ let make: (
       jsClient,
       ~options=MutationOptions.toJs(
         {
-          awaitRefetchQueries,
-          context,
-          errorPolicy,
-          fetchPolicy,
+          ?awaitRefetchQueries,
+          ?context,
+          ?errorPolicy,
+          ?fetchPolicy,
           mutation: Operation.query,
-          optimisticResponse,
-          updateQueries,
-          refetchQueries,
-          update,
+          ?optimisticResponse,
+          ?updateQueries,
+          ?refetchQueries,
+          ?update,
           variables,
         },
         ~mapJsVariables,
@@ -721,11 +731,11 @@ let make: (
       jsClient,
       ~options=QueryOptions.toJs(
         {
-          fetchPolicy,
+          ?fetchPolicy,
           query: Operation.query,
           variables,
-          errorPolicy,
-          context,
+          ?errorPolicy,
+          ?context,
         },
         ~mapJsVariables,
         ~serializeVariables=Operation.serializeVariables,
@@ -769,9 +779,9 @@ let make: (
       ~options={
         id,
         fragment: Fragment.query,
-        fragmentName,
-        optimistic,
-        canonizeResults,
+        ?fragmentName,
+        ?optimistic,
+        ?canonizeResults,
       },
       ~optimistic?,
       (),
@@ -799,11 +809,11 @@ let make: (
       jsClient,
       ~options=DataProxy.ReadQueryOptions.toJs(
         {
-          id,
+          ?id,
           query: Operation.query,
           variables,
-          optimistic,
-          canonizeResults,
+          ?optimistic,
+          ?canonizeResults,
         },
         ~mapJsVariables,
         ~serializeVariables=Operation.serializeVariables,
@@ -848,11 +858,11 @@ let make: (
       jsClient,
       ~options=SubscriptionOptions.toJs(
         {
-          fetchPolicy,
+          ?fetchPolicy,
           query: Operation.query,
           variables,
-          errorPolicy,
-          context,
+          ?errorPolicy,
+          ?context,
         },
         ~mapJsVariables,
         ~serializeVariables=Operation.serializeVariables,
@@ -904,13 +914,13 @@ let make: (
     ->Js_.watchQuery(
       ~options=WatchQueryOptions.toJs(
         {
-          fetchPolicy,
-          nextFetchPolicy,
+          ?fetchPolicy,
+          ?nextFetchPolicy,
           query: Operation.query,
           variables,
-          errorPolicy,
-          context,
-          pollInterval,
+          ?errorPolicy,
+          ?context,
+          ?pollInterval,
         },
         ~mapJsVariables,
         ~serializeVariables=Operation.serializeVariables,
@@ -932,12 +942,12 @@ let make: (
     jsClient->Js_.writeFragment(
       ~options=DataProxy.WriteFragmentOptions.toJs(
         {
-          broadcast,
+          ?broadcast,
           data,
           id,
           fragment: Fragment.query,
-          fragmentName,
-          overwrite,
+          ?fragmentName,
+          ?overwrite,
         },
         ~serialize=Fragment.serialize,
       ),
@@ -960,12 +970,12 @@ let make: (
     jsClient->Js_.writeQuery(
       ~options=DataProxy.WriteQueryOptions.toJs(
         {
-          broadcast,
+          ?broadcast,
           data,
-          id,
+          ?id,
           query: Operation.query,
           variables,
-          overwrite,
+          ?overwrite,
         },
         ~mapJsVariables,
         ~serialize=Operation.serialize,
@@ -995,13 +1005,13 @@ let make: (
     ->Js_.updateQuery(
       ~options=DataProxy.UpdateQueryOptions.toJs(
         {
-          optimistic,
-          canonizeResults,
-          broadcast,
-          id,
+          ?optimistic,
+          ?canonizeResults,
+          ?broadcast,
+          ?id,
           query: Operation.query,
           variables,
-          overwrite,
+          ?overwrite,
         },
         ~mapJsVariables,
         ~serializeVariables=Operation.serializeVariables,
@@ -1035,13 +1045,13 @@ let make: (
     jsClient
     ->Js_.updateFragment(
       ~options=DataProxy.UpdateFragmentOptions.toJs({
-        optimistic,
-        canonizeResults,
-        broadcast,
+        ?optimistic,
+        ?canonizeResults,
+        ?broadcast,
         id,
         fragment: Fragment.query,
-        fragmentName,
-        overwrite,
+        ?fragmentName,
+        ?overwrite,
       }),
       ~update=jsData =>
         jsData

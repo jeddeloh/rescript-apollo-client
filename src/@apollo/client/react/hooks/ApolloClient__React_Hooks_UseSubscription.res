@@ -27,7 +27,7 @@ module Js_ = {
   // };
   @module("@apollo/client")
   external useSubscription: (
-    . Graphql.Language.documentNode,
+    Graphql.Language.documentNode,
     SubscriptionHookOptions.Js_.t<'jsData, 'jsVariables>,
   ) => useSubscription_result<'jsData, 'jsVariables> = "useSubscription"
 }
@@ -68,17 +68,16 @@ let useSubscription:
   ) => {
     let safeParse = Utils.safeParse(Operation.parse)
 
-    let jsSubscriptionResult = Js_.useSubscription(.
+    let jsSubscriptionResult = Js_.useSubscription(
       Operation.query,
       SubscriptionHookOptions.toJs(
         {
-          client,
-          fetchPolicy,
-          onSubscriptionData,
-          onSubscriptionComplete,
-          subscription: None,
-          shouldResubscribe,
-          skip,
+          ?client,
+          ?fetchPolicy,
+          ?onSubscriptionData,
+          ?onSubscriptionComplete,
+          ?shouldResubscribe,
+          ?skip,
           variables,
         },
         ~mapJsVariables,

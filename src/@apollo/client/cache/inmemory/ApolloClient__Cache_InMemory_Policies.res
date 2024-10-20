@@ -9,24 +9,10 @@ module SelectionSetNode = ApolloClient__Graphql.Language.Ast.SelectionSetNode
 
 module KeyFieldsContext = {
   type t = {
-    typename: option<string>,
-    selectionSet: option<SelectionSetNode.t>,
-    fragment: option<FragmentMap.t>,
-    keyObject: option<Js.Json.t>,
-  }
-  module Js_ = {
-    // declare type KeyFieldsContext = {
-    //     typename?: string;
-    //     selectionSet?: SelectionSetNode;
-    //     fragmentMap?: FragmentMap;
-    //     keyObject?: Record<string, any>;
-    // };
-    type t = t = {
-      typename: option<string>,
-      selectionSet: option<SelectionSetNode.t>,
-      fragment: option<FragmentMap.Js_.t>,
-      keyObject: option<Js.Json.t>,
-    }
+    typename?: string,
+    selectionSet?: SelectionSetNode.t,
+    fragment?: FragmentMap.t,
+    keyObject?: Js.Json.t,
   }
 }
 
@@ -65,11 +51,11 @@ module TypePolicy = {
     //     };
     // };
     type t = {
-      keyFields: option<KeyArgs.Js_.t>,
-      queryType: option<bool>,
-      mutationType: option<bool>,
-      subscriptionType: option<bool>,
-      fields: option<Js.Dict.t<FieldsUnion.t>>,
+      keyFields?: KeyArgs.Js_.t,
+      queryType?: bool,
+      mutationType?: bool,
+      subscriptionType?: bool,
+      fields?: Js.Dict.t<FieldsUnion.t>,
     }
   }
 
@@ -85,19 +71,19 @@ module TypePolicy = {
   type t_fields = array<(fieldKey, t_field)>
 
   type t = {
-    keyFields: option<KeyArgs.t>,
-    queryType: option<bool>,
-    mutationType: option<bool>,
-    subscriptionType: option<bool>,
-    fields: option<t_fields>,
+    keyFields?: KeyArgs.t,
+    queryType?: bool,
+    mutationType?: bool,
+    subscriptionType?: bool,
+    fields?: t_fields,
   }
 
-  let toJs: (. t) => Js_.t = (. t) => {
-    keyFields: t.keyFields->Belt.Option.map(KeyArgs.toJs),
-    queryType: t.queryType,
-    mutationType: t.mutationType,
-    subscriptionType: t.subscriptionType,
-    fields: t.fields->Belt.Option.map(fields =>
+  let toJs: t => Js_.t = t => {
+    keyFields: ?t.keyFields->Belt.Option.map(KeyArgs.toJs),
+    queryType: ?t.queryType,
+    mutationType: ?t.mutationType,
+    subscriptionType: ?t.subscriptionType,
+    fields: ?t.fields->Belt.Option.map(fields =>
       fields
       ->Belt.Array.map(((fieldKey, t_field)) => (
         fieldKey,
@@ -118,6 +104,7 @@ module TypePolicy = {
     ),
   }
 
+  @deprecated("Construct the record directly instead")
   let make: (
     ~fields: t_fields=?,
     ~keyFields: KeyArgs.t=?,
@@ -126,11 +113,11 @@ module TypePolicy = {
     ~subscriptionType: bool=?,
     unit,
   ) => t = (~fields=?, ~keyFields=?, ~mutationType=?, ~queryType=?, ~subscriptionType=?, ()) => {
-    fields,
-    keyFields,
-    mutationType,
-    queryType,
-    subscriptionType,
+    ?fields,
+    ?keyFields,
+    ?mutationType,
+    ?queryType,
+    ?subscriptionType,
   }
 }
 
@@ -147,7 +134,7 @@ module TypePolicies = {
   type t = array<(typename, TypePolicy.t)>
 
   let toJs: t => Js_.t = t =>
-    t->Belt.Array.map(((key, policy)) => (key, TypePolicy.toJs(. policy)))->Js.Dict.fromArray
+    t->Belt.Array.map(((key, policy)) => (key, TypePolicy.toJs(policy)))->Js.Dict.fromArray
 }
 
 module PossibleTypesMap = {

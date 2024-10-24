@@ -115,7 +115,7 @@ module ObservableQuery = {
     ~safeParse,
   ) => {
     let parseWithOnErrorCall = (jsData, onError) =>
-      switch safeParse(jsData) {
+      switch safeParse(. jsData) {
       | Ok(data) => Some(data)
       | Error({error}) =>
         onError(error)

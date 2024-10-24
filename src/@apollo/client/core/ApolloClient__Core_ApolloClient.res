@@ -47,9 +47,9 @@ module DefaultWatchQueryOptions = {
     context?: Js.Json.t,
   }
 
-  let toJs: t => Js_.t = t => {
-    fetchPolicy: ?t.fetchPolicy->Belt.Option.map(WatchQueryFetchPolicy.toJs),
-    errorPolicy: ?t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
+  let toJs: (. t) => Js_.t = (. t) => {
+    fetchPolicy: ?t.fetchPolicy->Belt.Option.mapU(WatchQueryFetchPolicy.toJs),
+    errorPolicy: ?t.errorPolicy->Belt.Option.mapU(ErrorPolicy.toJs),
     context: ?t.context,
   }
 
@@ -79,13 +79,13 @@ module DefaultQueryOptions = {
     context?: Js.Json.t,
   }
 
-  let toJs: t => Js_.t = t => {
+  let toJs: (. t) => Js_.t = (. t) => {
     fetchPolicy: ?switch t.fetchPolicy {
-    | Some(fetchPolicy) => FetchPolicy.toJs(fetchPolicy)->Some
+    | Some(fetchPolicy) => FetchPolicy.toJs(. fetchPolicy)->Some
     | None => None
     },
     errorPolicy: ?switch t.errorPolicy {
-    | Some(errorPolicy) => ErrorPolicy.toJs(errorPolicy)->Some
+    | Some(errorPolicy) => ErrorPolicy.toJs(. errorPolicy)->Some
     | None => None
     },
     context: ?t.context,
@@ -123,12 +123,12 @@ module DefaultMutateOptions = {
     refetchQueries?: RefetchQueryDescription.t,
   }
 
-  let toJs: t => Js_.t = t => {
+  let toJs: (. t) => Js_.t = (. t) => {
     context: ?t.context,
-    fetchPolicy: ?t.fetchPolicy->Belt.Option.map(FetchPolicy__noCacheExtracted.toJs),
+    fetchPolicy: ?t.fetchPolicy->Belt.Option.mapU(FetchPolicy__noCacheExtracted.toJs),
     awaitRefetchQueries: ?t.awaitRefetchQueries,
-    errorPolicy: ?t.errorPolicy->Belt.Option.map(ErrorPolicy.toJs),
-    refetchQueries: ?t.refetchQueries->Belt.Option.map(RefetchQueryDescription.toJs),
+    errorPolicy: ?t.errorPolicy->Belt.Option.mapU(ErrorPolicy.toJs),
+    refetchQueries: ?t.refetchQueries->Belt.Option.mapU(RefetchQueryDescription.toJs),
   }
 
   @deprecated("Just construct instead")
@@ -168,10 +168,10 @@ module DefaultOptions = {
     mutate?: DefaultMutateOptions.t,
   }
 
-  let toJs: t => Js_.t = t => {
-    watchQuery: ?t.watchQuery->Belt.Option.map(DefaultWatchQueryOptions.toJs),
-    query: ?t.query->Belt.Option.map(DefaultQueryOptions.toJs),
-    mutate: ?t.mutate->Belt.Option.map(DefaultMutateOptions.toJs),
+  let toJs: (. t) => Js_.t = (. t) => {
+    watchQuery: ?t.watchQuery->Belt.Option.mapU(DefaultWatchQueryOptions.toJs),
+    query: ?t.query->Belt.Option.mapU(DefaultQueryOptions.toJs),
+    mutate: ?t.mutate->Belt.Option.mapU(DefaultMutateOptions.toJs),
   }
 
   @deprecated("Just construct instead")
@@ -256,7 +256,7 @@ module ApolloClientOptions = {
     ssrMode: ?t.ssrMode,
     connectToDevTools: ?t.connectToDevTools,
     queryDeduplication: ?t.queryDeduplication,
-    defaultOptions: ?t.defaultOptions->Belt.Option.map(DefaultOptions.toJs),
+    defaultOptions: ?t.defaultOptions->Belt.Option.mapU(DefaultOptions.toJs),
     assumeImmutableResults: ?t.assumeImmutableResults,
     resolvers: ?t.resolvers,
     typeDefs: ?t.typeDefs,
@@ -328,11 +328,11 @@ module Js_ = {
 
   // onClearStore(cb: () => Promise<any>): () => void;
   @send
-  external onClearStore: (t, ~cb: unit => Js.Promise.t<unit>, unit) => unit = "onClearStore"
+  external onClearStore: (t, ~cb: unit => Js.Promise.t<unit>) => unit = "onClearStore"
 
   // onResetStore(cb: () => Promise<any>): () => void;
   @send
-  external onResetStore: (t, ~cb: unit => Js.Promise.t<unit>, unit) => unit = "onResetStore"
+  external onResetStore: (t, ~cb: unit => Js.Promise.t<unit>) => unit = "onResetStore"
 
   // query<T = any, TVariables = OperationVariables>(options: QueryOptions<TVariables>): Promise<ApolloQueryResult<T>>;
   @send
@@ -446,9 +446,9 @@ type t = {
     'variables,
   ) => Js.Promise.t<Belt.Result.t<FetchResult.t__ok<'data>, ApolloError.t>>,
   @as("rescript_onClearStore")
-  onClearStore: (~cb: unit => Js.Promise.t<unit>, unit) => unit,
+  onClearStore: (~cb: unit => Js.Promise.t<unit>) => unit,
   @as("rescript_onResetStore")
-  onResetStore: (~cb: unit => Js.Promise.t<unit>, unit) => unit,
+  onResetStore: (~cb: unit => Js.Promise.t<unit>) => unit,
   @as("rescript_query")
   query: 'data 'variables 'jsVariables. (
     ~query: module(Operation with
@@ -665,7 +665,7 @@ let make: (
     ~update=?,
     variables,
   ) => {
-    let safeParse = Utils.safeParse(Operation.parse)
+    let safeParse = Utils.safeParse(. Operation.parse)
 
     Js_.mutate(
       jsClient,
@@ -725,7 +725,7 @@ let make: (
     ~mapJsVariables=Utils.identity,
     variables,
   ) => {
-    let safeParse = Utils.safeParse(Operation.parse)
+    let safeParse = Utils.safeParse(. Operation.parse)
 
     Js_.query(
       jsClient,
@@ -772,7 +772,7 @@ let make: (
     ~fragmentName=?,
     (),
   ) => {
-    let safeParse = Utils.safeParse(Fragment.parse)
+    let safeParse = Utils.safeParse(. Fragment.parse)
 
     jsClient
     ->Js_.readFragment(
@@ -787,7 +787,7 @@ let make: (
       (),
     )
     ->Js.toOption
-    ->Belt.Option.map(safeParse)
+    ->Belt.Option.mapU(safeParse)
   }
 
   let readQuery = (
@@ -803,7 +803,7 @@ let make: (
     ~canonizeResults=?,
     variables,
   ) => {
-    let safeParse = Utils.safeParse(Operation.parse)
+    let safeParse = Utils.safeParse(. Operation.parse)
 
     Js_.readQuery(
       jsClient,
@@ -821,7 +821,7 @@ let make: (
       ~optimistic,
     )
     ->Js.toOption
-    ->Belt.Option.map(safeParse)
+    ->Belt.Option.mapU(safeParse)
   }
 
   let resetStore: unit => Js.Promise.t<
@@ -852,7 +852,7 @@ let make: (
     ~mapJsVariables=Utils.identity,
     variables,
   ) => {
-    let safeParse = Utils.safeParse(Operation.parse)
+    let safeParse = Utils.safeParse(. Operation.parse)
 
     let jsObservable = Js_.subscribe(
       jsClient,
@@ -881,9 +881,9 @@ let make: (
             }
           }
 
-        let onError' = onError->Belt.Option.map(onError => {
+        let onError' = onError->Belt.Option.mapU((. onError) => {
           let return = unknown =>
-            Obj.magic(unknown)->ApolloError.Js_.ensureApolloError->ApolloError.fromJs->onError
+            Obj.magic(unknown)->ApolloError.Js_.ensureApolloError->ApolloError.fromJs(. _)->onError
           return
         })
 
@@ -908,7 +908,7 @@ let make: (
     ~pollInterval=?,
     variables,
   ) => {
-    let safeParse = Utils.safeParse(Operation.parse)
+    let safeParse = Utils.safeParse(. Operation.parse)
 
     jsClient
     ->Js_.watchQuery(
@@ -999,7 +999,7 @@ let make: (
     ~update,
     variables,
   ) => {
-    let safeParse = Utils.safeParse(Operation.parse)
+    let safeParse = Utils.safeParse(. Operation.parse)
 
     jsClient
     ->Js_.updateQuery(
@@ -1025,7 +1025,7 @@ let make: (
         ->Js.Nullable.fromOption,
     )
     ->Js.toOption
-    ->Belt.Option.map(safeParse)
+    ->Belt.Option.mapU(safeParse)
   }
 
   let updateFragment = (
@@ -1040,7 +1040,7 @@ let make: (
     ~update,
     (),
   ) => {
-    let safeParse = Utils.safeParse(Fragment.parse)
+    let safeParse = Utils.safeParse(. Fragment.parse)
 
     jsClient
     ->Js_.updateFragment(
@@ -1062,7 +1062,7 @@ let make: (
         ->Js.Nullable.fromOption,
     )
     ->Js.toOption
-    ->Belt.Option.map(safeParse)
+    ->Belt.Option.mapU(safeParse)
   }
 
   preserveJsPropsAndContext(

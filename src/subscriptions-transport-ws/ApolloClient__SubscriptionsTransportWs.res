@@ -64,7 +64,7 @@ module ConnectionParamsOptions = {
     | Function(unit => ConnectionParams.t)
     | Promise(Js.Promise.t<ConnectionParams.t>)
 
-  let toJs: t => Js_.t = x =>
+  let toJs: (. t) => Js_.t = (. x) =>
     switch x {
     | ConnectionParams(v) => Js_.Union.connectionParams(v)
     | Function(v) => Js_.Union.fn(v)
@@ -106,8 +106,8 @@ module ClientOptions = {
     inactivityTimeout?: int,
   }
 
-  let toJs: t => Js_.t = t => {
-    connectionParams: ?t.connectionParams->Belt.Option.map(ConnectionParamsOptions.toJs),
+  let toJs: (. t) => Js_.t = (. t) => {
+    connectionParams: ?t.connectionParams->Belt.Option.mapU(ConnectionParamsOptions.toJs),
     timeout: ?t.timeout,
     reconnect: ?t.reconnect,
     reconnectionAttempts: ?t.reconnectionAttempts,
@@ -194,7 +194,7 @@ module SubscriptionClient = {
   ) => t = (~url, ~options=?, ~webSocketImpl=?, ~webSocketProtocols=?, ()) => {
     let jsSubscriptionClient = Js_.make(
       ~url,
-      ~options=?options->Belt.Option.map(ClientOptions.toJs),
+      ~options=?options->Belt.Option.mapU(ClientOptions.toJs),
       ~webSocketImpl?,
       ~webSocketProtocols?,
       (),

@@ -371,7 +371,7 @@ module Js_ = {
   @send external setLink: (t, ApolloLink.Js_.t) => unit = "setLink"
 
   // stop(): void;
-  @send external stop: (t, unit) => unit = "stop"
+  @send external stop: t => unit = "stop"
 
   // subscribe<T = any, TVariables = OperationVariables>(options: SubscriptionOptions<TVariables>): Observable<FetchResult<T>>;
 
@@ -492,6 +492,7 @@ type t = {
   restore: (~serializedState: Js.Json.t) => ApolloCache.t<Js.Json.t>,
   @as("rescript_setLink")
   setLink: ApolloLink.t => unit,
+  @as("rescript_stop")
   stop: unit => unit,
   @as("rescript_subscribe")
   subscribe: 'data 'variables 'jsVariables. (
@@ -837,7 +838,7 @@ let make: (
 
   let setLink = link => jsClient->Js_.setLink(link)
 
-  let stop = () => jsClient->Js_.stop()
+  let stop = () => jsClient->Js_.stop
 
   let subscribe = (
     type data variables jsVariables,

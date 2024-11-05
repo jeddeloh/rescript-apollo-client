@@ -1,7 +1,7 @@
 {
   "name": "rescript-apollo-client",
   "description": "ReScript bindings for the Apollo Client ecosystem",
-  "version": "3.2.0",
+  "version": "4.0.0",
   "keywords": [
     "Apollo",
     "BuckleScript",
@@ -34,8 +34,8 @@
   "peerDependencies": {
     "@apollo/client": "^3.5.0",
     "@reasonml-community/graphql-ppx": "^1.0.0",
-    "@rescript/react": "~0.10. || ~0.11.0",
-    "rescript": "^10.0.0"
+    "@rescript/react": "~0.10.0 || ~0.11.0 || ~0.12.0",
+    "rescript": "^10.0.0 || ^11.0.0"
   },
   "peerDependenciesMeta": {
     "rescript": {

@@ -180,5 +180,5 @@ module RequestHandler = {
     NextLink.Js_.t,
   ) => option<Observable.t<FetchResult.Js_.t<Js.Json.t>, Js.Exn.t>>
 
-  let toJs: t => Js_.t = (t, operation, forward) => t(operation, forward)->Js.Null.fromOption
+  let toJs: t => Js_.t = t => (operation, forward) => t(operation, forward)->Js.Null.fromOption
 }

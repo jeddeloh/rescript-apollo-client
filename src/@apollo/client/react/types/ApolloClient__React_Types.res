@@ -155,10 +155,10 @@ module LazyQueryHookOptions = {
     displayName: ?t.displayName,
     errorPolicy: ?t.errorPolicy->Belt.Option.mapU(ErrorPolicy.toJs),
     onCompleted: ?t.onCompleted->Belt.Option.mapU((. onCompleted) =>
-      (. jsData) => safeParse(. jsData)->onCompleted
+      jsData => safeParse(. jsData)->onCompleted
     ),
-    onError: ?t.onError->Belt.Option.mapU((. onError) =>
-      (. jsApolloError) => ApolloError.fromJs(. jsApolloError)->onError
+    onError: ?t.onError->Belt.Option.mapU(onError =>
+      jsApolloError => ApolloError.fromJs(jsApolloError)->onError
     ),
     fetchPolicy: ?t.fetchPolicy->Belt.Option.mapU(WatchQueryFetchPolicy.toJs),
     notifyOnNetworkStatusChange: ?t.notifyOnNetworkStatusChange,

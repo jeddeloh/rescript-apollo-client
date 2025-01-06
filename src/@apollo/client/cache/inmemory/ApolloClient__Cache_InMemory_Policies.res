@@ -126,7 +126,7 @@ module TypePolicies = {
     // export declare type TypePolicies = {
     //     [__typename: string]: TypePolicy;
     // };
-    type t = RescriptCore.Dict.t<TypePolicy.Js_.t>
+    type t = Js.Dict.t<TypePolicy.Js_.t>
   }
 
   type typename = string
@@ -140,7 +140,7 @@ module TypePolicies = {
 }
 
 module PossibleTypesMap = {
-  type t = RescriptCore.Dict.t<array<string>>
+  type t = Js.Dict.t<array<string>>
   module Js_ = {
     // export declare type PossibleTypesMap = {
     //     [supertype: string]: string[];

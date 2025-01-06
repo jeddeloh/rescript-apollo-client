@@ -2,7 +2,7 @@ module FragmentDefinitionNode = ApolloClient__Graphql.Language.Ast.FragmentDefin
 
 module FragmentMap = {
   module Js_ = {
-    type t = RescriptCore.Dict.t<FragmentDefinitionNode.t>
+    type t = Js.Dict.t<FragmentDefinitionNode.t>
   }
 
   type t = Js_.t

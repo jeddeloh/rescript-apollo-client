@@ -585,7 +585,7 @@ let preserveJsPropsAndContext: (Js_.t, t) => t = %raw(`
 let make: (
   ~uri: UriFunction.t=?,
   ~credentials: string=?,
-  ~headers: RescriptCore.Dict.t<string>=?,
+  ~headers: Js.Dict.t<string>=?,
   ~link: ApolloLink.t=?,
   ~cache: ApolloCache.t<Js.Json.t>,
   ~ssrForceFetchDelay: int=?,

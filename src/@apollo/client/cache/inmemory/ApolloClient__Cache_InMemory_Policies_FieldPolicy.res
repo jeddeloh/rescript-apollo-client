@@ -5,7 +5,7 @@ module ReadFieldFunction = ApolloClient__Cache_Core_Types_Common.ReadFieldFuncti
 module ToReferenceFunction = ApolloClient__Cache_Core_Types_Common.ToReferenceFunction
 
 module StorageType = {
-  type t = RescriptCore.Dict.t<Js.Json.t>
+  type t = Js.Dict.t<Js.Json.t>
   module Js_ = {
     type t = t
   }
@@ -30,11 +30,11 @@ module FieldFunctionOptions = {
     //     mergeObjects<T extends StoreObject | Reference>(existing: T, incoming: T): T | undefined;
     // }
     type t = {
-      args: Js.nullable<RescriptCore.Dict.t<Js.Json.t>>,
+      args: Js.nullable<Js.Dict.t<Js.Json.t>>,
       fieldName: string,
       storeFieldName: string,
       field: Js.nullable<FieldNode.t>,
-      variables: option<RescriptCore.Dict.t<Js.Json.t>>,
+      variables: option<Js.Dict.t<Js.Json.t>>,
       isReference: bool,
       toReference: unimplemented,
       readField: unimplemented,
@@ -52,11 +52,11 @@ module FieldFunctionOptions = {
   }
 
   type t = {
-    args: Js.nullable<RescriptCore.Dict.t<Js.Json.t>>,
+    args: Js.nullable<Js.Dict.t<Js.Json.t>>,
     fieldName: string,
     storeFieldName: string,
     field: Js.nullable<FieldNode.t>,
-    variables: option<RescriptCore.Dict.t<Js.Json.t>>,
+    variables: option<Js.Dict.t<Js.Json.t>>,
     isReference: bool,
     toReference: unimplemented,
     storage: Js.nullable<StorageType.t>,

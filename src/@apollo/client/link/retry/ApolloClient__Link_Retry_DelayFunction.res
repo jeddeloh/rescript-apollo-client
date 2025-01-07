@@ -5,12 +5,12 @@ module DelayFunction = {
     // export interface DelayFunction {
     //     (count: number, operation: Operation, error: any): number;
     // }
-    type t = (. int, Operation.Js_.t, option<Js.Json.t>) => int
+    type t = (int, Operation.Js_.t, option<Js.Json.t>) => int
   }
 
   type t = (~count: int, ~operation: Operation.t, ~error: option<Js.Json.t>) => int
 
-  let toJs: t => Js_.t = (t, count, operation, error) =>
+  let toJs: t => Js_.t = t => (count, operation, error) =>
     t(~count, ~operation=operation->Operation.fromJs, ~error)
 }
 

@@ -417,8 +417,8 @@ module MutationOptions = {
     mutation: t.mutation,
     optimisticResponse: ?t.optimisticResponse->Belt.Option.map(optimisticResponse => variables =>
       optimisticResponse(variables)->serialize),
-    refetchQueries: t.refetchQueries->Belt.Option.map(RefetchQueryDescription.toJs),
-    update: t.update->Belt.Option.map(MutationUpdaterFn.toJs(_, ~safeParse)),
+    refetchQueries: ?t.refetchQueries->Belt.Option.map(RefetchQueryDescription.toJs),
+    update: ?t.update->Belt.Option.map(MutationUpdaterFn.toJs(_, ~safeParse)),
     updateQueries: ?t.updateQueries->Belt.Option.map(MutationQueryReducersMap.toJs(_, ~safeParse)),
     variables: t.variables->serializeVariables->mapJsVariables,
   }

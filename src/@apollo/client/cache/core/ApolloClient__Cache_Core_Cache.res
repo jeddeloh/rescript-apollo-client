@@ -196,7 +196,7 @@ module ApolloCache = {
         (),
       )
       ->Js.toOption
-      ->Belt.Option.mapU(safeParse)
+      ->Belt.Option.map(safeParse(_))
     }
 
     let readQuery = (
@@ -230,7 +230,7 @@ module ApolloCache = {
         ~optimistic,
       )
       ->Js.toOption
-      ->Belt.Option.mapU(safeParse)
+      ->Belt.Option.map(safeParse(_))
     }
 
     let writeFragment = (
@@ -330,7 +330,7 @@ module ApolloCache = {
           ->Js.Nullable.fromOption,
       )
       ->Js.toOption
-      ->Belt.Option.mapU(safeParse)
+      ->Belt.Option.map(safeParse(_))
     }
 
     let updateFragment = (
@@ -367,7 +367,7 @@ module ApolloCache = {
           ->Js.Nullable.fromOption,
       )
       ->Js.toOption
-      ->Belt.Option.mapU(safeParse)
+      ->Belt.Option.map(safeParse(_))
     }
 
     preserveJsPropsAndContext(

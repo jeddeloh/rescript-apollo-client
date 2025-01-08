@@ -8,12 +8,11 @@ let ensureError = ApolloError.ensureError
 
 external asJson: 'any => Js.Json.t = "%identity"
 
-let safeParse: (. 'jsData => 'data) => Types.safeParse<'data, 'jsData> = (. parse) =>
-  (. jsData) =>
-    switch parse(jsData) {
-    | data => Ok(data)
-    | exception Js.Exn.Error(error) => Error({value: jsData->asJson, error})
-    }
+let safeParse: ('jsData => 'data) => Types.safeParse<'data, 'jsData> = parse => jsData =>
+  switch parse(jsData) {
+  | data => Ok(data)
+  | exception Js.Exn.Error(error) => Error({value: jsData->asJson, error})
+  }
 
 let safeParseAndLiftToCommonResultProps: (
   ~jsData: option<'jsData>,
@@ -32,7 +31,7 @@ let safeParseAndLiftToCommonResultProps: (
   | (None, None) => None
   }
 
-  switch Belt.Option.mapU(jsData, safeParse) {
+  switch Belt.Option.map(jsData, safeParse(_)) {
   | Some(Error(parseError)) =>
     // Be careful we do not overwrite an existing error with a ParseError
     existingError->Belt.Option.isSome

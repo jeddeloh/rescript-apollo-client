@@ -788,7 +788,7 @@ let make: (
       (),
     )
     ->Js.toOption
-    ->Belt.Option.mapU(safeParse)
+    ->Belt.Option.map(safeParse(_))
   }
 
   let readQuery = (
@@ -822,7 +822,7 @@ let make: (
       ~optimistic,
     )
     ->Js.toOption
-    ->Belt.Option.mapU(safeParse)
+    ->Belt.Option.map(safeParse(_))
   }
 
   let resetStore: unit => Js.Promise.t<
@@ -1026,7 +1026,7 @@ let make: (
         ->Js.Nullable.fromOption,
     )
     ->Js.toOption
-    ->Belt.Option.mapU(safeParse)
+    ->Belt.Option.map(safeParse(_))
   }
 
   let updateFragment = (
@@ -1063,7 +1063,7 @@ let make: (
         ->Js.Nullable.fromOption,
     )
     ->Js.toOption
-    ->Belt.Option.mapU(safeParse)
+    ->Belt.Option.map(safeParse(_))
   }
 
   preserveJsPropsAndContext(

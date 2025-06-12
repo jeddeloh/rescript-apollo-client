@@ -4,7 +4,7 @@ const baseUrl =
 module.exports = {
   title: "ReScript Apollo Client",
   tagline: "Rescript bindings for the Apollo Client ecosystem",
-  url: "https://jeddeloh.github.io/rescript-apollo-client",
+  url: "https://jeddeloh.github.io",
   baseUrl,
   onBrokenLinks: "throw",
   favicon: "img/favicon.ico",

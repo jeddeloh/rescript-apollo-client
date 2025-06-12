@@ -20,13 +20,13 @@
     "webpack-dev-server": "^4.11.1"
   },
   "dependencies": {
-    "@apollo/client": "3.7.6",
+    "@apollo/client": "^3.13.8",
     "@rescript/react": "~0.11.0",
     "@ryyppy/rescript-promise": "2.1.0",
     "graphql": "^15.7.2",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "rescript-apollo-client": "*",
-    "subscriptions-transport-ws": "0.11.0"
+    "graphql-ws": "^5.5.5"
   }
 }

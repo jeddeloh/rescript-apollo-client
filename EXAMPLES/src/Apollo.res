@@ -16,15 +16,11 @@ let _retryLink = ApolloClient.Link.RetryLink.make(
 
 let wsLink = {
   open ApolloClient.Link.WebSocketLink
-  make(
-    ~uri="ws://" ++ graphqlEndpoint,
-    ~options=ClientOptions.make(
-      ~connectionParams=ConnectionParams(Obj.magic({"headers": headers})),
-      ~reconnect=true,
-      (),
-    ),
-    (),
-  )
+  make({
+    url: "ws://" ++ graphqlEndpoint,
+    connectionParams: ConnectionParams(Obj.magic({"headers": headers})),
+    shouldRetry: true,
+  })
 }
 
 let terminatingLink = ApolloClient.Link.split(~test=({query}) => {

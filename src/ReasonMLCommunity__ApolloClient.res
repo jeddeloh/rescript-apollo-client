@@ -52,7 +52,7 @@ module Utilities = ApolloClient__Utilities
 module Bindings = {
   module Client = ApolloClient__Client
   module Graphql = ApolloClient__Graphql
-  module SubscriptionTransportWs = ApolloClient__SubscriptionsTransportWs
+  module GraphqlWs = ApolloClient__GraphqlWs
   module ZenObservable = ApolloClient__ZenObservable
 }
 
@@ -76,7 +76,7 @@ module Types = {
   module ApolloLink = ApolloClient__Link_Core_ApolloLink
   module ApolloCache = ApolloClient__Cache_Core_Cache.ApolloCache
   module BaseSubscriptionOptions = ApolloClient__React_Types.BaseSubscriptionOptions
-  module ConnectionParamsOptions = ApolloClient__SubscriptionsTransportWs.ConnectionParamsOptions
+  module ConnectionParamsOptions = ApolloClient__GraphqlWs.ConnectionParamsOptions
   module DataProxy = ApolloClient__Cache_Core_Types.DataProxy
   module ErrorPolicy = ApolloClient__Core_WatchQueryOptions.ErrorPolicy
   module ErrorResponse = ApolloClient__Link_Error.ErrorResponse

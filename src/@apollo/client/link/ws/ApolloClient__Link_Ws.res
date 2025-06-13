@@ -2,59 +2,17 @@ module ApolloLink = ApolloClient__Link_Core_ApolloLink
 module Graphql = ApolloClient__Graphql
 
 module WebSocketLink = {
-  module ClientOptions = ApolloClient__SubscriptionsTransportWs.ClientOptions
-  module SubscriptionClient = ApolloClient__SubscriptionsTransportWs.SubscriptionClient
-
-  module Configuration = {
-    module Js_ = {
-      // export declare namespace WebSocketLink {
-      //     interface Configuration {
-      //         uri: string;
-      //         options?: ClientOptions;
-      //         webSocketImpl?: any;
-      //     }
-      // }
-      type any
-      type t = {
-        uri: string,
-        options: option<ClientOptions.Js_.t>,
-        webSocketImpl: option<any>,
-      }
-    }
-
-    type t = Js_.t
-  }
+  module ClientOptions = ApolloClient__GraphqlWs.ClientOptions
+  module Client = ApolloClient__GraphqlWs.Client
 
   module Js_ = {
-    // export declare class WebSocketLink extends ApolloLink {
-    //     private subscriptionClient;
-    //     constructor(paramsOrClient: WebSocketLink.Configuration | SubscriptionClient);
-    //     request(operation: Operation): Observable<FetchResult> | null;
+    // export class GraphQLWsLink extends ApolloLink {
+    //     constructor(public readonly client: Client);
+    //     request(operation: Operation): Observable<FetchResult>;
     // }
-    @module("@apollo/client/link/ws") @new
-    external make: @unwrap
-    [
-      | #Configuration(Configuration.Js_.t)
-      | #SubscriptionClient(SubscriptionClient.t)
-    ] => ApolloLink.Js_.t = "WebSocketLink"
+    @module("@apollo/client/link/subscriptions") @new
+    external make: Client.t => ApolloLink.Js_.t = "GraphQLWsLink"
   }
 
-  type webSocketImpl = Configuration.Js_.any
-
-  let make: (
-    ~uri: string,
-    ~options: ClientOptions.t=?,
-    ~webSocketImpl: webSocketImpl=?,
-    unit,
-  ) => ApolloLink.t = (~uri, ~options=?, ~webSocketImpl=?, ()) =>
-    Js_.make(
-      #Configuration({
-        uri,
-        options: options->Belt.Option.mapU(ClientOptions.toJs),
-        webSocketImpl,
-      }),
-    )
-
-  let makeWithSubscriptionClient: SubscriptionClient.t => ApolloLink.t = subscriptionClient =>
-    Js_.make(#SubscriptionClient(subscriptionClient))
+  let make: ClientOptions.t => ApolloLink.t = options => Js_.make(Client.createClient(options))
 }

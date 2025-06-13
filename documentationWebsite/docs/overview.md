@@ -101,7 +101,7 @@ Contains partial bindings to the following packages:
 
 - [@apollo/client](https://github.com/apollographql/apollo-client)
 - [graphql](https://github.com/graphql/graphql-js)
-- [subscriptions-transport-ws](https://github.com/apollographql/subscriptions-transport-ws)
+- [graphql-ws](https://github.com/enisdenjo/graphql-ws)
 - [zen-observable](https://github.com/zenparsing/zen-observable)
 
 ## Alternatives

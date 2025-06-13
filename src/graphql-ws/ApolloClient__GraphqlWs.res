@@ -428,17 +428,6 @@ module ClientOptions = {
     retryWait: ?t.retryWait,
     shouldRetry: ?t.shouldRetry,
     on: ?t.on,
-    // on: t.on->Belt.Option.map(listeners =>
-    //   listeners->Belt.Array.reduce(({"s": "test"}: Js_.onEventHandlers), (res, on) =>
-    //     switch on {
-    //     | Connecting(listener) => {
-    //         res["connecting"] = listener
-    //         res
-    //       }
-    //     | _ => res
-    //     }
-    //   )
-    // ),
     webSocketImpl: ?t.webSocketImpl,
     generateID: ?t.generateID,
     // TODO
